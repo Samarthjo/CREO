@@ -1,16 +1,15 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { Logo } from "../product/logo";
-import { NAV_LINKS } from "./nav-links";
-import { Cloud } from "../scene/cloud";
-import { Landscape } from "../scene/landscape";
-import { GlassTiles, tileSpots } from "../scene/tiles";
-import { Accent, Button, Eyebrow } from "../ui/kit";
+import { Logo } from "../../product/logo";
+import { Cloud } from "../../scene/cloud";
+import { Landscape } from "../../scene/landscape";
+import { GlassTiles, tileSpots } from "../../scene/tiles";
+import { Accent, Button, Eyebrow } from "../../ui/kit";
 
 const TILES = tileSpots(21, [{ x: 7, y: 64, n: 3, spread: 8 }, { x: 93, y: 58, n: 3, spread: 7 }, { x: 50, y: 84, n: 2, spread: 10 }]);
 
 /** Section 12: the closing CTA, on the night scene, in a frosted panel. */
-export function FinalCta() {
+export function ClassicFinalCta() {
   return (
     <section className="night relative bg-bg">
       <Landscape time="night" fadeTop={false} className="h-[44rem] sm:h-[48rem] lg:h-[54rem]">
@@ -29,16 +28,20 @@ export function FinalCta() {
   );
 }
 
-export function Footer() {
+export function ClassicFooter() {
   return (
     <footer className="relative -mt-8 rounded-t-[2rem] bg-lime-400 text-[#11140c]">
       <div className="mx-auto flex w-full max-w-[76rem] flex-wrap items-center justify-between gap-6 px-5 pb-10 pt-12 sm:px-6">
         <Logo inverse />
         <nav aria-label="Footer" className="flex flex-wrap gap-x-7 gap-y-2 text-sm font-medium">
           <Link href="/app" className="hover:underline">Workspace</Link>
-          {NAV_LINKS.map((l) => <Link key={l.href} href={l.href} className="hover:underline">{l.label}</Link>)}
+          <a href="#trend" className="hover:underline">Trend</a>
+          <a href="#studio" className="hover:underline">Studio</a>
+          <a href="#collab" className="hover:underline">Collab Inbox</a>
+          <a href="#cohort" className="hover:underline">Cohort</a>
+          <a href="#faq" className="hover:underline">FAQ</a>
         </nav>
-        <p className="w-full text-xs text-[#11140c]/70">Sample data. Works from what you add. Instagram Reels only. No testimonials yet.</p>
+        <p className="w-full text-xs text-[#11140c]/70">The creator, brands and numbers shown on this page are made-up samples running on the real CREO engine. No testimonials yet.</p>
       </div>
     </footer>
   );
