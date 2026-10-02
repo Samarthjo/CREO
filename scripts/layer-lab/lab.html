@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CREO scene lab</title>
+<link rel="stylesheet" href="/node_modules/@fontsource-variable/instrument-sans/index.css">
+<link rel="stylesheet" href="/node_modules/@fontsource-variable/geist-mono/index.css">
+<style>
+  html, body { margin: 0; background: #07080b; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script type="module">
+  // Query: variant=wide|tall tier=t2|t3 t=<sec> sweep=<0..1> progress=<0..1> beat=<n> dpr=<n> scale=<n>
+  // live=1 skips the still options, so frame() runs the automatic sweep and the easing like the real loop
+  const q = new URLSearchParams(location.search);
+  const variant = q.get("variant") === "tall" ? "tall" : "wide";
+  const tier = q.get("tier") === "t2" ? "t2" : "t3";
+  const k = parseFloat(q.get("scale") ?? "1");
+  const W = Math.round((variant === "wide" ? 1600 : 900) * k);
+  const H = Math.round((variant === "wide" ? 1000 : 1200) * k);
+  const dpr = parseFloat(q.get("dpr") ?? "1");
+  // Values printed by getLayerSample() on the real engine (Arjun Kulkarni, Pune).
+  const sample = {
+    creator: "Arjun Kulkarni",
+    followers: "27.4K",
+    audienceLine: "22 to 34 · Pune",
+    patternTitle: "I replaced X with AI for 7 days",
+    proofLift: "1.8x",
+    proofBasis: "2 posts",
+    durationSec: "21s",
+    brand: "Tessera",
+    offer: "₹12,000",
+    quoteShort: "₹17.5K–24K",
+    quoteLong: "₹17,500 to ₹24,000",
+    walkAway: "₹15,500",
+  };
+  window.__anchors = null;
+  const canvas = document.getElementById("c");
+  canvas.style.width = W + "px";
+  canvas.style.height = H + "px";
+  await import("./dist/lab.js");
+  const { createLayerScene, layerBus } = window.__lab;
+  layerBus.beat = parseInt(q.get("beat") ?? "-1", 10);
+  layerBus.progress = parseFloat(q.get("progress") ?? "0");
+  const still = q.has("live") ? undefined : {
+    timeSec: parseFloat(q.get("t") ?? "0"),
+    progress: parseFloat(q.get("progress") ?? "0"),
+    sweep: q.has("sweep") ? parseFloat(q.get("sweep")) : undefined,
+  };
+  const scene = await createLayerScene({ canvas, variant, tier, sample, still, onAnchors: (a) => { window.__anchors = a; window.__anchorCalls = (window.__anchorCalls ?? 0) + 1; } });
+  window.__scene = scene;
+  scene.resize(W, H, dpr);
+  await scene.warm();
+  const t0 = performance.now();
+  scene.frame(0);
+  window.__firstFrameMs = performance.now() - t0;
+  window.__ready = true;
+</script>
+</body>
+</html>

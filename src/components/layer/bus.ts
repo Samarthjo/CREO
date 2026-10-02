@@ -11,6 +11,6 @@ export const layerBus = {
   progress: 0,
   /** -1 while the hero is in view, then 0 to 4 for the five beats. Written by the story. */
   beat: -1,
-  /** Pointer position inside the stage, -1..1 on both axes, or null when there is no pointer (touch, idle). */
+  /** Pointer position inside the stage, -1..1 on both axes (x to the right, y downwards, like the page), or null when there is no pointer (touch, idle). The object is mutated in place. */
   pointer: null as { x: number; y: number } | null,
 };

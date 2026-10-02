@@ -1,21 +1,27 @@
-import { Cta } from "@/components/landing/cta";
-import { Footer } from "@/components/landing/footer";
-import { Hero } from "@/components/landing/hero";
-import { Nav } from "@/components/landing/nav";
-import { Rail } from "@/components/landing/rail";
+import type { Viewport } from "next";
+import { Cta } from "@/components/layer/cta";
+import { Footer } from "@/components/layer/footer";
+import { Hero } from "@/components/layer/hero";
+import { Nav } from "@/components/layer/nav";
+import { LayerRoot } from "@/components/layer/root";
+import { ScrollBus } from "@/components/layer/scroll-bus";
+import { Story } from "@/components/layer/story";
 
-// Short first page: one hero, one five-caption rail, one call to action.
-// The long sections (DNA, Trend, Studio, loop, Collab, HQ, FAQ) are unused on this page and remain in git history and /app.
+export const viewport: Viewport = { themeColor: "#07080B", colorScheme: "dark" };
+
+// One fixed stage behind everything: hero, five-beat story, one call to action.
+// The long sections under components/landing stay in the repo and are no longer used on this page.
 export default function Home() {
   return (
-    <>
+    <LayerRoot>
+      <ScrollBus />
       <Nav />
-      <main>
+      <main className="relative z-10">
         <Hero />
-        <Rail />
+        <Story />
         <Cta />
       </main>
       <Footer />
-    </>
+    </LayerRoot>
   );
 }

@@ -27,7 +27,11 @@ export interface LayerSceneOptions {
   sample: SceneSample;
   /** Called after a frame in which an anchor moved, with percentages of the stage (0..100). */
   onAnchors: (a: AnchorMap) => void;
-  /** Poster and test renders: deterministic time, preserved drawing buffer, no pointer. */
+  /**
+   * Poster and test renders: deterministic, preserved drawing buffer, no pointer, drawn once. `progress` is the bus value
+   * (default 0). `sweep` (0..1) puts the light bar at that fraction of the glass's width; leave it out for no bar. The
+   * scene has no other time-dependent state, so `timeSec` does not change the picture; it is kept for the contract.
+   */
   still?: { timeSec: number; progress?: number; sweep?: number };
 }
 

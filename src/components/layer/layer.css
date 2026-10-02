@@ -1,0 +1,339 @@
+/*
+  The Layer landing page. Everything is scoped under .layer so /app keeps its own theme.
+  The existing semantic token names are overridden here, so the kit components work on the dark ground unchanged.
+  Contrast: text 17.6:1, muted 7.2:1, accent 16.95:1, on-accent 16.5:1 (docs/creo-design-direction.md, section 10).
+*/
+html:has(.layer) {
+  background: #07080b;
+  color-scheme: dark;
+}
+
+.layer {
+  color-scheme: dark;
+  --bg: #07080b;
+  --surface: #0d0f14;
+  --raised: #12151b;
+  --sunk: #0a0b0f;
+  --line: #2a2d35;
+  --line-strong: #5b606b;
+  --ink: #f3f0e8;
+  --text: #f3f0e8;
+  --muted: #9a9c95;
+  --faint: #8a8e97;
+  --cta: #c6ff3d;
+  --on-cta: #0b0d08;
+  --accent: #c6ff3d;
+  --mark: #c6ff3d;
+  --on-mark: #0b0d08;
+  --mark-wash: rgb(198 255 61 / 0.28);
+  --eyebrow-bg: rgb(198 255 61 / 0.12);
+  --eyebrow-fg: #c6ff3d;
+  --soft: rgb(198 255 61 / 0.07);
+  --risk: #ff8b78;
+  --risk-wash: rgb(255 139 120 / 0.14);
+  --ok: #7fdc95;
+  --ok-wash: rgb(127 220 149 / 0.13);
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 48px -28px rgb(0 0 0 / 0.8);
+  --font-layer-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
+
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.layer :focus-visible {
+  outline-color: var(--accent);
+}
+
+/* ---- Stage: one fixed box behind the page; poster, canvas and chips share the aspect box inside it ---- */
+
+.layer-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
+  z-index: 0;
+  overflow: clip;
+  container-type: size;
+  background: var(--bg);
+  pointer-events: none;
+  --a: var(--a-w);
+}
+
+/* Cover-scaled and centred with no layout shift: the box is as large as the viewport needs, whichever side is tighter. */
+.layer-box {
+  --w: max(100cqw, calc(100cqh * var(--a)));
+  --h: calc(var(--w) / var(--a));
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  left: calc((100cqw - var(--w)) / 2);
+  top: calc((100cqh - var(--h)) / 2);
+}
+
+.layer-poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.layer-poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: relative;
+  color: transparent;
+}
+
+/* Only a broken image renders pseudo-elements, so a missing poster shows the ground instead of the browser's broken-image mark. */
+.layer-poster img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+}
+
+.layer-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 72% 60% at 50% 38%, transparent 38%, rgb(7 8 11 / 0.5) 100%),
+    radial-gradient(ellipse 70% 52% at 14% 96%, rgb(7 8 11 / 0.82), transparent 72%),
+    linear-gradient(to top, rgb(7 8 11 / 0.9) 0, rgb(7 8 11 / 0.5) 22%, transparent 48%);
+}
+
+/* The story begins: the stage dims so text on the beats keeps its contrast. */
+.layer-scrim-story {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgb(7 8 11 / 0.55);
+  opacity: min(1, calc(var(--hp, 0) * 1.2));
+}
+
+.layer-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Hero copy, chips and the sample label fade and rise as the page scrolls (--hp is written by ScrollBus). */
+.layer-fade {
+  opacity: max(0, calc(1 - var(--hp, 0) * var(--k, 1.3)));
+  transform: translate3d(0, calc(var(--hp, 0) * -3rem), 0);
+}
+
+/* ---- Chips ---- */
+
+.layer-chips {
+  --k: 2.2; /* the chips clear before the headline scrolls through them */
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layer-chip {
+  --ax: var(--ax-w);
+  --ay: var(--ay-w);
+  --lead: 1.75rem;
+  position: absolute;
+  left: calc(var(--ax) * 1%);
+  top: calc(var(--ay) * 1%);
+  width: 0;
+  height: 0;
+  animation: layer-chip-in 800ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both;
+  animation-delay: calc(600ms + var(--i, 0) * 110ms);
+}
+
+.layer-chip-tag {
+  position: absolute;
+  left: 0;
+  bottom: var(--lead);
+  transform: translateX(-50%);
+  padding: 0.3125rem 0.625rem;
+  border: 1px solid rgb(198 255 61 / 0.6);
+  border-radius: 999px;
+  background: rgb(7 8 11 / 0.62);
+  color: var(--ink);
+  font-family: var(--font-layer-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* The leader: a short vertical hairline from the chip down to the tile point, ending in a small dot. */
+.layer-chip::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: var(--lead);
+  background: linear-gradient(to bottom, rgb(198 255 61 / 0.6), rgb(198 255 61 / 0.2));
+}
+
+/* On the tall stage the PERFORMANCE and DEALS points are close, so their tags lean away from each other. */
+@media (max-width: 899.98px), (orientation: portrait) {
+  .layer-chip[data-anchor="perf"] .layer-chip-tag {
+    transform: translateX(-78%);
+  }
+
+  .layer-chip[data-anchor="deals"] .layer-chip-tag {
+    transform: translateX(-22%);
+  }
+}
+
+/* On the wide stage the PERFORMANCE chip would sit on the etched wordmark, so its tag hangs below the point. */
+@media (min-width: 900px) and (orientation: landscape) {
+  .layer-chip[data-anchor="perf"] {
+    --lead: 1.25rem;
+  }
+
+  .layer-chip[data-anchor="perf"] .layer-chip-tag {
+    top: var(--lead);
+    bottom: auto;
+  }
+
+  .layer-chip[data-anchor="perf"]::before {
+    top: 0;
+    bottom: auto;
+    background: linear-gradient(to top, rgb(198 255 61 / 0.6), rgb(198 255 61 / 0.2));
+  }
+}
+
+.layer-chip::after {
+  content: "";
+  position: absolute;
+  left: -2.5px;
+  top: -2.5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.layer-sample {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.25rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-family: var(--font-layer-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.layer-sample::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* Tier t1 (poster only): one light sweep across the stage. */
+.layer-sweep {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+
+html[data-layer-tier="t1"] .layer-sweep {
+  display: block;
+}
+
+.layer-sweep::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: 0;
+  width: 30%;
+  background: linear-gradient(100deg, transparent 10%, rgb(198 255 61 / 0.06) 40%, rgb(243 240 232 / 0.16) 50%, transparent 85%);
+  transform: translate3d(-250%, 0, 0) skewX(-18deg);
+  animation: layer-sweep 3000ms 500ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) 1 both;
+}
+
+@keyframes layer-chip-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.5rem, 0);
+  }
+}
+
+@keyframes layer-sweep {
+  to {
+    transform: translate3d(900%, 0, 0) skewX(-18deg);
+  }
+}
+
+@media (max-width: 899.98px), (orientation: portrait) {
+  .layer-stage {
+    --a: var(--a-t);
+  }
+  .layer-chip {
+    --ax: var(--ax-t);
+    --ay: var(--ay-t);
+  }
+  .layer-sample {
+    right: 1rem;
+    bottom: 1rem;
+  }
+}
+
+/* ---- Page blocks ---- */
+
+.layer-h1 {
+  font-size: clamp(2.75rem, 6.1vw, 5.75rem);
+  font-weight: 400;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  max-width: 10.5em;
+}
+
+.layer-cta::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 10rem;
+  background: linear-gradient(to bottom, transparent, var(--bg));
+  pointer-events: none;
+}
+
+.layer-cta {
+  background:
+    radial-gradient(ellipse 55% 60% at 82% 48%, rgb(198 255 61 / 0.12), transparent 70%),
+    radial-gradient(ellipse 40% 45% at 6% 100%, rgb(198 255 61 / 0.06), transparent 70%),
+    var(--bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer-chip {
+    animation: none;
+  }
+  .layer-sweep {
+    display: none !important;
+  }
+  .layer-fade {
+    transform: none;
+  }
+}

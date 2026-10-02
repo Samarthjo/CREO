@@ -8,6 +8,9 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "check:copy": "node scripts/check-copy.mjs http://localhost:3600",
+    "dev:layer": "next dev -p 3600",
+    "poster": "node scripts/poster.mjs",
     "test": "node --no-warnings --test \"tests/**/*.test.ts\""
   },
   "dependencies": {
