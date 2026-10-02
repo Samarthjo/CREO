@@ -229,10 +229,10 @@ function cardBase(g: Ctx, w: number, h: number) {
   blob(g, w * 0.9, h * 0.1, w * 0.6, "198,255,61", 0.06);
 }
 
-function label(g: Ctx, text: string, x: number, y: number, color = "#8c909a") {
+function label(g: Ctx, text: string, x: number, y: number, color = "#8c909a", size = 12) {
   g.fillStyle = color;
-  g.font = `500 12px ${MONO}`;
-  track(g, text.toUpperCase(), x, y, 1.2);
+  g.font = `500 ${size}px ${MONO}`;
+  track(g, text.toUpperCase(), x, y, size * 0.1);
 }
 
 export function audienceTexture(s: SceneSample) {
@@ -251,11 +251,11 @@ export function audienceTexture(s: SceneSample) {
       }
     }
     g.fillStyle = "#f3f0e8";
-    g.font = `500 30px ${SANS}`;
-    g.fillText(s.followers, 22, 232);
-    g.fillStyle = "#9a9c95";
-    g.font = `400 15px ${SANS}`;
-    g.fillText(s.audienceLine, 22, 258);
+    g.font = `500 40px ${SANS}`;
+    g.fillText(s.followers, 22, 238);
+    g.fillStyle = "#b4b6ae";
+    g.font = `400 18px ${SANS}`;
+    g.fillText(s.audienceLine, 22, 264);
     glassSheen(g, w, h);
   }, 480);
 }
@@ -324,8 +324,8 @@ export function dealTexture(s: SceneSample) {
     rr(g, 38, 148, w - 200, 8, 4);
     g.fill();
     g.fillStyle = LIME;
-    g.font = `600 17px ${MONO}`;
-    track(g, `OFFER  ${s.offer}`, 22, 222, 0.6);
+    g.font = `600 21px ${MONO}`;
+    track(g, `OFFER  ${s.offer}`, 22, 226, 0.6);
     glassSheen(g, w, h);
   }, 480);
 }
@@ -334,14 +334,14 @@ export function statTexture(big: string, caption: string, accent: boolean) {
   return tex(720, 432, (g, w, h) => {
     cardBase(g, w, h);
     g.fillStyle = accent ? LIME : "#f3f0e8";
-    g.font = `500 ${big.length > 6 ? 62 : 86}px ${SANS}`;
-    g.fillText(big, 20, 128);
-    label(g, caption, 22, 176, accent ? "#b9c98a" : "#8c909a");
-    g.strokeStyle = "rgba(255,255,255,.08)";
+    g.font = `500 ${big.length > 6 ? 70 : 104}px ${SANS}`;
+    g.fillText(big, 20, 140);
+    label(g, caption, 22, 196, accent ? "#d3e6a0" : "#b4b6ae", 17);
+    g.strokeStyle = "rgba(255,255,255,.1)";
     g.lineWidth = 1.5;
     g.beginPath();
-    g.moveTo(22, 196);
-    g.lineTo(w - 22, 196);
+    g.moveTo(22, 220);
+    g.lineTo(w - 22, 220);
     g.stroke();
     glassSheen(g, w, h);
   }, 480);
@@ -488,7 +488,7 @@ export function etchMaps(spec: EtchSpec) {
   // roughness: a clear pane (dark), with the network, the square and the letters frosted (light) and the C left polished
   const r = rg.g;
   const k2 = 0.5;
-  r.fillStyle = "rgb(32,32,32)";
+  r.fillStyle = "rgb(12,12,12)";
   r.fillRect(0, 0, rg.c.width, rg.c.height);
   r.globalCompositeOperation = "lighter";
   r.lineCap = "round";
@@ -503,7 +503,7 @@ export function etchMaps(spec: EtchSpec) {
     r.stroke();
   }
   r.globalCompositeOperation = "source-over";
-  logo(r, k2, "rgb(200,200,200)", "rgb(200,200,200)", "rgb(32,32,32)", "rgb(32,32,32)");
+  logo(r, k2, "rgb(200,200,200)", "rgb(200,200,200)", "rgb(12,12,12)", "rgb(12,12,12)");
   letters(r, k2, "rgb(200,200,200)", null);
 
   return { overlay: finish(ov.c, false), rough: finish(rg.c, false) };

@@ -17,6 +17,8 @@ export interface NetNode {
   /** Diameter, in percent of the network's width. */
   d: number;
   best: boolean;
+  /** Fewer than two posts behind it: drawn dashed and dimmer, so one post is not shown as confidently as two. */
+  thin: boolean;
   /** Reveal order, 0 to 1. */
   s: number;
 }
@@ -43,17 +45,20 @@ export interface StudioData {
   /** Script beats as seconds, so the timeline is drawn to scale. */
   segments: { id: string; sec: number }[];
   shots: string[];
-  shotsText: string;
-  tags: string;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
-const clip = (s: string, n: number) => {
-  const w = s.trim().split(/\s+/);
+/** The opening line for the phone frame: the first clause if it fits in n words, else the first n words with an ellipsis. */
+const hookLine = (s: string, n: number) => {
+  const words = (t: string) => t.trim().split(/\s+/);
+  const clause = s.split(/(?<=[.?!,])\s/)[0]!.replace(/[.,]$/, "");
+  if (words(clause).length <= n) return clause;
+  const w = words(s);
   return w.length > n ? `${w.slice(0, n).join(" ")}…` : s;
 };
 const plural = (n: number) => `${n} ${n === 1 ? "post" : "posts"}`;
-const hyphen = (s: string) => s.replace(/ first$/, "-first");
+/** The page says "Result-first" everywhere. The engine calls the same hook "Proof first" in the DNA and "Result first" in Studio. */
+const hyphen = (s: string) => s.replace(/^(Proof|Result) first$/, "Result-first");
 const angleDiff = (a: number, b: number) => Math.abs(((a - b + 540) % 360) - 180);
 
 function buildNetwork(): Network {
@@ -91,14 +96,14 @@ function buildNetwork(): Network {
     if (c < cost) [cost, offset] = [c, o];
   }
 
-  const nodes: NetNode[] = [{ id: "creator", kind: "creator", text: `${ws.dna.name}'s Creator DNA`, basis: plural(ws.dna.posts.length), x: cx, y: cy, d: 8.5, best: false, s: 0 }];
+  const nodes: NetNode[] = [{ id: "creator", kind: "creator", text: `${ws.dna.name}'s Creator DNA`, basis: plural(ws.dna.posts.length), x: cx, y: cy, d: 8.5, best: false, thin: false, s: 0 }];
   formats.forEach((f, i) => {
     const pos = at(17, 11, fDeg.get(f.key)!);
-    nodes.push({ id: f.key, kind: "format", text: `${f.label} ${f.lift.toFixed(1)}x`, basis: plural(f.posts), ...pos, d: round2(3.4 + f.lift * 1.1), best: false, s: round2(0.12 + i * 0.05) });
+    nodes.push({ id: f.key, kind: "format", text: `${f.label} format ${f.lift.toFixed(1)}x`, basis: plural(f.posts), ...pos, d: round2(3.4 + f.lift * 1.1), best: false, thin: f.posts < 2, s: round2(0.12 + i * 0.05) });
   });
   order.forEach((h, i) => {
     const pos = at(41, 25, offset + i * step);
-    nodes.push({ id: h.key, kind: "hook", text: `${hyphen(h.label)} hooks ${h.lift.toFixed(1)}x`, basis: plural(h.posts), ...pos, d: round2(2.6 + h.lift * 1.3), best: h.key === best, s: round2(0.3 + i * 0.06) });
+    nodes.push({ id: h.key, kind: "hook", text: `${hyphen(h.label)} hooks ${h.lift.toFixed(1)}x`, basis: plural(h.posts), ...pos, d: round2(2.6 + h.lift * 1.3), best: h.key === best, thin: h.posts < 2, s: round2(0.3 + i * 0.06) });
   });
 
   const byId = new Map(nodes.map((n) => [n.id, n] as const));
@@ -122,17 +127,14 @@ function buildNetwork(): Network {
 
 function buildStudio(trendId: string): StudioData {
   const pkg = demoPackage({ topic: "competitor research", proof: "", lengthSec: 30, language: "English", trendId });
-  const tags = (pkg.caption.match(/#\w+/g) ?? []).slice(0, 2).join(" ");
   return {
-    hooks: pkg.hooks.map((h) => ({ id: h.id, style: h.style, short: clip(h.text, 7) })),
+    hooks: pkg.hooks.map((h) => ({ id: h.id, style: hyphen(h.style), short: hookLine(h.text, 7) })),
     chosen: pkg.chosenHook,
     segments: pkg.script.map((b) => {
       const [from, to] = b.at.replace("s", "").split("-").map(Number);
       return { id: b.id, sec: Math.max(1, (to ?? 0) - (from ?? 0)) };
     }),
     shots: pkg.shots.map((s) => s.kind),
-    shotsText: `${pkg.shots.length} shots`,
-    tags,
   };
 }
 
@@ -182,7 +184,7 @@ function build() {
       walk: pos(q.walkAwayInr),
       from: pos(q.lowInr),
       to: pos(q.highInr),
-      label: `Offer ${sample.offer}, below the walk-away price of ${sample.walkAway}. CREO's quote is ${sample.quoteLong}.`,
+      label: `Their offer is ${sample.offer}, below the walk-away price of ${sample.walkAway}. CREO's quote is ${sample.quoteLong}.`,
     },
     learns: {
       bars,

@@ -18,8 +18,15 @@ const s = (n: number) => ({ "--s": n }) as CSSProperties;
 
 /** One beat: a glass card over the fixed stage. The card is the only place sample text lives, and it carries one "Sample data" label. */
 function Beat({ i, head, bare, children }: { i: number; head?: ReactNode; bare?: boolean; children: ReactNode }) {
+  const r = RAIL[i]!;
   return (
     <section id={`beat-${i}`} className="beat" data-beat={i} data-active={String(i === 0)} data-pos={i === 0 ? "now" : "next"} aria-labelledby={`rail-${i}`}>
+      {/* The rail's own label and caption, shown above the card where the rail is not (stacked layout, reduced motion).
+          Hidden from assistive tech: the section is already named by the rail heading it points at. */}
+      <p className="beat-cap" data-copy="marketing" aria-hidden="true">
+        <span className="beat-cap-n">{r.label}</span>
+        <span className="beat-cap-t">{r.caption}</span>
+      </p>
       <div className="beat-card" data-copy="sample">
         {!bare && (
           <header className="beat-head">
@@ -72,8 +79,7 @@ export function Story() {
                 </p>
                 <div className="sees-row">
                   <div className="sees-fit">
-                    <FitScore score={sees.fit} size={76} />
-                    <Chip tone="outline" className="capitalize">{sees.status}</Chip>
+                    <FitScore score={sees.fit} size={76} label={false} />
                   </div>
                   <div className="sees-tiles" role="img" aria-label={sees.tilesLabel}>
                     {sees.tiles.map((t, k) => (
@@ -92,7 +98,7 @@ export function Story() {
               <StudioCard studio={studio} />
             </Beat>
 
-            <Beat i={3} head={<Chip tone="outline">{deal.brand}</Chip>}>
+            <Beat i={3}>
               <div className="deal">
                 <div className="deal-msg rv" style={s(0)}>
                   <span className="deal-lines" aria-hidden>
@@ -105,7 +111,10 @@ export function Story() {
                   </p>
                 </div>
                 <div className="deal-terms">
-                  <p className="deal-range tnum rv" style={s(0.35)}>{deal.range}</p>
+                  <p className="deal-range tnum rv" style={s(0.35)}>
+                    <span className="deal-k">Your quote</span>
+                    {deal.range}
+                  </p>
                   <p className="deal-walk tnum rv" style={s(0.5)}>{deal.walkAway}</p>
                   {deal.flag && (
                     <Chip tone="risk" className="deal-flag rv">
@@ -128,9 +137,8 @@ export function Story() {
             <Beat i={4}>
               <div className="learn">
                 <div className="learn-add">
-                  <p className="learn-eyebrow">Example</p>
-                  <p className="learn-title">You add a result</p>
-                  <div className="learn-bars" role="img" aria-label="Proof-first posts against your baseline, with one example post added">
+                  <p className="learn-title">You add an example result</p>
+                  <div className="learn-bars" role="img" aria-label="Result-first posts against your usual views, with one example post added">
                     <span className="learn-base" style={{ bottom: `${(1 / learns.max) * 100}%` }} />
                     {learns.bars.map((b, k) => (
                       <span key={k} className="learn-bar rv" style={{ ...s(0.1 + k * 0.1), height: `${(b / learns.max) * 100}%` }} />
@@ -139,13 +147,14 @@ export function Story() {
                   </div>
                 </div>
                 <div className="learn-out">
-                  <p className="learn-eyebrow">Proof-first</p>
+                  <p className="learn-eyebrow">Result-first</p>
                   <p className="learn-lift tnum">
                     <span>{learns.before}</span>
                     <svg viewBox="0 0 24 12" width="24" height="12" aria-hidden>
                       <path d="M1 6h20m-5-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                     <span className="learn-after rv" style={s(0.6)}>{learns.after}</span>
+                    <span className="learn-unit">your usual views</span>
                   </p>
                   <p className="learn-mem rv" style={s(0.8)}>{learns.memory}</p>
                   <DnaNetwork net={network} interactive={false} />
@@ -157,7 +166,7 @@ export function Story() {
       </div>
       <noscript>
         {/* Without script nothing drives the pinned scene, so show the stacked layout at every width. */}
-        <style>{`.story{height:auto!important;padding-bottom:4rem!important}.story-pin{position:static!important;height:auto!important}.story-pin::before{display:none!important}.story-inner{display:flex!important;flex-direction:column!important;height:auto!important;max-width:46rem!important;padding:0 1.25rem!important}.story-rail{padding:1.25rem 1.25rem 1.25rem 2.5rem!important}.story-beats{gap:1.25rem!important}.beat{grid-area:auto!important;opacity:1!important;visibility:visible!important;transform:none!important;min-height:0!important}.beat-card{margin-inline:auto!important}.story-rail li{opacity:1!important}#story-end{position:static!important}`}</style>
+        <style>{`.story{height:auto!important;padding-bottom:4rem!important}.story-pin{position:static!important;height:auto!important}.story-inner{display:flex!important;flex-direction:column!important;height:auto!important;max-width:46rem!important;padding:0 1.25rem!important}.story-rail{padding:1.25rem 1.25rem 1.25rem 2.5rem!important}.story-beats{gap:1.25rem!important}.beat{grid-area:auto!important;opacity:1!important;visibility:visible!important;transform:none!important;min-height:0!important}.beat-card{margin-inline:auto!important}.story-rail li{opacity:1!important}#story-end{position:static!important}`}</style>
       </noscript>
       <StoryScroll />
       <div id="story-end" aria-hidden />

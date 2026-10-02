@@ -3,14 +3,19 @@
 import { useEffect } from "react";
 import { layerBus } from "../bus";
 
-// The same query as story.css, so the script and the stylesheet always agree on which layout is showing.
-const PINNED = "(min-width: 1024px) and (prefers-reduced-motion: no-preference)";
+// The same query as story.css, so the script and the stylesheet always agree on which layout is showing. The height is in
+// rem so that a larger text setting, which makes the cards taller, switches to the stacked layout sooner (see story.css).
+const PINNED = "(min-width: 1024px) and (min-height: 36rem) and (prefers-reduced-motion: no-preference)";
 const REDUCED = "(prefers-reduced-motion: reduce)";
 const BEATS = 5;
 /** Beat 1 starts this many screens before the section pins, so its card is already rising into view. */
 const LEAD = 0.5;
-/** Where in a beat a rail click lands: past the point where its object has finished drawing. */
-const LAND = 0.72;
+/** A beat draws over the first DRAW of its slot, then holds fully drawn for the rest. */
+const DRAW = 0.65;
+/** A beat is never empty when it arrives: its progress starts here rather than at 0. */
+const HEAD = 0.12;
+/** Where in a beat a rail click lands: past the point where its object has finished drawing (above DRAW). */
+const LAND = 0.78;
 
 const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 const round = (n: number) => Math.round(n * 500) / 500;
@@ -62,7 +67,7 @@ export function StoryScroll() {
         const raw = (scrollY - start) / Math.max(1, len);
         nextQ = clamp01(raw);
         next = raw < 0 ? -1 : Math.min(BEATS - 1, Math.floor(raw * BEATS));
-        beats.forEach((_, i) => (bs[i] = clamp01(nextQ * BEATS - i)));
+        beats.forEach((_, i) => (bs[i] = clamp01((nextQ * BEATS - i) / DRAW + HEAD)));
       } else {
         // Stacked: the beat nearest the middle of the screen is the active one; each beat fills in as it rises into view.
         next = -1;
@@ -119,6 +124,35 @@ export function StoryScroll() {
         y = r.top + scrollY - Math.max(0, (vh - r.height) / 2);
       }
       scrollTo({ top: y, behavior: reducedMq.matches ? "auto" : "smooth" });
+      // Keyboard activation (Enter gives detail 0): once the beat is showing, move focus into it, so the next Tab
+      // reaches that beat's own controls instead of the four remaining rail links.
+      if (e.detail === 0) focusBeatWhenShown(i);
+    };
+
+    const focusBeatWhenShown = (i: number) => {
+      let timer = 0;
+      const land = () => {
+        removeEventListener("scrollend", land);
+        clearTimeout(timer);
+        const el = beats[i];
+        if (!el || active !== i) return;
+        el.tabIndex = -1;
+        el.focus({ preventScroll: true });
+      };
+      addEventListener("scrollend", land, { once: true });
+      timer = window.setTimeout(land, 1400);
+    };
+
+    // Tabbing onto a rail link brings its beat into view, so a keyboard user can read what they land on.
+    const focusRail = (e: FocusEvent) => {
+      const a = (e.target as Element).closest<HTMLAnchorElement>("a[data-go]");
+      if (!a || !pinnedMq.matches) return;
+      const i = Number(a.dataset.go);
+      if (i === active) return;
+      const vh = innerHeight;
+      const start = root.getBoundingClientRect().top + scrollY - LEAD * vh;
+      const len = root.offsetHeight - vh + LEAD * vh;
+      scrollTo({ top: start + ((i + LAND) / BEATS) * len, behavior: "auto" });
     };
 
     update();
@@ -127,12 +161,14 @@ export function StoryScroll() {
     pinnedMq.addEventListener("change", schedule);
     reducedMq.addEventListener("change", schedule);
     root.addEventListener("click", go);
+    root.addEventListener("focusin", focusRail);
     return () => {
       removeEventListener("scroll", schedule);
       removeEventListener("resize", schedule);
       pinnedMq.removeEventListener("change", schedule);
       reducedMq.removeEventListener("change", schedule);
       root.removeEventListener("click", go);
+      root.removeEventListener("focusin", focusRail);
       cancelAnimationFrame(raf);
       layerBus.beat = -1;
     };

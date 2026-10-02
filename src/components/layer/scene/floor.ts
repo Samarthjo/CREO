@@ -17,6 +17,7 @@ export function createFloor(glow: { col: Color; at: Vector4 }) {
       uTaps: { value: 3 },
       uTexel: { value: new Vector2(1, 1) },
       uQuiet: { value: new Vector4(0.04, 0.5, 0.56, 0.94) },
+      uQuietK: { value: 1 },
       uRes: { value: new Vector2(1, 1) },
       uGlassX: { value: 0 },
       uDither: { value: 0 },

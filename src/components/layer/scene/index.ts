@@ -47,7 +47,38 @@ export type { AnchorMap, LayerScene, LayerSceneOptions, SceneSample } from "./ty
 
 const AUTO_DELAY = 0.35; // seconds after the first frame
 const AUTO_SECONDS = 3;
+const PAYOFF_SECONDS = 1.6; // after the scan: the performance tile rises and its pool of light comes up
+const IDLE_FRAME_MS = 33; // idle motion redraws at about 30 fps
+const IDLE_UNTIL = 0.15; // and only while the hero is the page
 const HERO_IDS: Exclude<AnchorId, "mark">[] = ["content", "audience", "trends", "deals", "perf"];
+/** The signal each story beat is about, in beat order: Sees, Knows you, Creates, Monetizes, Learns. The light bar parks on it. */
+const BEAT_FOCUS: Exclude<AnchorId, "mark">[] = ["trends", "audience", "content", "deals", "perf"];
+/** Multisample the composer target at 4x up to this many pixels, then at 2x: a 4K canvas would need a few hundred MB at 4x. */
+const MSAA4_MAX_PX = 4e6;
+/** Share of the canvas the transmission pass may use, by pixels: full-ish on a laptop, less on a big screen. */
+const transmissionScale = (px: number) => clamp(2.4e6 / px, 0.5, 0.85);
+
+/**
+ * three keeps one module-level DFG lookup texture for every physical material and registers a "dispose" listener on it
+ * for each renderer that uploads it. The listener closes over that renderer's whole texture state, so the texture (which
+ * lives as long as the page) keeps every renderer, its WebGL context and its canvas alive after renderer.dispose().
+ * Disposing the shared texture while its material is still known to the renderer removes the listener.
+ */
+function releaseSharedLut(renderer: WebGLRenderer, material: Material) {
+  const uniforms = (renderer.properties.get(material) as { uniforms?: Record<string, { value?: { dispose?: () => void } | null } | undefined> }).uniforms;
+  uniforms?.dfgLUT?.value?.dispose?.();
+}
+
+/**
+ * How far the scene has faded to the ground colour at story progress p: clear through the Monetizes beat and the start of
+ * Learns (which begins at 0.825), gone when the page's loop stops drawing. FADE_END must not be later than the progress at
+ * which loop.ts stops (CTA_PROGRESS, 0.92): the last frame the loop draws stays on screen. When the loop is changed to run
+ * to the end of the story, or to stop on scene.settled(), set FADE_START 0.86 and FADE_END 1 so the whole Learns beat
+ * keeps the glass and the brightening network.
+ */
+const FADE_START = 0.83;
+const FADE_END = 0.92;
+const fadeAt = (p: number) => smooth(FADE_START, FADE_END, p);
 const GLASS_DEPTH = 0.08;
 const BEVEL = 0.085;
 
@@ -62,10 +93,12 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
   const layout = LAYOUTS[variant];
   await loadFonts(sample);
 
-  const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: !!still, stencil: false });
+  // powerPreference stays at the default: "high-performance" wakes the discrete GPU of a dual-GPU laptop for a landing page
+  const renderer = new WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: !!still, stencil: false });
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
-  renderer.transmissionResolutionScale = still ? 1 : 0.5;
+  renderer.transmissionResolutionScale = still ? 1 : 0.85;
+  const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const aniso = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
   const scene = new Scene();
@@ -87,6 +120,8 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
   scene.add(built.root);
   const tiles = built.tiles;
   const heroes = HERO_IDS.map((id) => tiles.find((t) => t.spec.id === id)!);
+  const perf = heroes[HERO_IDS.indexOf("perf")]!;
+  const focusAt = BEAT_FOCUS.map((id) => HERO_IDS.indexOf(id));
 
   // ---- a few dozen motes of light in the air: scale and parallax, nothing animated
   {
@@ -166,7 +201,7 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
       ior: 1.5,
       dispersion: 0.4,
       attenuationColor: new Color(0xf2f6ff),
-      attenuationDistance: 8,
+      attenuationDistance: 20,
       envMap: envTex,
       specularIntensity: 0.6,
       envMapIntensity: 0.45,
@@ -256,7 +291,7 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
     if (composer) return;
     const size = renderer.getSize(new Vector2());
     const dpr = renderer.getPixelRatio();
-    const rt = new WebGLRenderTarget(Math.max(2, size.x * dpr), Math.max(2, size.y * dpr), { type: HalfFloatType, samples: 4 });
+    const rt = new WebGLRenderTarget(Math.max(2, size.x * dpr), Math.max(2, size.y * dpr), { type: HalfFloatType, samples: size.x * size.y * dpr * dpr > MSAA4_MAX_PX ? 2 : 4 });
     composer = new EffectComposer(renderer, rt);
     composer.setPixelRatio(dpr);
     composer.setSize(size.x, size.y);
@@ -284,6 +319,10 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
   let usedPointer = false;
   let lastFade = -1;
   let settled = false;
+  let lastDraw = -1e9;
+  let lastBeat = -9;
+  let pulse = 0;
+  let idleOn = false;
   let lastIn = { p: -1, b: -9, x: NaN };
   const reported: Partial<AnchorMap> = {};
   const v = new Vector3();
@@ -313,15 +352,19 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
     floor.material.uniforms.uRes!.value.set(cssW * dpr, cssH * dpr);
   }
 
+  /** The camera: the hero pose, then the story's opening pose by e (the first screen of scroll), then the end pose by d (the beats). */
   function pose(e: number, d: number, px: number) {
     const a = layout.cam;
     const b = layout.cam1;
-    camera.position.set(lerp(a.pos[0], b.pos[0], e) + px, lerp(a.pos[1], b.pos[1], e), lerp(a.pos[2], b.pos[2], e) - 1.1 * d);
-    camera.fov = lerp(a.fov, b.fov, e);
-    camera.lookAt(lerp(a.look[0], b.look[0], e), lerp(a.look[1], b.look[1], e), lerp(a.look[2], b.look[2], e));
+    const c = layout.cam2;
+    const at = (k: "pos" | "look", i: number) => lerp(lerp(a[k][i]!, b[k][i]!, e), c[k][i]!, d);
+    camera.position.set(at("pos", 0) + px, at("pos", 1), at("pos", 2));
+    camera.fov = lerp(lerp(a.fov, b.fov, e), c.fov, d);
+    camera.lookAt(at("look", 0), at("look", 1), at("look", 2));
     camera.updateProjectionMatrix();
-    glass.rotation.set(lerp(g.rx, -0.01, e), lerp(g.ry, 0, e), 0, "YXZ");
-    glass.scale.setScalar(lerp(1, 1.05, e));
+    const s = layout.glass1;
+    glass.rotation.set(lerp(g.rx, s.rx, e), lerp(g.ry, s.ry, e), 0, "YXZ");
+    glass.scale.setScalar(lerp(1, s.scale, e));
     camera.updateMatrixWorld();
     scene.updateMatrixWorld();
   }
@@ -391,13 +434,42 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
       if (Math.abs(par - parT) < 1e-3) par = parT;
       else animating = true;
     }
-    pose(e, d, par);
+    // idle motion (t3 only, never in stills or with reduced motion): the camera drifts a few centimetres and the light
+    // streak breathes, so the hero is not a still image once the first scan is over. It fades out as the page scrolls,
+    // so every scroll pose stays the same.
+    idleOn = tier === "t3" && !still && !reduce && prog < IDLE_UNTIL;
+    const idle = idleOn ? 1 - e : 0;
+    // the payoff: once the scan has read every signal, the performance tile (the "next best move") rises into its own light
+    const payoffK = still || reduce ? 0 : smooth(AUTO_DELAY + AUTO_SECONDS, AUTO_DELAY + AUTO_SECONDS + PAYOFF_SECONDS, elapsed) * (1 - e);
+    if (!still && !reduce && elapsed < AUTO_DELAY + AUTO_SECONDS + PAYOFF_SECONDS) animating = true;
+    perf.group.position.y = perf.baseY + 0.2 * payoffK;
+    pose(e, d, par + idle * 0.2 * Math.sin(elapsed * 0.4));
     measure();
 
     // the light bar: a fixed position for stills, the pointer, or the one automatic scan
     const ptr = still ? null : layerBus.pointer;
     const edge = g.w / 2 + 0.4;
-    if (still) {
+    // in the story the bar parks on the signal the current beat is about, and flares when the beat changes
+    const beat = layerBus.beat;
+    const focus = beat >= 0 && e > 0.6 ? focusAt[Math.min(4, beat)]! : -1;
+    if (beat !== lastBeat) {
+      if (focus >= 0 && lastBeat !== -9 && !still) pulse = 1;
+      lastBeat = beat;
+    }
+    if (focus >= 0) {
+      const n = heroPts[focus]!;
+      const tx = clamp(n.x + n.y * 0.16, -edge, edge);
+      if (still || first) {
+        sweepX = tx;
+        amt = 0.7;
+      } else {
+        sweepX = damp(sweepX, tx, 5, dt);
+        pulse = damp(pulse, 0, 1.8, dt);
+        const want = 0.55 + 0.45 * pulse;
+        amt = damp(amt, want, 6, dt);
+        if (Math.abs(sweepX - tx) > 2e-3 || Math.abs(amt - want) > 4e-3) animating = true;
+      }
+    } else if (still) {
       sweepX = lerp(-g.w / 2, g.w / 2, still.sweep ?? 0.5);
       amt = still.sweep === undefined ? 0 : 1;
     } else if (ptr) {
@@ -421,7 +493,7 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
 
     // tiles light up as the bar passes; the first scan also brings the rims up
     const sweepNdc = toNdc(sweepX);
-    const scatterK = lerp(1, 0.4, e);
+    const scatterK = lerp(1, 0.6, e);
     const heroK = lerp(1, 0.85, e);
     heroes.forEach((t, i) => {
       const dx = ndcX[i]! - sweepNdc;
@@ -430,13 +502,27 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
       t.rim!.color.copy(limeC).multiplyScalar(0.16 * heroK + boost * 1.6);
     });
     for (const t of tiles) if (!t.spec.id) t.face.emissiveIntensity = t.baseFace * scatterK;
+    if (payoffK > 0) {
+      perf.face.emissiveIntensity += 0.5 * payoffK;
+      perf.rim!.color.multiplyScalar(1 + 2.2 * payoffK);
+    }
+    if (built.payoff) built.payoff.color.copy(limeC).multiplyScalar(0.16 * payoffK);
+    // story-only tiles grow out of the floor while the camera rises
+    const grow = smooth(0.1, 0.6, e);
+    for (const t of tiles) {
+      if (!t.story) continue;
+      t.group.visible = t.story.shadow.visible = grow > 0.002;
+      t.group.scale.setScalar(Math.max(grow, 1e-3));
+      t.story.shadow.scale.copy(t.story.shadowScale).multiplyScalar(Math.max(grow, 1e-3));
+    }
+    floor.material.uniforms.uQuietK!.value = 1 - e;
 
     const u = overlayMat.uniforms;
     u.uMem!.value = mem;
     u.uSweep!.value = sweepX;
     u.uAmt!.value = amt;
-    u.uStreak!.value = -0.2 * e;
-    return { animating, fade: smooth(0.72, 0.9, prog) };
+    u.uStreak!.value = -0.2 * e + idle * 0.04 * Math.sin(elapsed * 0.55);
+    return { animating, fade: fadeAt(prog) };
   }
 
   function draw(fade: number) {
@@ -466,9 +552,14 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
       dpr = ratio;
       renderer.setPixelRatio(ratio);
       renderer.setSize(cssW, cssH, false);
+      if (!still) renderer.transmissionResolutionScale = transmissionScale(cssW * cssH * ratio * ratio);
       camera.aspect = cssW / cssH;
       camera.updateProjectionMatrix();
       if (composer) {
+        // a new size reallocates the targets, which is when a changed sample count takes effect
+        const samples = cssW * cssH * ratio * ratio > MSAA4_MAX_PX ? 2 : 4;
+        composer.renderTarget1.samples = samples;
+        composer.renderTarget2.samples = samples;
         composer.setPixelRatio(ratio);
         composer.setSize(cssW, cssH);
       }
@@ -478,18 +569,23 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
     frame(timeMs) {
       const ptr = layerBus.pointer;
       const input = { p: layerBus.progress, b: layerBus.beat, x: ptr ? ptr.x : NaN };
-      // nothing moved, nothing is easing, nothing is dirty: no work at all
-      if (!first && !dirty && settled && !still && input.p === lastIn.p && input.b === lastIn.b && Object.is(input.x, lastIn.x)) return false;
+      const unchanged = !first && !dirty && settled && !still && input.p === lastIn.p && input.b === lastIn.b && Object.is(input.x, lastIn.x);
+      // nothing moved, nothing is easing, nothing is dirty: no work at all. Only the hero's idle motion keeps drawing, at 30 fps.
+      if (unchanged && !(idleOn && timeMs - lastDraw >= IDLE_FRAME_MS)) return false;
       lastIn = input;
       const { animating, fade } = step(timeMs);
       settled = !animating;
-      if (!first && !dirty && !animating && fade === lastFade) return false;
+      if (!first && !dirty && !animating && !idleOn && fade === lastFade) return false;
       draw(fade);
       lastFade = fade;
+      lastDraw = timeMs;
       report();
       first = false;
       dirty = false;
       return true;
+    },
+    settled() {
+      return !first && !dirty && settled && !idleOn && lastIn.p === layerBus.progress && lastIn.b === layerBus.beat && lastFade === fadeAt(prog) && prog === clamp(layerBus.progress);
     },
     setTier(next) {
       if (next === tier) return;
@@ -500,15 +596,23 @@ export async function createLayerScene(opts: LayerSceneOptions): Promise<LayerSc
       if (renderer.compileAsync) await renderer.compileAsync(scene, camera);
       else renderer.compile(scene, camera);
     },
-    dispose() {
+    dispose(opts) {
       scene.traverse((o) => {
         const m = o as Mesh;
         const mat = m.material as Material | Material[] | undefined;
-        if (mat) for (const x of Array.isArray(mat) ? mat : [mat]) x.dispose();
+        if (mat) {
+          for (const x of Array.isArray(mat) ? mat : [mat]) {
+            releaseSharedLut(renderer, x);
+            x.dispose();
+          }
+        }
       });
       for (const d of disposables) d.dispose();
       disposeComposer();
       renderer.dispose();
+      // the canvas belongs to the page, which may hand it to the next scene (a variant change); only a final teardown
+      // gives the context back, otherwise every mount would leave one more live WebGL context behind
+      if (opts?.loseContext) renderer.forceContextLoss();
     },
   };
 }

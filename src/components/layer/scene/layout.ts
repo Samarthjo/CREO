@@ -18,12 +18,18 @@ export interface TileSpec {
   lift?: number;
   /** Which reel picture (0..3). */
   seed?: number;
+  /** Only in the story: the tile grows out of the floor as the camera rises, so the headline never has anything behind it. */
+  story?: boolean;
 }
 
 export interface Layout {
   cam: { pos: V3; look: V3; fov: number };
-  /** Camera at progress 0.15 and later: closer, a little lower. */
+  /** Camera at progress 0.15: the story's opening pose, raised so the floor, the tiles and the pane fill the frame behind the cards. */
   cam1: { pos: V3; look: V3; fov: number };
+  /** Camera at the end of the story: it drifts here from cam1 as the beats go by. */
+  cam2: { pos: V3; look: V3; fov: number };
+  /** The pane in the story: it leans back to face the raised camera, and grows a little. */
+  glass1: { rx: number; ry: number; scale: number };
   glass: { w: number; h: number; x: number; y: number; z: number; rx: number; ry: number; r: number };
   /** Height of the CREO mark above the glass centre, in world units. Moves it clear of the tiles behind the pane. */
   markY: number;
@@ -36,7 +42,9 @@ export interface Layout {
 
 const WIDE: Layout = {
   cam: { pos: [0.1, 1.3, 13], look: [0.1, -0.1, 0], fov: 26 },
-  cam1: { pos: [0.1, 1.1, 12.0], look: [0.1, 0.05, 0], fov: 25.5 },
+  cam1: { pos: [-0.6, 5.5, 11], look: [-0.6, 0.3, 1.2], fov: 30 },
+  cam2: { pos: [-1.8, 4.5, 10.2], look: [-0.1, 0.3, 1.0], fov: 30 },
+  glass1: { rx: -0.45, ry: 0, scale: 1.02 },
   glass: { w: 5.3, h: 1.5, x: 0.1, y: 1.11, z: 2.3, rx: -0.09, ry: -0.05, r: 0.2 },
   markY: 0.36,
   glow: [0.5, 0.66, 0.5, 0.3],
@@ -63,12 +71,22 @@ const WIDE: Layout = {
     { kind: "followers", w: 1.45, h: 0.87, x: -5.8, z: -2.9, ry: 0.4, rx: -0.14 },
     { kind: "walk", w: 1.45, h: 0.87, x: 2.6, z: 2.9, ry: -0.35, rx: -1.4 },
     { kind: "length", w: 1.45, h: 0.87, x: 4.7, z: 1.4, ry: -0.5, rx: -1.4 },
+    // near the camera and flat on the floor, so the lower right of the frame holds something instead of black
+    { kind: "quote", w: 1.1, h: 0.66, x: 1.45, z: 5.2, ry: -0.3, rx: -1.4 },
+    { kind: "followers", w: 1.1, h: 0.66, x: 2.25, z: 7.0, ry: 0.25, rx: -1.4 },
+    { kind: "reel", w: 0.72, h: 1.28, x: 3.1, z: 5.0, ry: -0.55, rx: -1.4, seed: 1 },
+    // the story's lower left, where the headline stood
+    { kind: "length", w: 1.2, h: 0.72, x: -2.7, z: 4.3, ry: 0.35, rx: -1.4, story: true },
+    { kind: "reel", w: 0.72, h: 1.28, x: -1.3, z: 4.1, ry: 0.5, rx: -1.4, seed: 2, story: true },
   ],
 };
 
 const TALL: Layout = {
   cam: { pos: [0, 1.5, 14.5], look: [0, 0.2, 0], fov: 34 },
+  // the tall stage has no pinned story (the beats stack), so it keeps the low, close pose and the slow dolly
   cam1: { pos: [0, 1.3, 13.5], look: [0, 0.25, 0], fov: 33 },
+  cam2: { pos: [0, 1.3, 12.4], look: [0, 0.25, 0], fov: 33 },
+  glass1: { rx: -0.01, ry: 0, scale: 1.05 },
   glass: { w: 3.2, h: 2.4, x: 0, y: 1.7, z: 2.3, rx: -0.09, ry: 0, r: 0.2 },
   markY: 0.5,
   glow: [0.5, 0.68, 0.6, 0.26],

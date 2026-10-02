@@ -29,8 +29,10 @@ export interface LayerSceneOptions {
   onAnchors: (a: AnchorMap) => void;
   /**
    * Poster and test renders: deterministic, preserved drawing buffer, no pointer, drawn once. `progress` is the bus value
-   * (default 0). `sweep` (0..1) puts the light bar at that fraction of the glass's width; leave it out for no bar. The
-   * scene has no other time-dependent state, so `timeSec` does not change the picture; it is kept for the contract.
+   * (default 0). `sweep` (0..1) puts the light bar at that fraction of the glass's width; leave it out for no bar. A still
+   * has none of the live scene's time-dependent motion (the idle camera drift and light breathing of t3, the payoff after
+   * the first scan), so `timeSec` does not change the picture; it is kept for the contract. With a story beat on the bus
+   * (layerBus.beat 0 to 4) the bar sits on that beat's signal, as it does live.
    */
   still?: { timeSec: number; progress?: number; sweep?: number };
 }
@@ -42,5 +44,14 @@ export interface LayerScene {
   setTier(tier: "t2" | "t3"): void;
   /** Resolves when shaders are compiled, so the first visible frame does not hitch. */
   warm(): Promise<void>;
-  dispose(): void;
+  /**
+   * True when the picture on the canvas is final for the current bus values: nothing is easing, no idle motion runs and
+   * the last frame was drawn from the present progress and beat. A loop may stop only once this is true.
+   */
+  settled(): boolean;
+  /**
+   * Free everything the scene made. Pass `loseContext` only on the final teardown of a canvas: it releases the WebGL
+   * context, which a canvas that will host the next scene must keep.
+   */
+  dispose(opts?: { loseContext?: boolean }): void;
 }

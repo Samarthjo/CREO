@@ -73,6 +73,7 @@ uniform vec3 uCam;
 uniform vec3 uGround;
 uniform float uTaps;
 uniform vec4 uQuiet;
+uniform float uQuietK;
 uniform vec2 uRes;
 uniform vec2 uTexel;
 uniform float uGlassX;
@@ -112,7 +113,10 @@ void main() {
   vec3 refl = acc / n;
 
   vec2 sc = gl_FragCoord.xy / uRes;
-  float quiet = 1.0 - 0.96 * smoothstep(0.0, 0.05, sc.x - uQuiet.x) * smoothstep(0.0, 0.08, uQuiet.z - sc.x) * smoothstep(0.0, 0.08, (1.0 - sc.y) - uQuiet.y) * smoothstep(0.0, 0.08, uQuiet.w - (1.0 - sc.y));
+  // the headline's quiet rectangle: the reflection is held back inside it. The top edge is a long ramp so the lime light fades
+  // out above the type instead of ending in a band, and the right edge lets the reflection come back beside the headline.
+  // uQuietK is 1 on the hero and 0 once the story starts, when there is no headline to protect.
+  float quiet = 1.0 - 0.96 * uQuietK * smoothstep(0.0, 0.05, sc.x - uQuiet.x) * smoothstep(0.0, 0.06, uQuiet.z - sc.x) * smoothstep(0.0, 0.16, (1.0 - sc.y) - uQuiet.y) * smoothstep(0.0, 0.08, uQuiet.w - (1.0 - sc.y));
 
   float dist = length(vWorld.xz - uCam.xz);
   float fog = 1.0 - smoothstep(14.0, 40.0, dist);

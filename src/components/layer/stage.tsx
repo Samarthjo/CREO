@@ -42,7 +42,7 @@ export function Stage() {
           <img src={POSTERS.tall.src} width={POSTERS.tall.width} height={POSTERS.tall.height} alt="" fetchPriority="high" decoding="async" />
         </picture>
         <StageCanvas sample={getLayerSample()} />
-        <ul className="layer-chips layer-fade" data-hp data-copy="marketing">
+        <ul className="layer-chips layer-fade" data-hp data-copy="marketing" aria-hidden="true">
           {CHIPS.map((c, i) => (
             <li key={c.id} className="layer-chip" data-anchor={c.id} style={chipVars(c.id, i)}>
               <span className="layer-chip-tag">{c.label}</span>
@@ -52,9 +52,10 @@ export function Stage() {
       </div>
       <div className="layer-scrim" />
       <div className="layer-scrim-story" data-hp />
+      <div className="layer-scrim-rail" data-hp />
       <div className="layer-grain" />
       <div className="layer-sweep" />
-      <p className="layer-sample layer-fade" data-hp data-copy="marketing">Sample data</p>
+      <p className="layer-sample layer-fade" data-hp data-copy="marketing" aria-hidden="true">Sample data</p>
     </div>
   );
 }

@@ -43,8 +43,6 @@ export function StudioCard({ studio }: { studio: StudioData }) {
               <span key={i} className="studio-shot" data-kind={k} />
             ))}
           </div>
-          <p className="studio-meta">{studio.shotsText}</p>
-          <p className="studio-tags">{studio.tags}</p>
         </div>
       </div>
     </div>

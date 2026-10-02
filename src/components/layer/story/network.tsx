@@ -43,6 +43,7 @@ export function DnaNetwork({ net, length, interactive = true }: { net: Network; 
             className: "net-node rv",
             "data-kind": n.kind,
             "data-best": n.best ? "" : undefined,
+            "data-thin": n.thin ? "" : undefined,
             "data-on": interactive && n.id === active ? "" : undefined,
             style: { "--s": n.s, "--d": n.d, left: `${n.x}%`, top: `${(n.y / 60) * 100}%` } as CSSProperties,
           };
@@ -72,11 +73,16 @@ export function DnaNetwork({ net, length, interactive = true }: { net: Network; 
             />
           );
         })}
+        {interactive && (
+          // The label sits beside its node. It is the one live region, so a change in focus is announced once.
+          <span className="net-tag" aria-live="polite" data-flip={shown.y < 24 ? "" : undefined} data-edge={shown.x < 24 ? "l" : shown.x > 76 ? "r" : undefined} style={{ left: `${shown.x}%`, top: `${(shown.y / 60) * 100}%` }}>
+            <span key={shown.id} className="swap-in">{shown.text}</span>
+          </span>
+        )}
       </div>
       {interactive && (
-        <div className="net-read" aria-live="polite">
+        <div className="net-read">
           <span key={shown.id} className="net-read-row swap-in">
-            <Chip tone="lime">{shown.text}</Chip>
             <Chip tone="outline">{shown.basis}</Chip>
           </span>
           {length && <Chip tone="outline">{length}</Chip>}

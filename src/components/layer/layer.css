@@ -117,6 +117,23 @@ html:has(.layer) {
   opacity: min(1, calc(var(--hp, 0) * 1.2));
 }
 
+/* Pinned story only: a left-hand scrim keeps the rail's text readable over the brightest part of the scene. It lives in
+   the fixed stage (not in the story section), so it has no edge that tracks the section's top. */
+.layer-scrim-rail {
+  display: none;
+}
+
+@media (min-width: 1024px) and (min-height: 36rem) and (prefers-reduced-motion: no-preference) {
+  .layer-scrim-rail {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(90deg, rgb(7 8 11 / 0.82), rgb(7 8 11 / 0.5) 34%, transparent 56%);
+    opacity: min(1, calc(var(--hp, 0) * 1.2));
+  }
+}
+
 .layer-grain {
   position: absolute;
   inset: 0;
@@ -129,6 +146,12 @@ html:has(.layer) {
 .layer-fade {
   opacity: max(0, calc(1 - var(--hp, 0) * var(--k, 1.3)));
   transform: translate3d(0, calc(var(--hp, 0) * -3rem), 0);
+}
+
+/* The hero copy clears before it reaches the pane: opacity is gone by about 0.3 of the hero scroll, and the rise is small. */
+.layer-hero.layer-fade {
+  --k: 3.4;
+  transform: translate3d(0, calc(var(--hp, 0) * -1rem), 0);
 }
 
 /* ---- Chips ---- */
@@ -162,12 +185,13 @@ html:has(.layer) {
   bottom: var(--lead);
   transform: translateX(-50%);
   padding: 0.3125rem 0.625rem;
-  border: 1px solid rgb(198 255 61 / 0.6);
+  border: 1px solid rgb(243 240 232 / 0.24);
   border-radius: 999px;
-  background: rgb(7 8 11 / 0.62);
+  background: rgb(7 8 11 / 0.58);
   color: var(--ink);
   font-family: var(--font-layer-mono);
-  font-size: 11px;
+  /* Scales with the stage (the container is .layer-stage), so the labels keep their size against a larger pane. */
+  font-size: clamp(11px, 0.78cqw, 14px);
   line-height: 1;
   letter-spacing: 0.08em;
   white-space: nowrap;
@@ -197,8 +221,22 @@ html:has(.layer) {
 
 /* On the wide stage the PERFORMANCE chip would sit on the etched wordmark, so its tag hangs below the point. */
 @media (min-width: 900px) and (orientation: landscape) {
+  /* AUDIENCE sits right against the CREO mark tile, so its tag leans away from it and rises. */
+  .layer-chip[data-anchor="audience"] {
+    --lead: 2.5rem;
+  }
+
+  .layer-chip[data-anchor="audience"] .layer-chip-tag {
+    transform: translateX(-72%);
+  }
+
   .layer-chip[data-anchor="perf"] {
-    --lead: 1.25rem;
+    --lead: 1.75rem;
+  }
+
+  /* Leans right so the tag clears the "1.8x" figure on the tile behind it. */
+  .layer-chip[data-anchor="perf"] .layer-chip-tag {
+    transform: translateX(-26%);
   }
 
   .layer-chip[data-anchor="perf"] .layer-chip-tag {
@@ -298,14 +336,44 @@ html[data-layer-tier="t1"] .layer-sweep {
   }
 }
 
+/* ---- Nav ---- */
+
+/* One lime button at a time: the nav button is a quiet outline while the hero button is on screen, and fills in as the hero clears. */
+.layer-nav-cta {
+  --on: clamp(0, calc((var(--hp, 0) - 0.3) * 6.5), 1);
+}
+
+.layer-nav-cta a {
+  background: rgb(198 255 61 / var(--on));
+  color: color-mix(in srgb, var(--ink), var(--on-cta) calc(var(--on) * 100%));
+  box-shadow: inset 0 0 0 1px rgb(243 240 232 / calc(0.3 * (1 - var(--on))));
+}
+
+@media (max-width: 359.98px) {
+  .layer-nav-logo .font-display {
+    display: none;
+  }
+}
+
 /* ---- Page blocks ---- */
 
 .layer-h1 {
-  font-size: clamp(2.75rem, 6.1vw, 5.75rem);
+  /* Capped by viewport height too, so a short laptop window keeps a gap between the pane and the headline. */
+  font-size: min(clamp(2.75rem, 6.1vw, 5.75rem), 9.6svh);
   font-weight: 400;
   line-height: 0.98;
   letter-spacing: -0.045em;
   max-width: 10.5em;
+  overflow-wrap: anywhere;
+}
+
+/* The gaps under the headline shrink with the window height, so a short laptop keeps its quiet zone above the headline. */
+.layer-hero-tag {
+  margin-top: min(1.5rem, 2.6svh);
+}
+
+.layer-hero-cta {
+  margin-top: min(2rem, 3.6svh);
 }
 
 .layer-cta::before {
@@ -333,7 +401,8 @@ html[data-layer-tier="t1"] .layer-sweep {
   .layer-sweep {
     display: none !important;
   }
-  .layer-fade {
+  .layer-fade,
+  .layer-hero.layer-fade {
     transform: none;
   }
 }

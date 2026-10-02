@@ -9,6 +9,7 @@ import {
   MeshStandardMaterial,
   OneMinusSrcAlphaFactor,
   PlaneGeometry,
+  Vector3,
   ZeroFactor,
 } from "three";
 import type { BufferGeometry, Texture } from "three";
@@ -26,9 +27,15 @@ export interface Tile {
   rim: MeshBasicMaterial | null;
   /** Emissive brightness of the face at rest. */
   baseFace: number;
+  /** Height of the group's origin at rest, so the scene can lift a tile and put it back. */
+  baseY: number;
+  /** Set for tiles that exist only in the story: the scene scales them (and their shadow) in and out. */
+  story: { shadow: Mesh; shadowScale: Vector3 } | null;
 }
 
 const DEPTH = 0.06;
+/** Emissive brightness of the five signal faces at rest. Bright enough to read through the transmission pass. */
+const HERO_FACE = 1.3;
 
 /** Builds every tile with its contact shadow (and, for the five signals, a lime light spill on the floor). */
 export function buildTiles(layout: Layout, sample: SceneSample, anisotropy: number, env: Texture) {
@@ -107,6 +114,7 @@ export function buildTiles(layout: Layout, sample: SceneSample, anisotropy: numb
   const flat = own(new PlaneGeometry(1, 1).rotateX(-Math.PI / 2));
 
   const tiles: Tile[] = [];
+  let payoff: MeshBasicMaterial | null = null;
   for (const spec of layout.tiles) {
     const hero = !!spec.id;
     const map = textureFor(spec);
@@ -151,11 +159,25 @@ export function buildTiles(layout: Layout, sample: SceneSample, anisotropy: numb
       spill.renderOrder = 1;
       root.add(spill);
     }
-    tiles.push({ spec, group: g, face, rim, baseFace: hero ? 0.8 : 0.3 });
+    if (spec.id === "perf") {
+      // the payoff light: a lime pool under the performance tile, off until the first scan has finished
+      payoff = own(
+        new MeshBasicMaterial({ map: shadowTex, color: 0x000000, blending: AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 }),
+      );
+      const pool = new Mesh(flat, payoff);
+      pool.scale.set(spec.w * 1.9, 1, 1.3);
+      pool.position.set(fx, 0.008, fz + 0.3);
+      pool.rotation.y = spec.ry * 0.5;
+      pool.renderOrder = 1;
+      root.add(pool);
+    }
+    tiles.push({ spec, group: g, face, rim, baseFace: hero ? HERO_FACE : 0.3, baseY: g.position.y, story: spec.story ? { shadow, shadowScale: shadow.scale.clone() } : null });
+    if (spec.story) g.visible = shadow.visible = false;
   }
   return {
     root,
     tiles,
+    payoff,
     dispose: () => {
       for (const o of owned) o.dispose();
     },

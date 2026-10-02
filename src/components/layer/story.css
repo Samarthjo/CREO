@@ -25,6 +25,8 @@
 /* ---- Rail: five numbered labels with captions, and a lime line that runs along them ---- */
 
 .story-rail {
+  /* Stacked layout: each card carries its own caption (.beat-cap), so the rail only shows in the pinned scene. */
+  display: none;
   position: relative;
   padding: 1.25rem 1.25rem 1.25rem 2.5rem;
   border: 1px solid rgb(255 255 255 / 0.08);
@@ -128,18 +130,67 @@
 
 .story-beats {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
+  counter-reset: beatn;
 }
 
 .beat {
   --bu: 1;
+  counter-increment: beatn;
   display: grid;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  gap: 0.9rem;
   min-height: 56svh;
+}
+
+/* Chips may wrap when text is very large, instead of pushing the page sideways. */
+.beat-card .whitespace-nowrap {
+  white-space: normal;
+}
+
+.beat:focus {
+  outline: none;
+}
+
+/* Stacked layout and reduced motion: the rail's label and caption sit on top of each card. */
+.beat-cap {
+  display: grid;
+  gap: 0.4rem;
+  width: 100%;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding-inline: 0.25rem;
+}
+
+.beat-cap-n {
+  font-family: var(--font-layer-mono);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.beat-cap-n::before {
+  content: counter(beatn, decimal-leading-zero) "  ";
+  white-space: pre;
+  color: var(--accent);
+}
+
+.beat-cap-t {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
 .beat-card {
   position: relative;
+  min-width: 0;
+  overflow-wrap: anywhere;
   width: 100%;
   max-width: 46rem;
   margin-inline: auto;
@@ -168,6 +219,7 @@
 }
 
 .beat-head {
+  flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -196,9 +248,10 @@
   background: var(--accent);
 }
 
-/* Anything that draws in with its beat: --s is when it starts (0 to 1) and --rv is how far along it is. */
+/* Anything that draws in with its beat: --s is when it starts (0 to 1) and --rv is how far along it is.
+   Everything has finished by --bu of about 0.32 (the latest --s is 0.9), so a card is never left half-drawn. */
 .rv {
-  --rv: clamp(0, calc((var(--bu, 1) * 1.8 - var(--s, 0)) * 4), 1);
+  --rv: clamp(0, calc((var(--bu, 1) * 4 - var(--s, 0) * 1.2) * 5), 1);
   opacity: var(--rv);
 }
 
@@ -218,7 +271,6 @@
 
 .sees-x {
   color: var(--accent);
-  font-style: italic;
 }
 
 .sees-row {
@@ -284,6 +336,7 @@
 
 .net-wrap {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.9rem;
 }
 
@@ -341,6 +394,15 @@ button.net-node::after {
   border-radius: 50%;
 }
 
+.net-node[data-kind="format"] {
+  border-radius: 28%;
+}
+
+.net-node[data-thin] {
+  border-style: dashed;
+  opacity: 0.7;
+}
+
 .net-node[data-best] {
   border-color: var(--accent);
   background: radial-gradient(circle at 35% 30%, #efffbd, var(--accent) 55%, #7fa510);
@@ -369,6 +431,45 @@ button.net-node::after {
 .net-node[data-kind="creator"] svg {
   width: 62%;
   height: 62%;
+}
+
+/* The label for the node in focus sits beside it, so the reading is attached to what it describes. */
+.net-tag {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgb(198 255 61 / 0.6);
+  border-radius: 999px;
+  background: rgb(7 8 11 / 0.82);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.15;
+  max-width: 90%;
+  width: max-content;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 0.9rem));
+}
+
+.net-tag[data-flip] {
+  transform: translate(-50%, 0.9rem);
+}
+
+.net-tag[data-edge="l"] {
+  transform: translate(-12%, calc(-100% - 0.9rem));
+}
+
+.net-tag[data-edge="r"] {
+  transform: translate(-88%, calc(-100% - 0.9rem));
+}
+
+.net-tag[data-edge="l"][data-flip] {
+  transform: translate(-12%, 0.9rem);
+}
+
+.net-tag[data-edge="r"][data-flip] {
+  transform: translate(-88%, 0.9rem);
 }
 
 .net-read {
@@ -561,6 +662,7 @@ button.net-node::after {
 
 .deal {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
 }
 
@@ -571,6 +673,18 @@ button.net-node::after {
   border-radius: 1rem 1rem 1rem 0.3rem;
   background: rgb(255 255 255 / 0.05);
   transform: translate3d(0, calc((1 - var(--rv)) * -14px), 0);
+}
+
+.deal-msg::after {
+  content: "";
+  position: absolute;
+  bottom: -1.05rem;
+  left: 1.6rem;
+  width: 9px;
+  height: 9px;
+  border: solid rgb(198 255 61 / 0.85);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .deal-lines {
@@ -597,10 +711,33 @@ button.net-node::after {
 }
 
 .deal-quote {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   margin: 0;
   font-size: 1.0625rem;
   line-height: 1.35;
   color: var(--ink);
+}
+
+.deal-quote::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--muted);
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.deal-k {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-family: var(--font-layer-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .deal-terms {
@@ -614,17 +751,26 @@ button.net-node::after {
   font-family: var(--font-display);
   font-size: clamp(1.6rem, 2.4vw, 2.3rem);
   font-weight: 400;
-  white-space: nowrap;
+  text-wrap: balance;
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--ink);
   transform: translate3d(0, calc((1 - var(--rv)) * 10px), 0);
 }
 
+/* Each number takes the colour of its mark on the axis: lime band for the quote, red tick for the walk-away. */
+.deal-range {
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--accent);
+}
+
 .deal-walk {
   margin: 0;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--risk);
   font-size: 0.9375rem;
-  color: var(--muted);
+  font-weight: 500;
+  color: var(--risk);
 }
 
 .deal-flag {
@@ -681,6 +827,7 @@ button.net-node::after {
 
 .learn {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
 }
 
@@ -765,6 +912,20 @@ button.net-node::after {
   color: var(--accent);
 }
 
+.learn-lift {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+
+.learn-unit {
+  flex-basis: 100%;
+  white-space: nowrap;
+  font-family: var(--font-layer-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
 .learn-mem {
   margin: 0;
   padding: 0.7rem 0.9rem;
@@ -779,7 +940,7 @@ button.net-node::after {
 
 /* In beat 5 the same network is a small, quiet picture that brightens as the result lands. */
 .learn .net {
-  --lit: clamp(0, calc((var(--bu, 1) - 0.25) * 1.6), 1);
+  --lit: clamp(0, calc((var(--bu, 1) - 0.1) * 2.5), 1);
   opacity: calc(0.4 + 0.6 * var(--lit));
 }
 
@@ -807,18 +968,35 @@ button.net-node::after {
     grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
     align-items: center;
   }
+  .deal-msg::after {
+    bottom: auto;
+    left: auto;
+    top: calc(50% - 5px);
+    right: -1.2rem;
+    transform: rotate(-45deg);
+  }
   .learn {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
   }
 }
 
-/* ---- Pinned: from 1024px, when motion is allowed. Keep this query identical to PINNED in story/scroll.tsx ---- */
+/* ---- Pinned: from 1024px, when motion is allowed and the window is tall enough for the tallest card. Keep this query
+   identical to PINNED in story/scroll.tsx. The height is in rem, so a larger text setting (which makes the cards taller)
+   turns the pin off sooner, as a short window does: 36rem is 576px at the default size and the tallest card is about 515px. ---- */
 
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+@media (min-width: 1024px) and (min-height: 36rem) and (prefers-reduced-motion: no-preference) {
   .story {
-    height: 400svh;
+    height: 430svh; /* 6.4 screens in all, inside the 6.5 cap in scripts/check-copy.mjs */
     padding: 0;
+  }
+
+  .beat-cap {
+    display: none;
+  }
+
+  .story-rail {
+    display: block;
   }
 
   .story-pin {
@@ -826,15 +1004,6 @@ button.net-node::after {
     top: 0;
     height: 100svh;
     overflow: clip;
-  }
-
-  /* A scrim on the left keeps the rail's text readable over the brightest part of the scene. */
-  .story-pin::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, rgb(7 8 11 / 0.82), rgb(7 8 11 / 0.5) 34%, transparent 56%);
-    pointer-events: none;
   }
 
   .story-inner {
@@ -867,16 +1036,21 @@ button.net-node::after {
     transition: color 0.3s;
   }
 
-  .story-rail li {
-    transition: opacity 0.35s;
-  }
-
-  .story-rail li[data-active="false"] {
-    opacity: 0.5;
+  /* State is shown by colour and the lime dot, never by opacity: inactive text stays at 7:1 or better on the dark ground. */
+  .story-rail {
+    text-shadow: 0 0 1.2rem rgb(7 8 11 / 0.85), 0 0 0.4rem rgb(7 8 11 / 0.7);
   }
 
   .story-rail li[data-active="false"] .rail-caption {
     color: var(--muted);
+  }
+
+  .story-rail li[data-active="false"] .rail-label {
+    color: var(--faint);
+  }
+
+  .story-rail li[data-active="true"] .rail-label {
+    color: var(--ink);
   }
 
   .story-rail li::before {
@@ -949,7 +1123,7 @@ button.net-node::after {
   }
   to {
     opacity: 0;
-    transform: scale(1.5, 1.7);
+    transform: scale(1.06);
   }
 }
 

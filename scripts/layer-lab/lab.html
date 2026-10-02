@@ -13,7 +13,7 @@
 <body>
 <canvas id="c"></canvas>
 <script type="module">
-  // Query: variant=wide|tall tier=t2|t3 t=<sec> sweep=<0..1> progress=<0..1> beat=<n> dpr=<n> scale=<n>
+  // Query: variant=wide|tall tier=t2|t3 t=<sec> sweep=<0..1> progress=<0..1> beat=<n> dpr=<n> scale=<n> L=<layout json>
   // live=1 skips the still options, so frame() runs the automatic sweep and the easing like the real loop
   const q = new URLSearchParams(location.search);
   const variant = q.get("variant") === "tall" ? "tall" : "wide";
@@ -42,7 +42,9 @@
   canvas.style.width = W + "px";
   canvas.style.height = H + "px";
   await import("./dist/lab.js");
-  const { createLayerScene, layerBus } = window.__lab;
+  const { createLayerScene, layerBus, LAYOUTS } = window.__lab;
+  // L=<json>: replace keys of the variant's layout, for look-dev experiments (e.g. L={"cam1":{"pos":[0,1,11],"look":[0,0,0],"fov":26}})
+  if (q.has("L")) Object.assign(LAYOUTS[variant], JSON.parse(q.get("L")));
   layerBus.beat = parseInt(q.get("beat") ?? "-1", 10);
   layerBus.progress = parseFloat(q.get("progress") ?? "0");
   const still = q.has("live") ? undefined : {

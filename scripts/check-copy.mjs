@@ -7,7 +7,7 @@ import { createRequire } from "node:module";
 
 const HEADLINE = "The Intelligence Layer for Creators.";
 const TAGLINE = "Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.";
-const CAPS = { marketing: 105, form: 40, sample: 80, total: 225, firstScreen: 45 };
+const CAPS = { marketing: 105, form: 40, sample: 80, total: 225, firstScreen: 45, beatStrings: 4 };
 const VIEWPORTS = [
   { name: "desktop", width: 1440, height: 900, maxScreens: 6.5, mobile: false },
   { name: "mobile", width: 390, height: 844, maxScreens: 7, mobile: true },
@@ -43,6 +43,9 @@ function measure({ headline, tagline }) {
   };
 
   const buckets = {};
+  // Sample strings per beat (docs/creo-design-direction.md, section 6: at most 4). A string is one text block: a paragraph,
+  // button, list item or chip, however many inline spans it holds. The "Sample data" label is exempt.
+  const beatStrings = {};
   const outside = [];
   let total = 0;
   let firstScreen = 0;
@@ -59,6 +62,13 @@ function measure({ headline, tagline }) {
     const bucket = el.closest("[data-copy]")?.getAttribute("data-copy") ?? null;
     if (bucket) buckets[bucket] = (buckets[bucket] ?? 0) + n;
     else outside.push({ text: text.trim().slice(0, 80), tag: el.tagName.toLowerCase(), words: n });
+    const beat = el.closest("[data-beat]");
+    if (beat && bucket === "sample" && !el.closest(".beat-tag")) {
+      const block = el.closest("p, button, h1, h2, h3, h4, li, label, figcaption") ?? el;
+      const id = beat.getAttribute("data-beat");
+      const set = (beatStrings[id] ??= new Map());
+      set.set(block, (set.get(block) ?? "") + " " + text.trim());
+    }
     total += n;
 
     const range = document.createRange();
@@ -70,7 +80,9 @@ function measure({ headline, tagline }) {
   const h1s = [...document.querySelectorAll("h1")];
   const norm = (s) => s.replace(/\s+/g, " ").trim();
   const doc = document.documentElement;
+  const beatCounts = Object.fromEntries(Object.entries(beatStrings).map(([k, v]) => [k, [...v.values()].map((t) => t.trim().slice(0, 60))]));
   return {
+    beatCounts,
     buckets,
     total,
     firstScreen,
@@ -129,6 +141,7 @@ const failures = [];
 for (const r of results) {
   const fail = (msg) => failures.push(`${r.viewport}: ${msg}`);
   for (const key of ["marketing", "form", "sample"]) if ((r.buckets[key] ?? 0) > CAPS[key]) fail(`${key} ${r.buckets[key]} words, cap ${CAPS[key]}`);
+  for (const [beat, strings] of Object.entries(r.beatCounts)) if (strings.length > CAPS.beatStrings) fail(`beat ${Number(beat) + 1} has ${strings.length} sample strings, cap ${CAPS.beatStrings}: ${strings.map((x) => JSON.stringify(x)).join(", ")}`);
   if (r.total > CAPS.total) fail(`total ${r.total} words, cap ${CAPS.total}`);
   if (r.firstScreen > CAPS.firstScreen) fail(`first screen ${r.firstScreen} words, cap ${CAPS.firstScreen}`);
   if (r.screens > r.maxScreens) fail(`page is ${r.screens} screens, cap ${r.maxScreens}`);
@@ -145,6 +158,7 @@ if (json) {
     const b = (k) => String(r.buckets[k] ?? 0);
     console.log(`${r.viewport} ${r.size}: marketing ${b("marketing")}/${CAPS.marketing}, form ${b("form")}/${CAPS.form}, sample ${b("sample")}/${CAPS.sample}, total ${r.total}/${CAPS.total}, first screen ${r.firstScreen}/${CAPS.firstScreen}, ${r.screens}/${r.maxScreens} screens, overflow ${r.overflowX}px`);
     console.log(`  h1 equals locked headline: ${r.h1Ok}; tagline present: ${r.taglineOk}; console errors: ${r.consoleErrors.length}`);
+    console.log(`  sample strings per beat: ${Object.entries(r.beatCounts).map(([k, v]) => `${Number(k) + 1}:${v.length}`).join(" ") || "none visible"}`);
     for (const o of r.outside) console.log(`  outside a bucket: <${o.tag}> "${o.text}" (${o.words} words)`);
   }
   console.log(failures.length ? `FAIL\n${failures.map((f) => `  ${f}`).join("\n")}` : "OK");
