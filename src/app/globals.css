@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/*
+  CREO design tokens.
+  One accent: the marker. It is only ever a fill or a wash behind text, never text color,
+  so ink stays the reading color in both themes.
+  Shape rule: panels 20px, controls 12px, buttons and chips fully round.
+*/
+:root {
+  color-scheme: light;
+  --bg: #f4f5f6;
+  --surface: #fbfbfc;
+  --raised: #fdfdfe;
+  --sunk: #eceef0;
+  --line: #dfe2e6;
+  --line-strong: #c9ced5;
+  --ink: #12151a;
+  --text: #272c34;
+  --muted: #5a626d;
+  --faint: #838b96;
+  --mark: #f3e26b;
+  --on-mark: #14161a;
+  --mark-wash: rgb(243 226 107 / 0.6);
+  --risk: #b4321e;
+  --risk-wash: rgb(180 50 30 / 0.09);
+  --ok: #1f7a4d;
+  --ok-wash: rgb(31 122 77 / 0.09);
+  --shadow-panel: 0 1px 0 rgb(18 24 34 / 0.04), 0 18px 40px -24px rgb(22 30 44 / 0.24);
+  --shadow-pop: 0 2px 4px rgb(18 24 34 / 0.05), 0 28px 60px -20px rgb(22 30 44 / 0.3);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0c0e11;
+    --surface: #13161a;
+    --raised: #1a1e24;
+    --sunk: #0a0c0e;
+    --line: #242932;
+    --line-strong: #343a45;
+    --ink: #f0f2f5;
+    --text: #d5d9df;
+    --muted: #9aa2ae;
+    --faint: #707885;
+    --mark: #f0de62;
+    --on-mark: #14161a;
+    --mark-wash: rgb(240 222 98 / 0.36);
+    --risk: #ff8b78;
+    --risk-wash: rgb(255 139 120 / 0.13);
+    --ok: #6fd69e;
+    --ok-wash: rgb(111 214 158 / 0.12);
+    --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.03), 0 24px 48px -28px rgb(0 0 0 / 0.7);
+    --shadow-pop: 0 2px 4px rgb(0 0 0 / 0.3), 0 32px 64px -24px rgb(0 0 0 / 0.8);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c0e11;
+  --surface: #13161a;
+  --raised: #1a1e24;
+  --sunk: #0a0c0e;
+  --line: #242932;
+  --line-strong: #343a45;
+  --ink: #f0f2f5;
+  --text: #d5d9df;
+  --muted: #9aa2ae;
+  --faint: #707885;
+  --mark: #f0de62;
+  --on-mark: #14161a;
+  --mark-wash: rgb(240 222 98 / 0.36);
+  --risk: #ff8b78;
+  --risk-wash: rgb(255 139 120 / 0.13);
+  --ok: #6fd69e;
+  --ok-wash: rgb(111 214 158 / 0.12);
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.03), 0 24px 48px -28px rgb(0 0 0 / 0.7);
+  --shadow-pop: 0 2px 4px rgb(0 0 0 / 0.3), 0 32px 64px -24px rgb(0 0 0 / 0.8);
+}
+
+@theme inline {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-sunk: var(--sunk);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-body: var(--text);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-mark: var(--mark);
+  --color-on-mark: var(--on-mark);
+  --color-mark-wash: var(--mark-wash);
+  --color-risk: var(--risk);
+  --color-risk-wash: var(--risk-wash);
+  --color-ok: var(--ok);
+  --color-ok-wash: var(--ok-wash);
+  --radius-panel: 1.25rem;
+  --radius-control: 0.75rem;
+  --shadow-panel: var(--shadow-panel);
+  --shadow-pop: var(--shadow-pop);
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+  body { min-height: 100dvh; font-size: 0.9375rem; line-height: 1.55; }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  ::selection { background: var(--mark); color: var(--on-mark); }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  button, [role="button"] { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  textarea, input, select { font: inherit; color: var(--ink); }
+  .tnum { font-variant-numeric: tabular-nums; }
+}
+
+/* The marker: CREO highlights what matters. Wraps across lines without breaking. */
+.mark {
+  background: linear-gradient(var(--mark-wash), var(--mark-wash)) no-repeat 0 90% / 100% 64%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  border-radius: 0.2em;
+  padding: 0 0.16em;
+  margin: 0 -0.16em;
+  color: inherit;
+}
+.mark[data-risk] {
+  background-image: linear-gradient(var(--risk-wash), var(--risk-wash));
+  box-shadow: inset 0 -1.5px 0 var(--risk);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mark[data-sweep] { animation: sweep 0.7s var(--ease-out) both; animation-delay: var(--d, 0ms); }
+  @keyframes sweep { from { background-size: 0% 64%; } to { background-size: 100% 64%; } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.scroll-thin { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+
+/* Inside an inverted (ink) panel the marker becomes a solid fill so text stays readable in both themes. */
+.on-ink .mark {
+  background-image: linear-gradient(var(--mark), var(--mark));
+  color: var(--on-mark);
+}
