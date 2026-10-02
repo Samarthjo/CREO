@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Classic page", description: "The ful
 // The earlier long landing page, kept whole. Order follows docs/design-research.md section 7.
 export default function ClassicPage() {
   return (
-    <>
+    <div>
       <Nav />
       <main>
         <ClassicHero />
@@ -37,6 +37,6 @@ export default function ClassicPage() {
         <ClassicFinalCta />
       </main>
       <ClassicFooter />
-    </>
+    </div>
   );
 }
