@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "../product/logo";
-import { MotionSwitch } from "../ui/motion-switch";
 import { NAV_LINKS } from "./nav-links";
 
 export function Footer() {
@@ -12,10 +11,7 @@ export function Footer() {
           <Link href="/app" className="inline-flex items-center leading-5 hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center">Workspace</Link>
           {NAV_LINKS.map((l) => <Link key={l.href} href={l.href} className="inline-flex items-center leading-5 hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center">{l.label}</Link>)}
         </nav>
-        <div className="flex w-full flex-wrap items-center justify-between gap-4">
-          <p className="text-sm font-medium text-[#11140c]">Sample data. Works from what you add. Instagram Reels only. No testimonials yet.</p>
-          <MotionSwitch className="text-[#11140c]" />
-        </div>
+        <p className="w-full text-sm font-medium text-[#11140c]">Sample data. Works from what you add. Instagram Reels only. No testimonials yet.</p>
       </div>
     </footer>
   );

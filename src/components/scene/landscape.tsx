@@ -8,13 +8,16 @@ import { paletteFor, type Look, type Palette, type Time } from "./palette";
   Every layer is its own element so a painted PNG/WebP can replace it later without touching layout
   (see docs/design-direction.md section 11). Server component: output is deterministic, no hydration drift.
   Two looks. "classic" is the original pastel scene with scroll parallax, kept for /classic. "calm" is the site's scene: muted
-  slate, forest and cream, one light direction, varied trees (a few near ones sway), still mountains and water, no parallax.
+  slate, forest and cream, one light direction, varied trees, still mountains and water, no parallax.
+  Near trees move in one wind (see scripts/wind.mjs and windFor below). Distant trees are too far away to show it.
 */
 const W = 1600;
 const H = 900;
 const SHORE = 620;
 
 const bump = (x: number, c: number, w: number) => Math.exp(-(((x - c) / w) ** 2));
+/** A tree's bounding box in scene units: x, y, width, height. */
+type Box = [number, number, number, number];
 
 function pine(x: number, y: number, h: number, r: () => number) {
   const tiers = 5;
@@ -31,7 +34,8 @@ function pine(x: number, y: number, h: number, r: () => number) {
   const apex = `${r1(x)} ${r1(y - h)}`;
   const full = `M${apex}L${right.join("L")}L${r1(x + h * 0.02)} ${r1(y - trunk)}L${r1(x + h * 0.02)} ${r1(y)}L${r1(x - h * 0.02)} ${r1(y)}L${r1(x - h * 0.02)} ${r1(y - trunk)}L${left.join("L")}Z`;
   const lit = `M${apex}L${[...left].reverse().join("L")}L${r1(x)} ${r1(y - trunk)}Z`;
-  return { full, lit };
+  const reach = h * 0.24;
+  return { full, lit, box: [r1(x - reach - 2), r1(y - h - 3), r1(2 * reach + 4), r1(h + 5)] as Box };
 }
 
 function rock(cx: number, cy: number, rx: number, ry: number, r: () => number) {
@@ -71,7 +75,10 @@ function conifer(x: number, y: number, h: number, r: () => number, o: { tiers?: 
   const apex = `${r1(ax)} ${r1(y - h)}`;
   const tw = Math.max(1, h * 0.022);
   const full = `M${apex}L${right.join("L")}L${r1(x + tw)} ${r1(y - trunk)}L${r1(x + tw)} ${r1(y)}L${r1(x - tw)} ${r1(y)}L${r1(x - tw)} ${r1(y - trunk)}L${left.join("L")}Z`;
-  return { full, left: `M${apex}L${[...left].reverse().join("L")}L${r1(x)} ${r1(y - trunk)}Z`, right: `M${apex}L${right.join("L")}L${r1(x)} ${r1(y - trunk)}Z` };
+  const reach = h * slim * 1.15;
+  const x0 = Math.min(x, ax) - reach - 2;
+  const box: Box = [r1(x0), r1(y - h - 3), r1(Math.max(x, ax) + reach + 2 - x0), r1(h + 5)];
+  return { full, left: `M${apex}L${[...left].reverse().join("L")}L${r1(x)} ${r1(y - trunk)}Z`, right: `M${apex}L${right.join("L")}L${r1(x)} ${r1(y - trunk)}Z`, box };
 }
 
 /** A rounded broadleaf crown: a cluster of overlapping circles on a thin trunk. Same return shape as conifer(). */
@@ -86,9 +93,13 @@ function broadleaf(x: number, y: number, h: number, r: () => number) {
   const circle = (c: { cx: number; cy: number; rr: number }) => `M${r1(c.cx - c.rr)} ${r1(c.cy)}a${r1(c.rr)} ${r1(c.rr)} 0 1 0 ${r1(2 * c.rr)} 0a${r1(c.rr)} ${r1(c.rr)} 0 1 0 ${r1(-2 * c.rr)} 0Z`;
   const tw = Math.max(0.8, h * 0.03);
   const trunk = `M${r1(x - tw)} ${r1(y)}L${r1(x - tw)} ${r1(cy)}L${r1(x + tw)} ${r1(cy)}L${r1(x + tw)} ${r1(y)}Z`;
-  const full = trunk + blobs.map(circle).join("");
+  const crown = blobs.map(circle).join("");
   const half = (side: number) => blobs.map((c) => circle({ cx: c.cx + side * c.rr * 0.3, cy: c.cy - c.rr * 0.22, rr: c.rr * 0.62 })).join("");
-  return { full, left: half(-1), right: half(1) };
+  const x0 = Math.min(...blobs.map((c) => c.cx - c.rr)) - 2;
+  const y0 = Math.min(...blobs.map((c) => c.cy - c.rr)) - 2;
+  const box: Box = [r1(x0), r1(y0), r1(Math.max(...blobs.map((c) => c.cx + c.rr)) + 2 - x0), r1(y + 2 - y0)];
+  // The crown pivots where the trunk enters it, so leaves can move without the trunk sliding.
+  return { full: trunk + crown, trunk, crown, left: half(-1), right: half(1), pivot: [r1(x), r1(cy + h * 0.16)] as [number, number], box };
 }
 
 function Back({ id, p, calm, dir }: { id: string; p: Palette; calm: boolean; dir: number }) {
@@ -236,49 +247,101 @@ function NearClassic({ id, p }: { id: string; p: Palette }) {
   const lFlowers = flowers(leftPts, 0, 760, 70);
   const rFlowers = flowers(rightPts, 1030, 1600, 50);
 
-  const lPines = [[34, 1.0], [150, 0.78], [262, 0.52], [352, 0.34]].map(([x, s]) => pine(x!, leftTop(x!) + 22, 330 * s!, r));
-  const rPines = [[1500, 0.62], [1410, 0.44], [1548, 0.36]].map(([x, s]) => pine(x!, rightTop(x!) + 18, 260 * s!, r));
+  const lPines = [[34, 1.0], [150, 0.78], [262, 0.52], [352, 0.34]].map(([x, s]) => ({ x: x!, s: s!, base: r1(leftTop(x!) + 22), ...pine(x!, leftTop(x!) + 22, 330 * s!, r) }));
+  const rPines = [[1500, 0.62], [1410, 0.44], [1548, 0.36]].map(([x, s]) => ({ x: x!, s: s!, base: r1(rightTop(x!) + 18), ...pine(x!, rightTop(x!) + 18, 260 * s!, r) }));
   const rocks = [
     rock(430, leftTop(430) + 40, 74, 34, r), rock(230, leftTop(230) + 90, 54, 26, r), rock(610, leftTop(610) + 52, 46, 20, r),
     rock(1210, rightTop(1210) + 34, 62, 26, r), rock(1460, rightTop(1460) + 70, 82, 34, r), rock(1330, 876, 90, 28, r),
   ];
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className="size-full" aria-hidden focusable="false">
-      <defs>
-        <linearGradient id={`${id}-bank`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={p.bankLit} /><stop offset="1" stopColor={p.bankShade} /></linearGradient>
-        <clipPath id={`${id}-lbc`}><path d={leftPath} /></clipPath>
-        <clipPath id={`${id}-rbc`}><path d={rightPath} /></clipPath>
-      </defs>
-      <path d={leftPath} fill={`url(#${id}-bank)`} />
-      <path d={rightPath} fill={`url(#${id}-bank)`} />
-      <g clipPath={`url(#${id}-lbc)`}>{lDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
-      <g clipPath={`url(#${id}-rbc)`}>{rDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
-      {rocks.map((k, i) => (
-        <g key={i}><path d={k.full} fill={p.rock} /><path d={k.lit} fill={p.rockLit} opacity="0.85" /></g>
-      ))}
-      {[...lFlowers, ...rFlowers].map((f, i) => <circle key={i} cx={f.x} cy={f.y} r={f.s} fill={p.flower} opacity={f.o} />)}
-      {[...rPines, ...lPines].map((t, i) => (
-        <g key={i}><path d={t.full} fill={p.pine} /><path d={t.lit} fill={p.pineLit} opacity="0.85" /></g>
-      ))}
-    </svg>
+    <>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className="size-full" aria-hidden focusable="false">
+        <defs>
+          <linearGradient id={`${id}-bank`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={p.bankLit} /><stop offset="1" stopColor={p.bankShade} /></linearGradient>
+          <clipPath id={`${id}-lbc`}><path d={leftPath} /></clipPath>
+          <clipPath id={`${id}-rbc`}><path d={rightPath} /></clipPath>
+        </defs>
+        <path d={leftPath} fill={`url(#${id}-bank)`} />
+        <path d={rightPath} fill={`url(#${id}-bank)`} />
+        <g clipPath={`url(#${id}-lbc)`}>{lDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
+        <g clipPath={`url(#${id}-rbc)`}>{rDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
+        {rocks.map((k, i) => (
+          <g key={i}><path d={k.full} fill={p.rock} /><path d={k.lit} fill={p.rockLit} opacity="0.85" /></g>
+        ))}
+        {[...lFlowers, ...rFlowers].map((f, i) => <circle key={i} cx={f.x} cy={f.y} r={f.s} fill={p.flower} opacity={f.o} />)}
+      </svg>
+      <Trees>
+        {[...rPines, ...lPines].map((t, i) => (
+          <WindTree key={i} box={t.box} root={[t.x, t.base]} pivot={[t.x, t.base]} wind={windFor("c", t.x, t.s, i)}>
+            <path d={t.full} fill={p.pine} />
+            <path d={t.lit} fill={p.pineLit} opacity="0.85" />
+          </WindTree>
+        ))}
+      </Trees>
+    </>
   );
 }
 
-type Tree = { side: "l" | "r"; x: number; s: number; kind: "c" | "b"; tiers?: number; slim?: number; lean?: number; sway?: [number, number] };
-// Varied by hand: heights, species, slenderness and spacing differ. Three of the near ones sway, each on its own timing.
+type Tree = { side: "l" | "r"; x: number; s: number; kind: "c" | "b"; tiers?: number; slim?: number; lean?: number };
+// Varied by hand: heights, species, slenderness and spacing differ.
 const TREES: Tree[] = [
-  { side: "l", x: 22, s: 1.0, kind: "c", tiers: 6, slim: 0.17, lean: 0.02, sway: [9.4, -2.1] },
+  { side: "l", x: 22, s: 1.0, kind: "c", tiers: 6, slim: 0.17, lean: 0.02 },
   { side: "l", x: 104, s: 0.62, kind: "b" },
-  { side: "l", x: 166, s: 0.84, kind: "c", tiers: 5, slim: 0.21, lean: -0.015, sway: [11.2, -6.4] },
+  { side: "l", x: 166, s: 0.84, kind: "c", tiers: 5, slim: 0.21, lean: -0.015 },
   { side: "l", x: 246, s: 0.46, kind: "c", tiers: 4, slim: 0.19 },
   { side: "l", x: 306, s: 0.56, kind: "b" },
   { side: "l", x: 378, s: 0.3, kind: "c", tiers: 4, slim: 0.2, lean: 0.03 },
-  { side: "r", x: 1496, s: 0.68, kind: "c", tiers: 6, slim: 0.16, lean: -0.02, sway: [8.3, -4.2] },
+  { side: "r", x: 1496, s: 0.68, kind: "c", tiers: 6, slim: 0.16, lean: -0.02 },
   { side: "r", x: 1420, s: 0.4, kind: "b" },
   { side: "r", x: 1558, s: 0.48, kind: "c", tiers: 5, slim: 0.2, lean: 0.02 },
   { side: "r", x: 1352, s: 0.26, kind: "c", tiers: 4, slim: 0.18 },
 ];
+
+/**
+ * How one near tree moves in the wind. The whole tree leans from its trunk base as gusts arrive (keyframes gust-* in
+ * app/wind.css: tall trees answer slowly, small ones quickly) and its crown flutters on a faster loop of its own.
+ * Every tree shares the 24 s gust cycle and is delayed by its distance from the left edge, so each gust crosses the scene
+ * from left to right with the clouds.
+ */
+function windFor(kind: "c" | "b", x: number, s: number, i: number) {
+  const size = s >= 0.75 ? "t" : s >= 0.45 ? "m" : "s";
+  const fdur = 8.5 + ((i * 1.37) % 3);
+  return { gust: `gust-${size}-${kind}`, lag: `${r1((x / W) * 3.2 - 24)}s`, flutter: `flutter-${kind}`, fdur: `${r1(fdur)}s`, fdel: `${r1(-((i * 2.3) % fdur))}s` };
+}
+
+const pct = (v: number, start: number, len: number) => `${r1(((v - start) / len) * 100)}%`;
+
+/**
+ * One near tree on its own layer, placed exactly where the scene's slice-scaled SVG would draw it (--u is one scene unit,
+ * set by <Trees>). Each tree is a separate element so the browser animates it on the compositor: moving trees cost no
+ * restyle or repaint of the page.
+ */
+function WindTree({ box, root, pivot, wind, trunk, children }: { box: Box; root: [number, number]; pivot: [number, number]; wind: ReturnType<typeof windFor>; trunk?: ReactNode; children: ReactNode }) {
+  const [x0, y0, w, h] = box;
+  const vb = `${x0} ${y0} ${w} ${h}`;
+  return (
+    <div
+      className={`tree ${wind.gust}`}
+      style={{ left: `calc(50cqw + ${r1(x0 - W / 2)} * var(--u))`, top: `calc(100cqh + ${r1(y0 - H)} * var(--u))`, width: `calc(${w} * var(--u))`, height: `calc(${h} * var(--u))`, transformOrigin: `${pct(root[0], x0, w)} ${pct(root[1], y0, h)}`, animationDelay: wind.lag }}
+    >
+      {trunk && <svg viewBox={vb} preserveAspectRatio="none" className="absolute inset-0 size-full" focusable="false">{trunk}</svg>}
+      {/* A div, not the svg itself: Chrome only hands rotate animations on HTML boxes to the compositor. */}
+      <div className={`crown ${wind.flutter} absolute inset-0`} style={{ transformOrigin: `${pct(pivot[0], x0, w)} ${pct(pivot[1], y0, h)}`, animationDuration: wind.fdur, animationDelay: wind.fdel }}>
+        <svg viewBox={vb} preserveAspectRatio="none" className="size-full" focusable="false">{children}</svg>
+      </div>
+    </div>
+  );
+}
+
+/** The layer the near trees sit on. It maps scene units to the same slice scaling as the scene's SVGs (xMidYMax). */
+function Trees({ children }: { children: ReactNode }) {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 [container-type:size]" style={{ "--u": `max(calc(100cqw / ${W}), calc(100cqh / ${H}))` } as CSSProperties}>
+      {children}
+    </div>
+  );
+}
 
 function NearCalm({ id, p, dir }: { id: string; p: Palette; dir: number }) {
   const r = rng(77);
@@ -306,36 +369,41 @@ function NearCalm({ id, p, dir }: { id: string; p: Palette; dir: number }) {
     rock(1210, rightTop(1210) + 34, 62, 26, r), rock(1460, rightTop(1460) + 70, 82, 34, r), rock(1330, 876, 90, 28, r),
   ];
   const trees = TREES.map((t) => {
-    const base = (t.side === "l" ? leftTop(t.x) : rightTop(t.x)) + 20;
+    const base = r1((t.side === "l" ? leftTop(t.x) : rightTop(t.x)) + 20);
     const h = 330 * t.s;
-    const shape = t.kind === "c" ? conifer(t.x, base, h, r, { tiers: t.tiers, slim: t.slim, lean: t.lean }) : broadleaf(t.x, base, h * 0.8, r);
-    return { ...t, ...shape };
+    if (t.kind === "c") return { ...t, base, ...conifer(t.x, base, h, r, { tiers: t.tiers, slim: t.slim, lean: t.lean }), trunk: undefined, pivot: [t.x, base] as [number, number] };
+    const b = broadleaf(t.x, base, h * 0.8, r);
+    return { ...t, base, ...b, full: b.crown };
   });
   const crown = (k: "c" | "b") => (k === "c" ? p.pine : p.crown ?? p.pine);
   const crownLit = (k: "c" | "b") => (k === "c" ? p.pineLit : p.crownLit ?? p.pineLit);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className="size-full" aria-hidden focusable="false">
-      <defs>
-        <linearGradient id={`${id}-bank`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={p.bankLit} /><stop offset="1" stopColor={p.bankShade} /></linearGradient>
-        <clipPath id={`${id}-lbc`}><path d={leftPath} /></clipPath>
-        <clipPath id={`${id}-rbc`}><path d={rightPath} /></clipPath>
-      </defs>
-      <path d={leftPath} fill={`url(#${id}-bank)`} />
-      <path d={rightPath} fill={`url(#${id}-bank)`} />
-      <g clipPath={`url(#${id}-lbc)`}>{lDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
-      <g clipPath={`url(#${id}-rbc)`}>{rDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
-      {rocks.map((k, i) => (
-        <g key={i}><path d={k.full} fill={p.rock} /><path d={k.lit} fill={p.rockLit} opacity="0.8" /></g>
-      ))}
-      {trees.map((t, i) => (
-        <g key={i} className={t.sway ? "sway" : undefined} style={t.sway ? ({ "--dur": `${t.sway[0]}s`, "--delay": `${t.sway[1]}s` } as CSSProperties) : undefined}>
-          <path d={t.full} fill={crown(t.kind)} />
-          <path d={dir < 0 ? t.left : t.right} fill={crownLit(t.kind)} opacity="0.85" />
-          <path d={dir < 0 ? t.right : t.left} fill={p.treeShade ?? p.pine} opacity="0.32" />
-        </g>
-      ))}
-    </svg>
+    <>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className="size-full" aria-hidden focusable="false">
+        <defs>
+          <linearGradient id={`${id}-bank`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={p.bankLit} /><stop offset="1" stopColor={p.bankShade} /></linearGradient>
+          <clipPath id={`${id}-lbc`}><path d={leftPath} /></clipPath>
+          <clipPath id={`${id}-rbc`}><path d={rightPath} /></clipPath>
+        </defs>
+        <path d={leftPath} fill={`url(#${id}-bank)`} />
+        <path d={rightPath} fill={`url(#${id}-bank)`} />
+        <g clipPath={`url(#${id}-lbc)`}>{lDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
+        <g clipPath={`url(#${id}-rbc)`}>{rDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
+        {rocks.map((k, i) => (
+          <g key={i}><path d={k.full} fill={p.rock} /><path d={k.lit} fill={p.rockLit} opacity="0.8" /></g>
+        ))}
+      </svg>
+      <Trees>
+        {trees.map((t, i) => (
+          <WindTree key={i} box={t.box} root={[t.x, t.base]} pivot={t.pivot} wind={windFor(t.kind, t.x, t.s, i)} trunk={t.trunk && <path d={t.trunk} fill={crown(t.kind)} />}>
+            <path d={t.full} fill={crown(t.kind)} />
+            <path d={dir < 0 ? t.left : t.right} fill={crownLit(t.kind)} opacity="0.85" />
+            <path d={dir < 0 ? t.right : t.left} fill={p.treeShade ?? p.pine} opacity="0.32" />
+          </WindTree>
+        ))}
+      </Trees>
+    </>
   );
 }
 
