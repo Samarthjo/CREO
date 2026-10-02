@@ -19,8 +19,8 @@ export function HumanAiSection() {
   return (
     <section id="human" ref={ref} className={cn("relative", pinned && "h-[320svh]")}>
       <div className={cn("relative overflow-hidden", pinned ? "sticky top-0 flex h-svh flex-col justify-center" : "py-20")}>
-        <Cloud time="dusk" seed={6} className="drift-x absolute -left-[5%] top-[4%] w-[17rem] sm:w-[26rem]" style={{ "--dur": "100s" } as CSSProperties} />
-        <Cloud time="dusk" seed={9} className="drift-x absolute -right-[4%] top-[34%] w-[13rem] sm:w-[19rem]" style={{ "--dur": "130s", "--delay": "-50s" } as CSSProperties} />
+        <Cloud time="dusk" look="classic" seed={6} className="wind absolute -left-[5%] top-[4%] w-[17rem] sm:w-[26rem]" style={{ "--dur": "320s", "--run": "5vw" } as CSSProperties} />
+        <Cloud time="dusk" look="classic" seed={9} className="wind absolute -right-[4%] top-[34%] w-[13rem] sm:w-[19rem]" style={{ "--dur": "420s", "--delay": "-150s", "--run": "5vw" } as CSSProperties} />
 
         <div className="relative mx-auto w-full max-w-[76rem] px-5 sm:px-6">
           <div className="flex flex-col items-center text-center">

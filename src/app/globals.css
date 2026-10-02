@@ -221,13 +221,35 @@
 }
 
 /* Scene motion. Only transform and opacity animate. */
-@keyframes drift-x { from { transform: translate3d(-2.5%, 0, 0); } to { transform: translate3d(2.5%, 0, 0); } }
-@keyframes drift-y { from { transform: translate3d(0, -6px, 0); } to { transform: translate3d(0, 6px, 0); } }
-@keyframes bird { from { transform: translate3d(-4vw, 2vh, 0); opacity: 0; } 15%, 85% { opacity: 0.7; } to { transform: translate3d(110vw, -6vh, 0); opacity: 0; } }
-.drift-x { animation: drift-x var(--dur, 60s) ease-in-out infinite alternate; animation-delay: var(--delay, 0s); }
-.drift-y { animation: drift-y var(--dur, 9s) ease-in-out infinite alternate; animation-delay: var(--delay, 0s); }
-@keyframes twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
-.twinkle { animation: twinkle 4.5s ease-in-out infinite; }
+
+/*
+  Calm motion. Wind blows one way: a cloud fades in, drifts a short way at its own slow speed, fades out, and starts again,
+  so nothing ever reverses. A few near trees sway a hair around their trunks. Everything else in the scene is still.
+  Both stop when the visitor turns motion off, when the device asks for less, on touch screens, and while off screen.
+*/
+.wind { opacity: var(--o, 1); }
+.sway { transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes wind {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  14%, 86% { opacity: var(--o, 1); }
+  100% { transform: translate3d(var(--run, 8vw), 0, 0); opacity: 0; }
+}
+@keyframes sway { from { transform: rotate(-0.55deg); } to { transform: rotate(0.65deg); } }
+@media (prefers-reduced-motion: no-preference) {
+  .wind { animation: wind var(--dur, 300s) linear infinite; animation-delay: var(--delay, 0s); }
+  @media (pointer: fine) {
+    .sway { animation: sway var(--dur, 9s) ease-in-out infinite alternate; animation-delay: var(--delay, 0s); }
+  }
+}
+[data-offscreen] .wind, [data-offscreen] .sway, html[data-tab-hidden] .wind, html[data-tab-hidden] .sway { animation-play-state: paused; }
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+/* Nothing waits for an entrance animation on a phone, with reduced motion, or with the motion switch off. */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) { [data-reveal] { opacity: 1 !important; transform: none !important; } }
+html[data-motion="off"] [data-reveal] { opacity: 1 !important; transform: none !important; }
 
 /* The sky of a scene fades into the page so it never ends in a hard edge at the top. */
 .scene-fade-top {
@@ -249,6 +271,12 @@
   :root:not([data-theme="light"]) [data-time]:not([data-time="night"])::after { opacity: 1; }
 }
 
+/* The hero's sky dissolves into the page over its top half, so text over the peaks stays clear. */
+.scene-fade-long {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.35) 24%, #000 52%);
+  mask-image: linear-gradient(to bottom, transparent 0, rgb(0 0 0 / 0.35) 24%, #000 52%);
+}
+
 /* A little paper grain over the painted layers. */
 .grain {
   opacity: 0.16;
@@ -257,7 +285,7 @@
 
 /* Scene parallax: pure CSS scroll-driven animation. Browsers without support just show a still scene. */
 @supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
+  @media (prefers-reduced-motion: no-preference) and (pointer: fine) {
     .px { animation: px-shift linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; will-change: transform; }
     @keyframes px-shift {
       from { transform: translate3d(0, calc(var(--px) * -0.9), 0); }

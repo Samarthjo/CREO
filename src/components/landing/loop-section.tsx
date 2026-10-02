@@ -2,7 +2,6 @@
 
 import { BookmarkSimple, ChartLineUp, Compass, PaperPlaneTilt, PencilSimpleLine, TrendUp } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
-import { Cloud } from "../scene/cloud";
 import { Accent, Chip, Eyebrow, FitScore, Mark, cn } from "../ui/kit";
 import { demoPackage, getDemo } from "./demo";
 import { usePinnedSteps } from "./use-pinned-steps";
@@ -35,9 +34,6 @@ export function LoopSection() {
   return (
     <section id="loop" ref={ref} className={cn("relative", pinned && "h-[460svh]")}>
       <div className={cn("relative overflow-hidden bg-[linear-gradient(180deg,var(--bg)_0%,var(--sky-tint)_42%,var(--bg)_100%)]", pinned ? "sticky top-0 flex h-svh items-center" : "py-20")}>
-        <Cloud time="day" seed={3} className="drift-x absolute -left-[4%] top-[8%] w-[18rem] opacity-90 sm:w-[24rem]" style={{ "--dur": "95s" } as React.CSSProperties} />
-        <Cloud time="day" seed={8} className="drift-x absolute -right-[4%] bottom-[10%] w-[16rem] opacity-80 sm:w-[22rem]" style={{ "--dur": "120s", "--delay": "-40s" } as React.CSSProperties} />
-
         <div className="relative mx-auto grid grid-cols-[minmax(0,1fr)] w-full max-w-[76rem] items-center gap-10 px-5 sm:px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
           <div>
             <Eyebrow>The learning loop</Eyebrow>
@@ -51,7 +47,7 @@ export function LoopSection() {
                 const on = i === active;
                 return (
                   <li key={s.id}>
-                    <button type="button" onClick={() => go(i)} aria-current={on ? "step" : undefined} className="group flex w-full items-start gap-3.5 rounded-control px-2 py-2 text-left">
+                    <button type="button" onClick={() => go(i)} aria-current={on ? "step" : undefined} className="group flex min-h-11 w-full items-start gap-3.5 rounded-control px-2 py-2 text-left">
                       <span className={cn("tnum mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold transition-colors duration-300", on ? "bg-lime-400 text-[#11140c]" : i < active ? "bg-cta text-on-cta" : "border border-line-strong text-muted")}>{i + 1}</span>
                       <span className="min-w-0">
                         <span className={cn("block text-[0.9375rem] font-medium transition-colors", on ? "text-ink" : "text-muted group-hover:text-ink")}>{s.title}</span>
@@ -83,10 +79,10 @@ export function LoopSection() {
                   onClick={() => go(i)}
                   aria-label={`Step ${i + 1}: ${s.title}`}
                   aria-current={on ? "step" : undefined}
-                  className={cn("absolute grid size-11 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border transition-all duration-500 sm:size-14", on ? "scale-110 border-transparent bg-lime-400 text-[#11140c] shadow-[0_0_0_8px_rgb(181_207_79/0.25)]" : i < active ? "border-transparent bg-cta text-on-cta" : "border-line-strong bg-bg text-muted hover:text-ink")}
+                  className={cn("absolute -ml-[22px] -mt-[22px] grid size-11 place-items-center rounded-full border transition-[color,background-color,border-color,box-shadow] duration-500 sm:-ml-7 sm:-mt-7 sm:size-14", on ? "border-transparent bg-lime-400 text-[#11140c] shadow-[0_0_0_8px_rgb(181_207_79/0.25)]" : i < active ? "border-transparent bg-cta text-on-cta" : "border-line-strong bg-bg text-muted hover:text-ink")}
                   style={pos(i)}
                 >
-                  <Icon size={22} weight={on ? "fill" : "regular"} />
+                  <Icon size={24} weight={on ? "fill" : "regular"} />
                 </button>
               );
             })}

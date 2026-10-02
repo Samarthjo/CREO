@@ -19,8 +19,8 @@ function Editable({ value, label, multiline, onSave, className }: { value: strin
       <div className="flex items-start gap-2">
         <p className={cn("min-w-0 flex-1 whitespace-pre-line", className)}><Slots text={value} /></p>
         {onSave && (
-          <button type="button" aria-label={`Edit ${label}`} onClick={() => { setDraft(value); setReason(""); setEditing(true); }} className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-muted transition hover:bg-sunk hover:text-ink">
-            <PencilSimple size={15} />
+          <button type="button" aria-label={`Edit ${label}`} onClick={() => { setDraft(value); setReason(""); setEditing(true); }} className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full text-muted transition hover:bg-sunk hover:text-ink pointer-coarse:size-11">
+            <PencilSimple size={16} />
           </button>
         )}
       </div>
@@ -64,7 +64,7 @@ export function PackageView({ pkg, onEdit, onChooseHook }: { pkg: StudioPackage;
                 <div className="mb-2 flex items-center gap-2">
                   <Chip tone={h.recommended ? "mark" : "neutral"}>{h.style}</Chip>
                   {h.recommended && <span className="text-xs text-muted">Recommended for you</span>}
-                  <button type="button" role="radio" aria-checked={h.id === pkg.chosenHook} onClick={() => onChooseHook?.(h.id)} disabled={!onChooseHook} className={cn("ml-auto rounded-full px-3 py-1 text-xs font-medium transition", h.id === pkg.chosenHook ? "bg-ink text-bg" : "border border-line-strong text-ink hover:bg-sunk", !onChooseHook && "pointer-events-none")}>
+                  <button type="button" role="radio" aria-checked={h.id === pkg.chosenHook} onClick={() => onChooseHook?.(h.id)} disabled={!onChooseHook} className={cn("ml-auto rounded-full px-3 py-1 text-xs font-medium transition pointer-coarse:min-h-11 pointer-coarse:px-4", h.id === pkg.chosenHook ? "bg-ink text-bg" : "border border-line-strong text-ink hover:bg-sunk", !onChooseHook && "pointer-events-none")}>
                     {h.id === pkg.chosenHook ? "Using this hook" : "Use this hook"}
                   </button>
                 </div>

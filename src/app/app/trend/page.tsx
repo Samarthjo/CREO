@@ -101,7 +101,7 @@ export default function TrendPage() {
                   <p className="mt-2 max-w-[56ch] text-sm text-muted">{current.pattern.summary}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {current.pattern.source === "creator" && <Button variant="quiet" size="sm" onClick={() => { dispatch({ type: "pattern-remove", id: current.pattern.id }); setSel(null); }}><Trash size={15} />Remove</Button>}
+                  {current.pattern.source === "creator" && <Button variant="quiet" size="sm" onClick={() => { dispatch({ type: "pattern-remove", id: current.pattern.id }); setSel(null); }}><Trash size={16} />Remove</Button>}
                   <Button variant="primary" size="lg" onClick={() => router.push(`/app/studio?trend=${current.pattern.id}`)}>Turn this into my content</Button>
                 </div>
               </div>

@@ -67,7 +67,7 @@ export function StudioClient() {
               <Field label="Topic" hint="What the video is about, in a few words.">
                 <Input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="e.g. competitor research" aria-invalid={!!err} />
                 <span className="flex flex-wrap gap-1.5 pt-1">
-                  {ws.dna.topics.slice(0, 4).map((t) => <button key={t} type="button" onClick={() => setTopic(t)} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted transition hover:border-ink hover:text-ink">{t}</button>)}
+                  {ws.dna.topics.slice(0, 4).map((t) => <button key={t} type="button" onClick={() => setTopic(t)} className="rounded-full border border-line px-2.5 py-0.5 text-xs text-muted transition pointer-coarse:min-h-11 pointer-coarse:px-3.5 hover:border-ink hover:text-ink">{t}</button>)}
                 </span>
                 {err && <span className="text-xs font-medium text-risk" role="alert">{err}</span>}
               </Field>
@@ -101,7 +101,7 @@ export function StudioClient() {
                 <h2 className="font-display text-[1.5rem] font-semibold leading-tight tracking-tight">{cap(current.topic)}</h2>
                 <Chip tone={STATUS[current.status]}>{STATUS_LABEL[current.status]}</Chip>
                 {current.trendTitle && <Chip tone="outline">{current.trendTitle}</Chip>}
-                <button type="button" aria-label="Delete this package" className="ml-auto text-muted transition hover:text-risk" onClick={() => { dispatch({ type: "pkg-remove", id: current.id }); setSel(null); }}><Trash size={17} /></button>
+                <button type="button" aria-label="Delete this package" className="ml-auto grid size-11 place-items-center rounded-full text-muted transition hover:bg-sunk hover:text-risk lg:size-9" onClick={() => { dispatch({ type: "pkg-remove", id: current.id }); setSel(null); }}><Trash size={20} /></button>
               </div>
               <PackageView
                 key={current.id}

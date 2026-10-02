@@ -5,5 +5,5 @@ import { SubPage } from "@/components/landing/subpage";
 export const metadata: Metadata = { title: "FAQ" };
 
 export default function FaqPage() {
-  return <SubPage title="FAQ" night><Faq /></SubPage>;
+  return <SubPage title="FAQ"><Faq /></SubPage>;
 }

@@ -1,11 +1,8 @@
 import type { CSSProperties } from "react";
 import { Cloud } from "../scene/cloud";
 import { Landscape } from "../scene/landscape";
-import { GlassTiles, tileSpots } from "../scene/tiles";
 import { Accent, Eyebrow } from "../ui/kit";
 import { Ticket, TicketStrip } from "../ui/ticket";
-
-const TILES = tileSpots(9, [{ x: 8, y: 62, n: 3, spread: 8 }, { x: 94, y: 56, n: 3, spread: 7 }]);
 
 /**
  * Section 9: social proof, done honestly. There are no founding creators yet, so there are no quotes, logos or results.
@@ -14,9 +11,8 @@ const TILES = tileSpots(9, [{ x: 8, y: 62, n: 3, spread: 8 }, { x: 94, y: 56, n:
 export function ProofSection() {
   return (
     <section id="proof" className="relative">
-      <Landscape time="dusk" fadeTop={false} className="h-[60rem] sm:h-[54rem] lg:h-[58rem]">
-        <Cloud time="dusk" seed={4} className="drift-x absolute -left-[6%] top-[27%] w-[14rem] sm:top-[5%] sm:-left-[4%] sm:w-[24rem]" style={{ "--dur": "110s" } as CSSProperties} />
-        <GlassTiles spots={TILES} />
+      <Landscape time="dusk" look="classic" fadeTop={false} className="h-[60rem] sm:h-[54rem] lg:h-[58rem]">
+        <Cloud time="dusk" look="classic" seed={4} className="wind absolute -left-[6%] top-[27%] w-[14rem] sm:top-[5%] sm:-left-[4%] sm:w-[24rem]" style={{ "--dur": "340s", "--run": "5vw" } as CSSProperties} />
         <div className="night absolute inset-0 flex flex-col items-center px-5 pt-20 text-center sm:px-6 lg:pt-28">
           <Eyebrow>Founding creators</Eyebrow>
           <h2 className="mt-5 max-w-[14ch] font-display text-[clamp(2.4rem,5.4vw,4.75rem)] font-normal leading-[1.02] tracking-[-0.04em]">Be creator <Accent>#01</Accent>.</h2>

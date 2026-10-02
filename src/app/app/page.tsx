@@ -39,7 +39,7 @@ export default function HqPage() {
           <Panel as="section" className="p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold">Approvals</h2>
-              <Link href="/app/approvals" className="text-[0.8125rem] font-medium text-muted underline-offset-4 hover:text-ink hover:underline">View all</Link>
+              <Link href="/app/approvals" className="inline-flex min-h-5 items-center text-[0.8125rem] font-medium leading-5 text-muted underline-offset-4 hover:text-ink hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-end">View all</Link>
             </div>
             {pending.length ? (
               <ul className="mt-3 divide-y divide-line">
@@ -59,7 +59,7 @@ export default function HqPage() {
           <Panel as="section" className="p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold">Creator DNA</h2>
-              <Link href="/app/dna" className="text-[0.8125rem] font-medium text-muted underline-offset-4 hover:text-ink hover:underline">Open</Link>
+              <Link href="/app/dna" className="inline-flex min-h-5 items-center text-[0.8125rem] font-medium leading-5 text-muted underline-offset-4 hover:text-ink hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-end">Open</Link>
             </div>
             <ul className="mt-3 space-y-2.5 text-sm text-body">
               {insights.lines.slice(0, 3).map((l) => <li key={l}>{l}</li>)}
@@ -70,7 +70,7 @@ export default function HqPage() {
           <Panel as="section" className="p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold">Memory</h2>
-              <Link href="/app/memory" className="text-[0.8125rem] font-medium text-muted underline-offset-4 hover:text-ink hover:underline">Open</Link>
+              <Link href="/app/memory" className="inline-flex min-h-5 items-center text-[0.8125rem] font-medium leading-5 text-muted underline-offset-4 hover:text-ink hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-end">Open</Link>
             </div>
             {ws.memory.length ? <ul className="mt-2">{ws.memory.slice(0, 3).map((m) => <MemoryRow key={m.id} item={m} compact />)}</ul> : <p className="mt-3 text-sm text-muted">Approvals, edits and results will appear here and shape the next draft.</p>}
           </Panel>

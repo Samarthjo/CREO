@@ -100,7 +100,7 @@ function Deal({ q, dna, dispatch, requestApproval, onDelete }: { q: Inquiry; dna
         <h2 className="font-display text-[1.75rem] font-semibold leading-tight tracking-tight">{q.extraction.brand ?? "Unknown brand"}</h2>
         <Chip tone={healthTone(ev.health)}>{HEALTH_LABEL[ev.health]}, {ev.score} of 100</Chip>
         <Chip tone="outline">CREO suggests: {ev.recommendation}</Chip>
-        <button type="button" aria-label="Delete this inquiry" onClick={onDelete} className="ml-auto text-muted transition hover:text-risk"><Trash size={17} /></button>
+        <button type="button" aria-label="Delete this inquiry" onClick={onDelete} className="ml-auto grid size-11 place-items-center rounded-full text-muted transition hover:bg-sunk hover:text-risk lg:size-9"><Trash size={20} /></button>
       </header>
 
       <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">

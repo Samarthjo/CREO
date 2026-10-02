@@ -11,6 +11,8 @@ export interface Palette {
   rock: string; rockLit: string;
   pine: string; pineLit: string; flower: string;
   cloudTop: string; cloudBottom: string; cloudLight: string;
+  /** Rounded broadleaf crowns, and the darker side of every tree (the side away from the light). Calm look only. */
+  crown?: string; crownLit?: string; treeShade?: string;
 }
 
 /** Original palettes for the four times of day. The page walks dawn, day, dusk, night as you scroll. */
@@ -64,3 +66,40 @@ export const PALETTES: Record<Time, Palette> = {
     cloudTop: "#4a5bb0", cloudBottom: "#1c2465", cloudLight: "#7686d4",
   },
 };
+
+/**
+ * The calm look: muted slate, forest and cream, with one light direction per scene (from the side the sun or moon is on).
+ * Pastel pinks and lavenders are gone; the page's lime accent carries the colour. Only the times of day the site uses are
+ * defined here; the others fall back to PALETTES.
+ */
+export const CALM_PALETTES: Partial<Record<Time, Palette>> = {
+  dawn: {
+    skyTop: "#dde4e4", skyMid: "#ecefe6", skyLow: "#f6f0df",
+    glow: "#fff3d6", glowOpacity: 0.9, sunX: 0.28, moon: false,
+    farShade: "#b3c0c3", farLit: "#d6dedb", farSnow: "#f8f6ee",
+    midShade: "#8a9ca1", midLit: "#b4c2bd", haze: "#eef0e5",
+    lakeTop: "#dfe6e0", lakeLow: "#7f9a9c", glint: "#fbf8ee",
+    shore: "#44604f", shoreLit: "#628069",
+    bankLit: "#86a35a", bankShade: "#3b5532", bankDab: "#a3bd6d",
+    rock: "#78838a", rockLit: "#aab3b6",
+    pine: "#244538", pineLit: "#3b6a50", flower: "#f7f4e8",
+    cloudTop: "#f7f1e4", cloudBottom: "#c3ced1", cloudLight: "#fffbf1",
+    crown: "#3f6247", crownLit: "#6a8c62", treeShade: "#10241c",
+  },
+  night: {
+    skyTop: "#0d1130", skyMid: "#151b43", skyLow: "#222c63",
+    glow: "#d7ddf2", glowOpacity: 0.5, sunX: 0.74, moon: true,
+    farShade: "#1f2862", farLit: "#37458a", farSnow: "#aeb9e0",
+    midShade: "#161d52", midLit: "#2d3a84", haze: "#27327a",
+    lakeTop: "#34439a", lakeLow: "#0c1240", glint: "#dde3f8",
+    shore: "#0d1f2b", shoreLit: "#16343d",
+    bankLit: "#1c3b44", bankShade: "#0a1b22", bankDab: "#2a4f52",
+    rock: "#2e3a7c", rockLit: "#4f5ca0",
+    pine: "#07161c", pineLit: "#0f2a31", flower: "#9fabdc",
+    cloudTop: "#424f9e", cloudBottom: "#1a2260", cloudLight: "#6a79c6",
+    crown: "#0b1f27", crownLit: "#16343d", treeShade: "#030b0f",
+  },
+};
+
+export type Look = "calm" | "classic";
+export const paletteFor = (time: Time, look: Look): Palette => (look === "calm" ? CALM_PALETTES[time] ?? PALETTES[time] : PALETTES[time]);

@@ -44,7 +44,7 @@ function NavLinks({ path, pendingCount }: { path: string; pendingCount: number }
                     aria-current={active ? "page" : undefined}
                     className={cn("flex h-11 items-center gap-3 rounded-full px-3 text-sm font-medium transition lg:h-10", active ? "bg-mark-wash text-ink" : "text-muted hover:bg-sunk hover:text-ink")}
                   >
-                    <Icon size={19} weight={active ? "fill" : "regular"} className="shrink-0" />
+                    <Icon size={20} weight={active ? "fill" : "regular"} className="shrink-0" />
                     <span>{it.label}</span>
                     {it.badge && pendingCount > 0 && (
                       <span className="tnum ml-auto grid size-5 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg">{pendingCount}</span>
@@ -125,7 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
 
       <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-3 border-b border-line bg-surface/95 px-4 backdrop-blur lg:hidden">
-        <Link href="/" aria-label="CREO home"><Logo /></Link>
+        <Link href="/" aria-label="CREO home" className="flex h-11 items-center"><Logo /></Link>
         <span className="min-w-0 truncate text-sm font-medium text-ink">{current}</span>
         <div className="flex items-center gap-1">
           <ThemeToggle />
@@ -136,7 +136,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             aria-expanded={open}
             aria-controls="app-menu"
             onClick={() => setOpen((o) => !o)}
-            className="grid size-10 place-items-center rounded-full text-ink transition hover:bg-sunk"
+            className="grid size-11 place-items-center rounded-full text-ink transition hover:bg-sunk"
           >
             {open ? <X size={20} /> : <List size={20} />}
           </button>

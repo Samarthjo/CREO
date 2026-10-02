@@ -1,13 +1,13 @@
 import type { CSSProperties } from "react";
 import { cn } from "../ui/kit";
 import { r1, rng } from "./noise";
-import { PALETTES, type Time } from "./palette";
+import { paletteFor, type Look, type Time } from "./palette";
 
 /** A soft painted cumulus with a flat base and long wisps, in the palette of the given time of day. */
-export function Cloud({ time, seed = 1, className, style }: { time: Time; seed?: number; className?: string; style?: CSSProperties }) {
-  const p = PALETTES[time];
+export function Cloud({ time, look = "calm", seed = 1, className, style }: { time: Time; look?: Look; seed?: number; className?: string; style?: CSSProperties }) {
+  const p = paletteFor(time, look);
   const r = rng(seed * 101);
-  const id = `cl-${time}-${seed}`;
+  const id = `cl-${look}-${time}-${seed}`;
   const puffs = Array.from({ length: 13 }, (_, i) => {
     const t = i / 12;
     const hump = Math.sin(Math.PI * (0.08 + 0.84 * t));

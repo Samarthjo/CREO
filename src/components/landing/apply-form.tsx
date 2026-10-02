@@ -53,7 +53,7 @@ export function ApplyForm() {
       <div className="hidden" aria-hidden><label>Website<input tabIndex={-1} autoComplete="off" value={v.website} onChange={set("website")} /></label></div>
       <div className="flex flex-col gap-1.5 md:col-span-2">
         <label className="flex items-start gap-3 text-sm text-body">
-          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 size-4 accent-[var(--ink)]" aria-invalid={!!errors.agreed} />
+          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 size-4 shrink-0 accent-[var(--ink)] pointer-coarse:size-5" aria-invalid={!!errors.agreed} />
           <span>I'll share weekly feedback and let CREO quote my results with permission.</span>
         </label>
         {err("agreed")}

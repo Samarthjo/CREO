@@ -1,22 +1,14 @@
 import { Cloud } from "../../scene/cloud";
 import { Landscape } from "../../scene/landscape";
-import { GlassTiles, tileSpots } from "../../scene/tiles";
 import { Accent, Button, Eyebrow } from "../../ui/kit";
 import { HeroProduct } from "./hero-product";
-
-const TILES = tileSpots(3, [
-  { x: 6, y: 52, n: 4, spread: 9 },
-  { x: 93, y: 44, n: 3, spread: 7 },
-  { x: 24, y: 80, n: 2, spread: 6 },
-]);
 
 export function ClassicHero() {
   return (
     <section id="top" className="relative isolate pb-16 pt-28 sm:pt-32 lg:pb-24">
-      <Landscape time="dawn" className="absolute inset-x-0 top-36 -z-10 h-[42rem] rounded-b-[2.5rem] sm:h-[50rem] lg:top-40 lg:h-[58.5rem] lg:rounded-b-[4rem]">
-        <Cloud time="dawn" seed={2} className="drift-x absolute -left-[6%] top-[14%] w-[16rem] sm:w-[22rem]" style={{ "--dur": "90s" } as React.CSSProperties} />
-        <Cloud time="dawn" seed={5} className="drift-x absolute -right-[5%] top-[22%] w-[15rem] sm:w-[21rem]" style={{ "--dur": "110s", "--delay": "-30s" } as React.CSSProperties} />
-        <GlassTiles spots={TILES} />
+      <Landscape time="dawn" look="classic" className="absolute inset-x-0 top-36 -z-10 h-[42rem] rounded-b-[2.5rem] sm:h-[50rem] lg:top-40 lg:h-[58.5rem] lg:rounded-b-[4rem]">
+        <Cloud time="dawn" look="classic" seed={2} className="wind absolute -left-[6%] top-[14%] w-[16rem] sm:w-[22rem]" style={{ "--dur": "300s", "--run": "5vw" } as React.CSSProperties} />
+        <Cloud time="dawn" look="classic" seed={5} className="wind absolute -right-[5%] top-[22%] w-[15rem] sm:w-[21rem]" style={{ "--dur": "360s", "--delay": "-90s", "--run": "5vw" } as React.CSSProperties} />
       </Landscape>
 
       <div className="mx-auto flex w-full max-w-[72rem] flex-col items-center px-5 text-center sm:px-6">

@@ -14,7 +14,7 @@ export function Tabs<T extends string>({ items, value, onChange, label }: { item
           type="button"
           aria-selected={value === it.id}
           onClick={() => onChange(it.id)}
-          className={cn("whitespace-nowrap rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium transition", value === it.id ? "bg-surface text-ink shadow-[0_1px_2px_rgb(18_24_34/0.12)]" : "text-muted hover:text-ink")}
+          className={cn("whitespace-nowrap rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium leading-5 transition pointer-coarse:min-h-11", value === it.id ? "bg-surface text-ink shadow-[0_1px_2px_rgb(18_24_34/0.12)]" : "text-muted hover:text-ink")}
         >
           {it.label}
         </button>
@@ -50,7 +50,7 @@ export function CopyButton({ text, label = "Copy", className }: { text: string; 
         }
       }}
     >
-      {done ? <Check size={14} weight="bold" /> : <Copy size={14} />}
+      {done ? <Check size={16} weight="bold" /> : <Copy size={16} />}
       {done ? "Copied" : label}
     </Button>
   );
@@ -66,7 +66,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     <button
       type="button"
       aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
-      className={cn("grid size-9 place-items-center rounded-full text-muted transition hover:bg-sunk hover:text-ink", className)}
+      className={cn("grid size-9 place-items-center rounded-full text-muted transition hover:bg-sunk hover:text-ink pointer-coarse:size-11", className)}
       onClick={() => {
         const next = dark ? "light" : "dark";
         document.documentElement.dataset.theme = next;
@@ -78,7 +78,7 @@ export function ThemeToggle({ className }: { className?: string }) {
         setDark(!dark);
       }}
     >
-      {dark ? <Sun size={18} /> : <Moon size={18} />}
+      {dark ? <Sun size={20} /> : <Moon size={20} />}
     </button>
   );
 }

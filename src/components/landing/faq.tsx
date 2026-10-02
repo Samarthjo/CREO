@@ -23,12 +23,12 @@ export function Faq() {
       <Reveal>
         <div className="mx-auto max-w-[48rem] divide-y divide-line rounded-panel border border-line bg-surface px-6 sm:px-8">
           {FAQS.map((f) => (
-            <details key={f.q} name="faq" className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[1.0625rem] font-medium text-ink [&::-webkit-details-marker]:hidden">
+            <details key={f.q} name="faq" className="group">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-5 text-[1.0625rem] font-medium text-ink [&::-webkit-details-marker]:hidden">
                 {f.q}
-                <Plus size={18} className="shrink-0 text-muted transition-transform duration-300 group-open:rotate-45" aria-hidden />
+                <Plus size={20} className="shrink-0 text-muted transition-transform duration-300 group-open:rotate-45" aria-hidden />
               </summary>
-              <p className="mt-3 max-w-[60ch] text-[0.9375rem] leading-relaxed text-muted">{f.a}</p>
+              <p className="-mt-2 max-w-[60ch] pb-5 text-[0.9375rem] leading-relaxed text-muted">{f.a}</p>
             </details>
           ))}
         </div>

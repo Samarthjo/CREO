@@ -27,13 +27,13 @@ export function MemoryRow({ item, compact, onRemove }: { item: MemoryItem; compa
         {!compact && d && (d.ai || d.human) && (
           <div className="mt-2 space-y-1 rounded-control bg-sunk p-3 text-[0.8125rem]">
             {d.ai && <p className="text-muted"><span className="font-medium text-ink">AI wrote</span> {d.ai}</p>}
-            {d.human && <p className="flex gap-1.5 text-ink"><ArrowBendDownRight size={14} className="mt-1 shrink-0 text-muted" /><span><span className="font-medium">Changed to</span> {d.human}</span></p>}
+            {d.human && <p className="flex gap-1.5 text-ink"><ArrowBendDownRight size={16} className="mt-1 shrink-0 text-muted" /><span><span className="font-medium">Changed to</span> {d.human}</span></p>}
             {d.reason && <p className="text-muted"><span className="font-medium text-ink">Why</span> {d.reason}</p>}
           </div>
         )}
         {!compact && d?.result && <p className="mt-1.5 text-[0.8125rem] text-muted">Result: {d.result}</p>}
       </div>
-      {onRemove && <button type="button" onClick={onRemove} className="self-start text-xs text-muted underline-offset-4 hover:text-ink hover:underline">Remove</button>}
+      {onRemove && <button type="button" onClick={onRemove} className="inline-flex min-h-6 items-center self-start text-xs text-muted underline-offset-4 hover:text-ink hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11">Remove</button>}
     </li>
   );
 }

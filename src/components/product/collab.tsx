@@ -55,7 +55,7 @@ export function SignalList({ signals }: { signals: Signal[] }) {
         const I = SIG[s.severity].icon;
         return (
           <li key={s.id} className="flex gap-3">
-            <I size={18} className={cn("mt-0.5 shrink-0", s.severity === "risk" ? "text-risk" : "text-muted")} />
+            <I size={20} className={cn("mt-0.5 shrink-0", s.severity === "risk" ? "text-risk" : "text-muted")} />
             <div>
               <p className="text-sm font-medium text-ink">{s.label}</p>
               <p className="text-[0.8125rem] text-muted">{s.detail}</p>
@@ -84,7 +84,7 @@ export function QuotePanel({ ev }: { ev: Evaluation }) {
         </div>
       )}
       <details className="mt-4 group">
-        <summary className="cursor-pointer text-[0.8125rem] font-medium text-muted underline-offset-4 hover:text-ink hover:underline">How this is priced</summary>
+        <summary className="cursor-pointer py-2 text-[0.8125rem] font-medium leading-5 text-muted underline-offset-4 hover:text-ink hover:underline pointer-coarse:py-3">How this is priced</summary>
         <ol className="mt-2 divide-y divide-line">
           {q.steps.map((s, i) => (
             <li key={i} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 py-2 text-[0.8125rem]">

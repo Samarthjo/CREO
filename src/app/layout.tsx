@@ -28,8 +28,8 @@ export const viewport: Viewport = {
   ],
 };
 
-// Runs before paint so a saved theme choice never flashes the other theme.
-const themeInit = `try{var t=localStorage.getItem("creo.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
+// Runs before paint so a saved theme or motion choice never flashes the other one.
+const themeInit = `try{var t=localStorage.getItem("creo.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;if(localStorage.getItem("creo.motion")==="off")document.documentElement.dataset.motion="off"}catch(e){}`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

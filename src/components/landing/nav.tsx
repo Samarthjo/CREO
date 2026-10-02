@@ -33,13 +33,13 @@ export function Nav() {
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-3 sm:top-4">
-      <div className="pointer-events-auto flex h-12 items-center gap-1 rounded-full border border-line bg-bg/80 py-1 pl-4 pr-1 shadow-panel backdrop-blur-xl sm:gap-3">
-        <Link href="/" aria-label="CREO home" className="mr-1 sm:mr-3"><Logo /></Link>
+      <div className="pointer-events-auto flex h-12 items-center gap-1 rounded-full border border-line bg-bg/80 py-1 pl-4 pr-1 shadow-panel backdrop-blur-xl pointer-coarse:h-[3.25rem] sm:gap-3">
+        <Link href="/" aria-label="CREO home" className="mr-1 flex h-11 items-center sm:mr-3"><Logo /></Link>
         <nav aria-label="Pages" className="hidden items-center md:flex">
           {NAV_LINKS.map((l) => {
             const here = path === l.href;
             return (
-              <Link key={l.href} href={l.href} aria-current={here ? "page" : undefined} className={cn("rounded-full px-3 py-1.5 text-[0.8125rem] font-medium transition hover:bg-sunk hover:text-ink", here ? "bg-sunk text-ink" : "text-muted")}>{l.label}</Link>
+              <Link key={l.href} href={l.href} aria-current={here ? "page" : undefined} className={cn("rounded-full px-3 py-1.5 text-[0.8125rem] font-medium leading-5 transition hover:bg-sunk hover:text-ink", here ? "bg-sunk text-ink" : "text-muted")}>{l.label}</Link>
             );
           })}
         </nav>
@@ -52,7 +52,7 @@ export function Nav() {
           aria-expanded={open}
           aria-controls="mobile-menu"
           onClick={() => setOpen((o) => !o)}
-          className="grid size-10 shrink-0 place-items-center rounded-full text-ink transition hover:bg-sunk md:hidden"
+          className="grid size-11 shrink-0 place-items-center rounded-full text-ink transition hover:bg-sunk md:hidden"
         >
           {open ? <X size={20} /> : <List size={20} />}
         </button>

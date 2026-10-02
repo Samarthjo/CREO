@@ -117,7 +117,7 @@ function ApplyForm() {
         <div role="group" aria-label="Start with" className="flex flex-wrap gap-2">
           {FOCUS.map((f) => {
             const on = focus.includes(f);
-            return <button key={f} type="button" aria-pressed={on} onClick={() => setFocus((x) => (on ? x.filter((y) => y !== f) : [...x, f]))} className={cn("rounded-full border px-4 py-2 text-sm font-medium transition", on ? "border-transparent bg-mark text-on-mark" : "border-ink/45 text-ink hover:border-ink hover:bg-sunk")}>{f}</button>;
+            return <button key={f} type="button" aria-pressed={on} onClick={() => setFocus((x) => (on ? x.filter((y) => y !== f) : [...x, f]))} className={cn("rounded-full border px-4 py-2 text-sm font-medium leading-5 transition pointer-coarse:min-h-11", on ? "border-transparent bg-mark text-on-mark" : "border-ink/45 text-ink hover:border-ink hover:bg-sunk")}>{f}</button>;
           })}
         </div>
         {err("focus")}
@@ -126,7 +126,7 @@ function ApplyForm() {
       <div className="hidden" aria-hidden><label>Website<input tabIndex={-1} autoComplete="off" value={v.website} onChange={set("website")} /></label></div>
       <div className="flex flex-col gap-1.5 md:col-span-2">
         <label className="flex items-start gap-3 text-sm text-body">
-          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 size-4 accent-[var(--ink)]" aria-invalid={!!errors.agreed} />
+          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 size-4 shrink-0 accent-[var(--ink)] pointer-coarse:size-5" aria-invalid={!!errors.agreed} />
           <span>I will share weekly feedback and I am happy for CREO to quote my results with my permission.</span>
         </label>
         {err("agreed")}

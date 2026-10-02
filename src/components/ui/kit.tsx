@@ -9,7 +9,7 @@ const BTN = {
   ghost: "border border-line-strong text-ink hover:bg-sunk",
   quiet: "text-muted hover:text-ink hover:bg-sunk",
 } as const;
-const SIZE = { sm: "h-8 px-3.5 text-[0.8125rem]", md: "h-9 px-4 text-sm", lg: "h-11 px-6 text-[0.9375rem]" } as const;
+const SIZE = { sm: "h-8 px-3.5 text-[0.8125rem] pointer-coarse:h-11", md: "h-9 px-4 text-sm pointer-coarse:h-11", lg: "h-11 px-6 text-[0.9375rem]" } as const;
 
 type BtnProps = { variant?: keyof typeof BTN; size?: keyof typeof SIZE; href?: string } & ButtonHTMLAttributes<HTMLButtonElement> & Pick<AnchorHTMLAttributes<HTMLAnchorElement>, "target" | "rel">;
 
@@ -86,10 +86,10 @@ export function FitScore({ score, size = 52, label = true, inverse = false }: { 
   );
 }
 
-export const fieldClass = "w-full rounded-control border border-line-strong bg-raised px-3 py-2 text-sm text-ink placeholder:text-faint transition focus:border-ink focus:outline-none";
-export const Input = (p: InputHTMLAttributes<HTMLInputElement>) => <input {...p} className={cn(fieldClass, "h-10", p.className)} />;
+export const fieldClass = "w-full rounded-control border border-line-strong bg-raised px-3 py-2 text-sm text-ink placeholder:text-faint transition focus:border-ink focus:outline-none pointer-coarse:text-base";
+export const Input = (p: InputHTMLAttributes<HTMLInputElement>) => <input {...p} className={cn(fieldClass, "h-10 pointer-coarse:h-11", p.className)} />;
 export const Textarea = (p: TextareaHTMLAttributes<HTMLTextAreaElement>) => <textarea {...p} className={cn(fieldClass, "leading-relaxed", p.className)} />;
-export const Select = (p: SelectHTMLAttributes<HTMLSelectElement>) => <select {...p} className={cn(fieldClass, "h-10 pr-8", p.className)} />;
+export const Select = (p: SelectHTMLAttributes<HTMLSelectElement>) => <select {...p} className={cn(fieldClass, "h-10 pr-8 pointer-coarse:h-11", p.className)} />;
 export function Field({ label, hint, children, className }: { label: string; hint?: string; children: ReactNode; className?: string }) {
   return (
     <label className={cn("flex flex-col gap-1.5", className)}>

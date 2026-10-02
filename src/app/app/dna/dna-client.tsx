@@ -94,7 +94,7 @@ export function DnaClient() {
                 <thead><tr className="text-xs text-muted"><th className="pb-2 font-medium">Post</th><th className="pb-2 font-medium">Hook</th><th className="pb-2 font-medium">Format</th><th className="pb-2 text-right font-medium">Views</th><th className="pb-2 text-right font-medium">vs baseline</th><th /></tr></thead>
                 <tbody className="divide-y divide-line">
                   {d.posts.slice(0, 8).map((p) => (
-                    <tr key={p.id}><td className="max-w-[18rem] truncate py-2.5 text-ink">{p.title}</td><td className="py-2.5 text-muted">{HOOK_TYPES[p.hook]}</td><td className="py-2.5 text-muted">{FORMATS[p.format]}</td><td className="tnum py-2.5 text-right text-ink">{compact(p.views)}</td><td className="tnum py-2.5 text-right text-ink">{(p.views / insights.baseline).toFixed(1)}x</td><td className="py-2.5 text-right"><button type="button" aria-label={`Remove ${p.title}`} className="text-xs text-muted hover:text-risk" onClick={() => dispatch({ type: "post-remove", id: p.id })}>Remove</button></td></tr>
+                    <tr key={p.id}><td className="max-w-[18rem] truncate py-2.5 text-ink">{p.title}</td><td className="py-2.5 text-muted">{HOOK_TYPES[p.hook]}</td><td className="py-2.5 text-muted">{FORMATS[p.format]}</td><td className="tnum py-2.5 text-right text-ink">{compact(p.views)}</td><td className="tnum py-2.5 text-right text-ink">{(p.views / insights.baseline).toFixed(1)}x</td><td className="py-2.5 text-right"><button type="button" aria-label={`Remove ${p.title}`} className="inline-flex min-h-6 items-center justify-end text-xs text-muted hover:text-risk pointer-coarse:min-h-11 pointer-coarse:min-w-11" onClick={() => dispatch({ type: "post-remove", id: p.id })}>Remove</button></td></tr>
                   ))}
                 </tbody>
               </table>
@@ -119,7 +119,7 @@ export function DnaClient() {
                     <span className="min-w-0 flex-1 text-muted">{x.category}, {x.deliverables}</span>
                     <span className="tnum text-ink">{x.priceInr ? inr(x.priceInr) : "No fee"}</span>
                     <Chip tone={x.status === "paid" ? "ok" : x.status === "pending" ? "neutral" : "outline"}>{x.status}</Chip>
-                    <button type="button" aria-label={`Remove ${x.brand}`} className="text-xs text-muted hover:text-risk" onClick={() => dispatch({ type: "deal-remove", id: x.id })}>Remove</button>
+                    <button type="button" aria-label={`Remove ${x.brand}`} className="inline-flex min-h-6 items-center justify-end text-xs text-muted hover:text-risk pointer-coarse:min-h-11 pointer-coarse:min-w-11" onClick={() => dispatch({ type: "deal-remove", id: x.id })}>Remove</button>
                   </li>
                 ))}
               </ul>

@@ -13,7 +13,7 @@ export function ActionRow({ action, rank, compact, onGo }: { action: Action; ran
   return (
     <li className={cn("flex items-start gap-4 border-b border-line last:border-b-0", compact ? "py-3.5" : "py-4")}>
       <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full bg-sunk text-ink">
-        <Icon size={18} />
+        <Icon size={20} />
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-[0.9375rem] font-medium text-ink">
