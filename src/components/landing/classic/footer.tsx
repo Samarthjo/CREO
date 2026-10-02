@@ -15,7 +15,7 @@ export function ClassicFinalCta() {
           <div className="glass w-full max-w-[46rem] rounded-[2.25rem] px-6 py-12 text-center sm:px-12 sm:py-16">
             <Eyebrow>Founding Creator Cohort</Eyebrow>
             <h2 className="mx-auto mt-5 max-w-[13ch] font-display text-[clamp(2.4rem,5.6vw,4.75rem)] font-normal leading-[1] tracking-[-0.04em]">Stop guessing what to <Accent>post</Accent>.</h2>
-            <p className="mx-auto mt-5 max-w-[30rem] text-[1.0625rem] leading-relaxed text-body">10 to 15 creators. 30 days. ₹499. Direct access to the team, and a say in what we build.</p>
+            <p className="mx-auto mt-5 max-w-[30rem] text-[1.0625rem] leading-relaxed text-body">₹499 for 30 days. Limited seats per cohort. Hands-on CREO Strategist Support, and a say in what we build.</p>
             <div className="mt-8 flex justify-center"><Button variant="primary" size="lg" href="#apply">Join the Founding Cohort</Button></div>
           </div>
         </div>

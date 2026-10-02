@@ -1,18 +1,18 @@
 "use client";
 
-import { BookmarkSimple, ChartLineUp, Compass, PaperPlaneTilt, PencilSimpleLine, TrendUp } from "@phosphor-icons/react";
+import { Brain, ChartLineUp, Compass, MagnifyingGlass, PaperPlaneTilt, PencilSimpleLine } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
 import { Accent, Chip, Eyebrow, FitScore, Mark, cn } from "../ui/kit";
 import { demoPackage, getDemo } from "./demo";
 import { usePinnedSteps } from "./use-pinned-steps";
 
 const STEPS = [
-  { id: "recommend", title: "CREO recommends", body: "A trend, scored against your own history, with the reasons shown.", icon: Compass },
-  { id: "edit", title: "You edit", body: "You change what is off. CREO keeps the before, the after and your reason.", icon: PencilSimpleLine },
+  { id: "recommend", title: "CREO recommends", body: "A pattern, scored against your own history, with the reasons shown.", icon: Compass },
+  { id: "edit", title: "You edit or approve", body: "You change what is off, or approve it as it is. CREO keeps the before, the after and your reason.", icon: PencilSimpleLine },
   { id: "publish", title: "You publish", body: "Nothing goes out without your approval, and you post it your way.", icon: PaperPlaneTilt },
-  { id: "perform", title: "It performs", body: "Views, saves and replies come back from the post.", icon: ChartLineUp },
-  { id: "learn", title: "CREO learns", body: "The result and your reason are written to your Memory.", icon: BookmarkSimple },
-  { id: "next", title: "The next one is sharper", body: "The next recommendation starts from everything above.", icon: TrendUp },
+  { id: "perform", title: "The content performs", body: "Views, saves, shares and comments come back from the post.", icon: ChartLineUp },
+  { id: "analyze", title: "CREO analyzes the result", body: "It compares the post with what it expected and with your usual numbers, and works out why.", icon: MagnifyingGlass },
+  { id: "improve", title: "Your Creator Intelligence improves", body: "The result and your reason join your Creator Memory, so the next recommendation starts from evidence.", icon: Brain },
 ] as const;
 
 const N = STEPS.length;
@@ -21,7 +21,7 @@ const pos = (i: number, r = 40) => {
   return { left: `${50 + r * Math.cos(a)}%`, top: `${50 + r * Math.sin(a)}%` };
 };
 
-/** Section 5: the learning loop, CREO's main idea. Illustrative sequence on the sample creator, labelled as such. */
+/** The learning loop, CREO's main idea: recommendations meet real outcomes. Illustrative sequence on the sample creator, labelled as such. */
 export function LoopSection() {
   const { ref, pinned, active, go } = usePinnedSteps(N);
   const { brief } = getDemo();
@@ -37,10 +37,10 @@ export function LoopSection() {
         <div className="relative mx-auto grid grid-cols-[minmax(0,1fr)] w-full max-w-[76rem] items-center gap-10 px-5 sm:px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
           <div>
             <Eyebrow>The learning loop</Eyebrow>
-            <h2 className="mt-5 max-w-[14ch] font-display text-[clamp(2.3rem,5vw,4.25rem)] font-normal leading-[1.02] tracking-[-0.04em]">
-              Every edit makes the next one <Accent>sharper</Accent>.
+            <h2 className="mt-5 max-w-[17ch] font-display text-[clamp(2.1rem,4vw,3.4rem)] font-normal leading-[1.02] tracking-[-0.04em]">
+              CREO gets sharper because it sees what happens <Accent>next</Accent>.
             </h2>
-            <p className="mt-5 max-w-[30rem] text-[1.0625rem] leading-relaxed text-muted">Most tools forget you the moment you close them. CREO keeps what you changed, why, and how the post did.</p>
+            <p className="mt-5 max-w-[31rem] text-[1.0625rem] leading-relaxed text-muted">CREO doesn't just generate content and forget it. It connects recommendations to real outcomes so future decisions start with evidence from your own content history.</p>
 
             <ol className="mt-8 space-y-1" aria-label="The learning loop, step by step">
               {STEPS.map((s, i) => {
@@ -90,9 +90,10 @@ export function LoopSection() {
             <div className="absolute left-1/2 top-1/2 w-[54%] -translate-x-1/2 -translate-y-1/2 sm:w-[58%]">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={active} initial={{ opacity: 0, y: 12, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }} className="rounded-panel border border-line bg-raised p-4 shadow-pop sm:p-5">
-                  <div className="mb-3 flex items-center justify-between gap-2">
-                    <Chip tone="lime">{STEPS[active]!.title}</Chip>
-                    <span className="text-[0.6875rem] text-faint">Illustrative</span>
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                    {/* Inside the ring on a phone the card is narrow, so the chip shows the step number; the list above names it. */}
+                    <Chip tone="lime"><span className="sm:hidden">Step {active + 1}</span><span className="hidden sm:inline">{STEPS[active]!.title}</span></Chip>
+                    <span className="hidden text-[0.6875rem] text-faint sm:inline">Illustrative</span>
                   </div>
                   <StepCard i={active} top={top} next={next} hook={hook.text} />
                 </motion.div>
@@ -121,7 +122,7 @@ function StepCard({ i, top, next, hook }: { i: number; top: { subject?: string; 
   if (i === 1)
     return (
       <div className="space-y-2 text-[0.8125rem] leading-snug">
-        <p className="text-muted line-through decoration-risk/60">{hook}</p>
+        <p className="line-clamp-2 text-muted line-through decoration-risk/60 sm:line-clamp-none">{hook}</p>
         <p className="text-ink"><Mark sweep>Shorter, with your number up front.</Mark></p>
         <p className="text-xs text-muted">Reason saved: <span className="font-medium text-ink">too long for my style</span></p>
       </div>
@@ -148,18 +149,25 @@ function StepCard({ i, top, next, hook }: { i: number; top: { subject?: string; 
   if (i === 4)
     return (
       <div className="text-[0.8125rem] leading-snug">
-        <p className="text-[0.6875rem] font-medium text-muted">New memory</p>
-        <p className="mt-1 text-ink"><Mark sweep>Proof-first hooks under 28 seconds beat your baseline. Keep them short.</Mark></p>
+        <dl className="grid grid-cols-2 gap-3">
+          <div><dt className="text-[0.6875rem] font-medium text-muted">Expected</dt><dd className="tnum mt-0.5 text-[1.0625rem] text-muted">1.3x</dd></div>
+          <div><dt className="text-[0.6875rem] font-medium text-muted">Actual</dt><dd className="tnum mt-0.5 text-[1.0625rem] font-medium text-ink">1.6x</dd></div>
+        </dl>
+        <p className="mt-2.5 text-ink"><Mark sweep>The result was on screen by second 2.</Mark></p>
       </div>
     );
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <p className="text-[0.6875rem] font-medium text-muted">Next recommendation</p>
-        <p className="mt-0.5 font-display text-[1.0625rem] font-medium leading-snug tracking-tight text-ink">{next.subject}</p>
-        <p className="mt-1.5 text-xs text-muted">Hook already shortened.</p>
+    <div className="text-[0.8125rem] leading-snug">
+      <p className="text-[0.6875rem] font-medium text-muted">Added to your Creator Memory</p>
+      <p className="mt-1 text-ink"><Mark sweep>Proof-first hooks under 28 seconds beat your baseline.</Mark></p>
+      <p className="mt-2 text-xs text-muted max-[359px]:hidden sm:hidden">The next recommendation starts here.</p>
+      <div className="mt-3 hidden items-center justify-between gap-3 border-t border-line pt-3 sm:flex">
+        <div className="min-w-0">
+          <p className="text-[0.6875rem] font-medium text-muted">Next recommendation</p>
+          <p className="mt-0.5 line-clamp-2 font-medium text-ink">{next.subject}</p>
+        </div>
+        {next.fit ? <FitScore score={Math.min(99, next.fit + 4)} size={40} label={false} /> : null}
       </div>
-      {next.fit ? <FitScore score={Math.min(99, next.fit + 4)} size={50} /> : null}
     </div>
   );
 }

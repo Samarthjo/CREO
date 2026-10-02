@@ -23,7 +23,7 @@ export function ClassicHero() {
           <Button variant="primary" size="lg" href="#cohort">Join the Founding Creator Cohort</Button>
           <Button variant="ghost" size="lg" href="#loop" className="bg-bg/60 backdrop-blur">See how CREO works</Button>
         </div>
-        <p className="mt-4 text-[0.8125rem] text-muted">Founding price ₹499 for 30 days. 10 to 15 creators.</p>
+        <p className="mt-4 text-[0.8125rem] text-muted">₹499 <span aria-hidden className="mx-1">·</span> 30 days <span aria-hidden className="mx-1">·</span> Limited seats per cohort</p>
       </div>
 
       <div id="product" className="mt-24 px-4 sm:px-6 lg:mt-40">

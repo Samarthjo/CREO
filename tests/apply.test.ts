@@ -2,15 +2,35 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { validateApplication } from "../src/lib/apply.ts";
 
-const ok = { name: "Meher Shah", handle: "@meher.cooks", followers: "2K to 10K", niche: "food", contact: "meher@example.com", focus: ["Collab Inbox"], note: "", agreed: true };
+const ok = {
+  name: "Meher Shah",
+  handle: "@meher.cooks",
+  contact: "meher@example.com",
+  followers: "2K to 10K",
+  niche: "food",
+  platform: "Instagram",
+  postsPerWeek: "3 to 4",
+  goal: "Brand deals",
+  brandInquiries: "Sometimes",
+  problem: "",
+  agreed: true,
+};
 
 test("apply: a complete application is accepted and normalised", () => {
-  const r = validateApplication({ ...ok, handle: "https://www.instagram.com/meher.cooks/", note: "  help   with brand deals " });
+  const r = validateApplication({ ...ok, handle: "https://www.instagram.com/meher.cooks/", problem: "  help   with brand deals " });
   assert.ok(r.ok);
   if (r.ok) {
     assert.equal(r.value.handle, "@meher.cooks");
-    assert.equal(r.value.note, "help with brand deals");
+    assert.equal(r.value.problem, "help with brand deals");
+    assert.equal(r.value.goal, "Brand deals");
+    assert.equal(r.value.platform, "Instagram");
   }
+});
+
+test("apply: handles from other platforms work too", () => {
+  const r = validateApplication({ ...ok, platform: "YouTube", handle: "https://youtube.com/@meher-cooks" });
+  assert.ok(r.ok);
+  if (r.ok) assert.equal(r.value.handle, "@meher-cooks");
 });
 
 test("apply: phone numbers and emails both work as contact", () => {
@@ -25,23 +45,26 @@ test("apply: every required field is enforced with a plain message", () => {
   if (!r.ok) for (const k of ["name", "handle", "contact", "followers", "agreed"] as const) assert.ok(r.errors[k], `${k} should have an error`);
 });
 
-test("apply: niche and start-with are optional, but a niche that is given must be a real one", () => {
-  const { niche: _n, focus: _f, ...short } = ok;
+test("apply: the extra questions are optional, but an answer that is given must be a real option", () => {
+  const { niche: _n, platform: _p, postsPerWeek: _w, goal: _g, brandInquiries: _b, ...short } = ok;
   const r = validateApplication(short);
   assert.ok(r.ok);
-  if (r.ok) assert.deepEqual(r.value.focus, []);
-  assert.ok(validateApplication({ ...short, niche: "" }).ok);
+  if (r.ok) assert.equal(r.value.goal, undefined);
+  assert.ok(validateApplication({ ...short, niche: "", goal: "", platform: "" }).ok);
   assert.equal(validateApplication({ ...short, niche: "crypto" }).ok, false);
+  assert.equal(validateApplication({ ...short, goal: "Fame" }).ok, false);
+  assert.equal(validateApplication({ ...short, platform: "MySpace" }).ok, false);
+  assert.equal(validateApplication({ ...short, postsPerWeek: "daily" }).ok, false);
+  assert.equal(validateApplication({ ...short, brandInquiries: "maybe" }).ok, false);
 });
 
 test("apply: unknown enum values and a missing consent are rejected", () => {
-  assert.equal(validateApplication({ ...ok, niche: "crypto" }).ok, false);
   assert.equal(validateApplication({ ...ok, followers: "1 million" }).ok, false);
   assert.equal(validateApplication({ ...ok, agreed: "yes" }).ok, false);
 });
 
 test("apply: oversized input is clipped, not stored whole", () => {
-  const r = validateApplication({ ...ok, name: "x".repeat(500), note: "y".repeat(5000) });
+  const r = validateApplication({ ...ok, name: "x".repeat(500), problem: "y".repeat(5000) });
   assert.ok(r.ok);
-  if (r.ok) assert.ok(r.value.name.length <= 80 && r.value.note.length <= 400);
+  if (r.ok) assert.ok(r.value.name.length <= 80 && r.value.problem.length <= 400);
 });

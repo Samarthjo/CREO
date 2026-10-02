@@ -17,7 +17,7 @@ export function TrendSection() {
 
   return (
     <Section id="trend">
-      <SectionHead eyebrow="CREO Trend" title={<>Trends scored against <Accent>your</Accent> numbers.</>} sub="CREO explains why a pattern works, how well it fits your history, and gives you original ways to make it." />
+      <SectionHead eyebrow="CREO Trend" title={<>Understand why it <Accent>works</Accent>.</>} sub="Don't just see what's trending. Understand why it works, whether it fits you, and what original version you should make next." />
       <Reveal>
         <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
           <ul className="flex flex-col gap-2.5" aria-label="Trends ranked by creator fit">
@@ -33,18 +33,18 @@ export function TrendSection() {
             </div>
             <div className="mt-6 grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div>
-                <h4 className="mb-1 text-sm font-semibold text-ink">Why it fits, or does not</h4>
+                <h4 className="mb-1 text-sm font-semibold text-ink">Why it fits you, or does not</h4>
                 <FitBreakdown fit={cur.fit} />
               </div>
               <div>
-                <h4 className="mb-3 text-sm font-semibold text-ink">What is working</h4>
+                <h4 className="mb-3 text-sm font-semibold text-ink">Hook and style, decomposed</h4>
                 <MechanismGrid pattern={cur.pattern} />
               </div>
             </div>
             <div className="mt-6 border-t border-line pt-5">
-              <h4 className="text-sm font-semibold text-ink">Original versions for you</h4>
+              <h4 className="text-sm font-semibold text-ink">Suggested original versions</h4>
               <AdaptationList items={ideas} />
-              <div className="mt-5"><Button variant="primary" href="#studio">Turn this into my content</Button></div>
+              <div className="mt-5"><Button variant="primary" href="#studio">Save to Studio</Button></div>
             </div>
           </Panel>
         </div>

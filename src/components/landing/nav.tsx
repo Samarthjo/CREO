@@ -15,7 +15,7 @@ import { NAV_LINKS } from "./nav-links";
  */
 export function Nav() {
   const path = usePathname();
-  const cta = path === "/" ? { href: "#cohort", label: "Apply for the cohort", short: "Apply" } : path === "/cohort" ? { href: "#apply", label: "Join the cohort", short: "Join" } : path === "/classic" ? { href: "#cohort", label: "Join the cohort", short: "Join" } : { href: "/cohort", label: "Join the cohort", short: "Join" };
+  const cta = path === "/" ? { href: "#cohort", label: "Join the cohort", short: "Join" } : path === "/cohort" ? { href: "#apply", label: "Join the cohort", short: "Join" } : path === "/classic" ? { href: "#cohort", label: "Join the cohort", short: "Join" } : { href: "/cohort", label: "Join the cohort", short: "Join" };
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
 

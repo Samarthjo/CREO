@@ -25,17 +25,17 @@ const SIDE = [
 ] as const;
 
 const TABS: { id: View; label: string }[] = [
-  { id: "collab", label: "Collab Inbox" },
   { id: "hq", label: "HQ" },
   { id: "trend", label: "Trend" },
   { id: "studio", label: "Studio" },
+  { id: "collab", label: "Collab Inbox" },
   { id: "memory", label: "Memory" },
 ];
 
 /**
  * The hero is the product: a working CREO window on a sample creator.
- * It opens on the brand-deal moment, the most concrete thing CREO does: a brand offers a price, CREO prices it and
- * sets a walk-away number. HQ and Studio are one click away. Every number comes from the same engines the app uses.
+ * It opens on HQ, the creator's next best move with the reasons behind it. Trend, Studio, Collab Inbox and Memory
+ * are one click away. Every number comes from the same engines the app uses.
  */
 export function HeroProduct() {
   const { brief, ranked, ws } = getDemo();
@@ -48,7 +48,7 @@ export function HeroProduct() {
   const quote = q.evaluation.quote;
   const pkg = useMemo(() => demoPackage({ topic: "competitor research", proof: "6 hours saved a week", lengthSec: 30, language: "English", trendId }), [trendId]);
 
-  const [view, setView] = useState<View>("collab");
+  const [view, setView] = useState<View>("hq");
   const [approved, setApproved] = useState(false);
   const [stage, setStage] = useState(0);
   const [hookId, setHookId] = useState(pkg.chosenHook);

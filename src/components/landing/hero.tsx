@@ -15,9 +15,11 @@ export function Hero() {
         <p className="mt-4 max-w-[42rem] text-[1.125rem] leading-relaxed text-body sm:text-[1.25rem]">
           Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.
         </p>
-        <div className="mt-5">
-          <Button variant="primary" size="lg" href="#cohort">Apply for the founding cohort</Button>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Button variant="primary" size="lg" href="#cohort">Join the 30-Day Founding Cohort</Button>
+          <Button variant="ghost" size="lg" href="/learning-loop" className="bg-bg/60 backdrop-blur">See how CREO learns</Button>
         </div>
+        <p className="mt-3.5 text-[0.8125rem] font-medium text-body">₹499 <span aria-hidden className="mx-1 text-faint">·</span> 30 days <span aria-hidden className="mx-1 text-faint">·</span> Limited seats per cohort</p>
       </div>
 
       <div id="product" className="mt-7 px-4 sm:px-6 lg:mt-8">

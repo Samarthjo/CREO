@@ -24,7 +24,7 @@ export function ProofSection() {
               <Ticket key={n} label={`Founding Creator #${n}`} note="Seat open">Your name</Ticket>
             ))}
           </TicketStrip>
-          <p className="night mt-4 text-center text-xs text-ink [text-shadow:0_1px_10px_rgb(20_20_70/0.7)]">10 to 15 seats in the first cohort.</p>
+          <p className="night mt-4 text-center text-xs text-ink [text-shadow:0_1px_10px_rgb(20_20_70/0.7)]">Limited seats per cohort.</p>
         </div>
       </Landscape>
       <div aria-hidden className="h-28 bg-gradient-to-b from-[#353f88] to-[#0c1030]" />

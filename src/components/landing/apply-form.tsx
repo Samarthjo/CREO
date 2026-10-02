@@ -1,13 +1,21 @@
 "use client";
 
-import { CheckCircle } from "@phosphor-icons/react";
+import { CheckCircle, Minus, Plus } from "@phosphor-icons/react";
 import { useState } from "react";
-import { FOLLOWER_BANDS, validateApplication, type ApplicationErrors } from "@/lib/apply";
-import { Button, Field, Input, Select } from "../ui/kit";
+import { BRAND_INQUIRIES, FOLLOWER_BANDS, GOALS, PLATFORMS, POSTS_PER_WEEK, validateApplication, type ApplicationErrors } from "@/lib/apply";
+import { NICHES, type NicheKey } from "@/lib/engine/types";
+import { Button, Field, Input, Select, Textarea, cn } from "../ui/kit";
 
-/** The founding-cohort application. Short on purpose: four fields and one consent line. */
-export function ApplyForm() {
-  const [v, setV] = useState({ name: "", handle: "", followers: "", contact: "", website: "" });
+const EMPTY = { name: "", handle: "", contact: "", followers: "", niche: "", platform: "", postsPerWeek: "", goal: "", brandInquiries: "", problem: "", website: "" };
+
+/**
+ * The Founding Cohort application, used on the home page and on /cohort.
+ * Four answers are required. The rest help us pick the creators we can help most: on the home page they sit behind
+ * "Add more about you" so the form stays short; on /cohort they are open.
+ */
+export function ApplyForm({ variant = "short", submitLabel = "Apply for the next cohort" }: { variant?: "short" | "full"; submitLabel?: string }) {
+  const [v, setV] = useState(EMPTY);
+  const [more, setMore] = useState(variant === "full");
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<ApplicationErrors>({});
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
@@ -19,7 +27,11 @@ export function ApplyForm() {
     setServerError("");
     const payload = { ...v, agreed };
     const check = validateApplication(payload);
-    if (!check.ok) { setErrors(check.errors); return; }
+    if (!check.ok) {
+      setErrors(check.errors);
+      if (["niche", "platform", "postsPerWeek", "goal", "brandInquiries"].some((k) => k in check.errors)) setMore(true);
+      return;
+    }
     setErrors({});
     setState("sending");
     try {
@@ -44,12 +56,61 @@ export function ApplyForm() {
     );
 
   const err = (k: keyof ApplicationErrors) => errors[k] && <span className="text-xs font-medium text-risk" role="alert">{errors[k]}</span>;
+  const opt = <span className="font-normal text-muted"> (optional)</span>;
   return (
-    <form onSubmit={submit} noValidate className="grid gap-5 md:grid-cols-2">
-      <Field label="Your name">{<Input value={v.name} onChange={set("name")} autoComplete="name" aria-invalid={!!errors.name} />}{err("name")}</Field>
-      <Field label="Instagram handle"><Input value={v.handle} onChange={set("handle")} placeholder="@yourhandle" aria-invalid={!!errors.handle} />{err("handle")}</Field>
+    <form onSubmit={submit} noValidate className="grid grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-2">
+      <Field label="Your name"><Input value={v.name} onChange={set("name")} autoComplete="name" aria-invalid={!!errors.name} />{err("name")}</Field>
+      <Field label="Instagram or main creator handle"><Input value={v.handle} onChange={set("handle")} placeholder="@yourhandle" aria-invalid={!!errors.handle} />{err("handle")}</Field>
       <Field label="WhatsApp number or email"><Input value={v.contact} onChange={set("contact")} autoComplete="email" aria-invalid={!!errors.contact} />{err("contact")}</Field>
       <Field label="Followers"><Select value={v.followers} onChange={set("followers")} aria-invalid={!!errors.followers}><option value="">Choose a range</option>{FOLLOWER_BANDS.map((b) => <option key={b}>{b}</option>)}</Select>{err("followers")}</Field>
+
+      {variant === "short" && (
+        <button type="button" aria-expanded={more} aria-controls="apply-more" onClick={() => setMore((m) => !m)} className="inline-flex min-h-9 items-center gap-2 justify-self-start rounded-full text-[0.8125rem] font-medium text-ink underline-offset-4 hover:underline md:col-span-2 pointer-coarse:min-h-11">
+          {more ? <Minus size={16} /> : <Plus size={16} />}
+          {more ? "Fewer questions" : "Add more about you (optional, about a minute)"}
+        </button>
+      )}
+
+      {more && (
+        <div id="apply-more" className="contents">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[0.8125rem] font-medium text-ink">Primary platform{opt}</span>
+            <Select value={v.platform} onChange={set("platform")} aria-invalid={!!errors.platform}><option value="">Choose a platform</option>{PLATFORMS.map((p) => <option key={p}>{p}</option>)}</Select>
+            {err("platform")}
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[0.8125rem] font-medium text-ink">Posts per week{opt}</span>
+            <Select value={v.postsPerWeek} onChange={set("postsPerWeek")} aria-invalid={!!errors.postsPerWeek}><option value="">Choose</option>{POSTS_PER_WEEK.map((p) => <option key={p}>{p}</option>)}</Select>
+            {err("postsPerWeek")}
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[0.8125rem] font-medium text-ink">Niche{opt}</span>
+            <Select value={v.niche} onChange={set("niche")} aria-invalid={!!errors.niche}><option value="">Choose a niche</option>{(Object.keys(NICHES) as NicheKey[]).map((k) => <option key={k} value={k}>{NICHES[k].label}</option>)}</Select>
+            {err("niche")}
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[0.8125rem] font-medium text-ink">Do you get brand inquiries?{opt}</span>
+            <Select value={v.brandInquiries} onChange={set("brandInquiries")} aria-invalid={!!errors.brandInquiries}><option value="">Choose</option>{BRAND_INQUIRIES.map((p) => <option key={p}>{p}</option>)}</Select>
+            {err("brandInquiries")}
+          </label>
+          <div className="flex flex-col gap-1.5 md:col-span-2">
+            <span id="goal-label" className="text-[0.8125rem] font-medium text-ink">Main goal{opt}</span>
+            <div role="radiogroup" aria-labelledby="goal-label" className="flex flex-wrap gap-2">
+              {GOALS.map((g) => {
+                const on = v.goal === g;
+                return (
+                  <button key={g} type="button" role="radio" aria-checked={on} onClick={() => setV((x) => ({ ...x, goal: on ? "" : g }))} className={cn("rounded-full border px-4 py-2 text-sm font-medium leading-5 transition pointer-coarse:min-h-11", on ? "border-transparent bg-mark text-on-mark" : "border-ink/45 text-ink hover:border-ink hover:bg-sunk")}>
+                    {g}
+                  </button>
+                );
+              })}
+            </div>
+            {err("goal")}
+          </div>
+          <Field label="Your biggest creator problem right now" hint="Optional. One or two lines is plenty." className="md:col-span-2"><Textarea rows={3} value={v.problem} onChange={set("problem")} maxLength={400} /></Field>
+        </div>
+      )}
+
       <div className="hidden" aria-hidden><label>Website<input tabIndex={-1} autoComplete="off" value={v.website} onChange={set("website")} /></label></div>
       <div className="flex flex-col gap-1.5 md:col-span-2">
         <label className="flex items-start gap-3 text-sm text-body">
@@ -59,7 +120,7 @@ export function ApplyForm() {
         {err("agreed")}
       </div>
       {serverError && <p className="rounded-control bg-risk-wash p-3 text-sm font-medium text-risk md:col-span-2" role="alert">{serverError}</p>}
-      <div className="md:col-span-2"><Button type="submit" variant="primary" size="lg" disabled={state === "sending"}>{state === "sending" ? "Sending" : "Apply for the cohort"}</Button></div>
+      <div className="md:col-span-2"><Button type="submit" variant="primary" size="lg" disabled={state === "sending"}>{state === "sending" ? "Sending" : submitLabel}</Button></div>
     </form>
   );
 }

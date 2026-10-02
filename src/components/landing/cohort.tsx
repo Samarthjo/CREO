@@ -1,138 +1,109 @@
-"use client";
-
-import { CheckCircle } from "@phosphor-icons/react";
-import { useState } from "react";
-import { FOCUS, FOLLOWER_BANDS, validateApplication, type ApplicationErrors } from "@/lib/apply";
-import { NICHES, type NicheKey } from "@/lib/engine/types";
-import { Accent, Button, Field, Input, Mark, Panel, Select, Textarea, cn } from "../ui/kit";
+import { Check } from "@phosphor-icons/react/dist/ssr";
+import { Accent, Button, Mark, Panel } from "../ui/kit";
+import { ApplyForm } from "./apply-form";
 import { Reveal } from "./reveal";
 import { Section, SectionHead } from "./section";
 
-const GET = [
-  "A private group with direct founder and product access",
-  "Weekly strategy support from a CREO creator strategist",
-  "Trend, Studio, Collab Inbox Lite and HQ, running on your Creator DNA and Memory",
+const DURING = [
+  "CREO analyzes your existing content and performance",
+  "Builds your Creator DNA",
+  "Finds and explains the creative patterns that fit you",
+  "Turns opportunities into scripts and content packages",
+  "Learns from what you edit, accept, reject and publish",
+  "Tracks how those decisions perform",
+  "Hands-on CREO Strategist Support while the system learns",
 ];
 const ASK = [
   "Use CREO and give honest feedback every week",
   "Permission to quote your results and testimonials",
   "Tell us what is still weak, so we fix it first",
 ];
+const KEEP = [
+  "Your accumulated Creator Memory",
+  "Ongoing access to your CREO Intelligence",
+  "Trend, Studio and collaboration intelligence",
+  "Six months of CREO Strategist Support",
+  "A target of 2 to 3 support touchpoints a week",
+  "Continued product and intelligence improvements under plan terms",
+];
 
-function Terms({ title, items }: { title: string; items: string[] }) {
+function List({ title, items, tick }: { title: string; items: string[]; tick?: boolean }) {
   return (
     <div>
       <h3 className="font-display text-lg font-semibold text-ink">{title}</h3>
-      <ul className="mt-4 space-y-3.5 text-[0.9375rem] leading-snug text-muted">
-        {items.map((i) => <li key={i}>{i}</li>)}
+      <ul className="mt-4 space-y-3 text-pretty text-[0.9375rem] leading-snug text-muted">
+        {items.map((i) => (
+          <li key={i} className="flex gap-2.5">
+            {tick && <Check size={16} weight="bold" className="mt-0.5 shrink-0 text-accent" />}
+            <span>{i}</span>
+          </li>
+        ))}
       </ul>
     </div>
   );
 }
 
+/** The 30-day Founding Cohort: what happens during it, what we ask, what you can keep after it, and the application. */
 export function Cohort() {
   return (
     <Section id="cohort">
-      <SectionHead eyebrow="Founding Creator Cohort" title={<>Build it with us for <Accent>30 days</Accent>.</>} sub="CREO does most of the work. Our strategists work alongside it on strategy, trends and content while we automate the gaps." />
+      <SectionHead eyebrow="30-Day Founding Cohort" title={<>30 days to build the AI Creator Manager around <Accent>you</Accent>.</>} sub="Limited seats per cohort so the team can stay hands-on." />
 
       <Reveal>
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-surface shadow-pop">
-          <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+          <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <div className="border-b border-line p-8 sm:p-10 lg:border-b-0 lg:border-r lg:p-12">
               <p className="text-sm text-muted">Founding Creator Cohort</p>
               <p className="mt-3 font-display text-[clamp(4.5rem,8.5vw,7rem)] font-semibold leading-none tracking-[-0.04em] text-accent">₹499</p>
               <p className="mt-3 text-xl text-ink">for <Mark>30 days</Mark></p>
-              <p className="mt-7 max-w-[30ch] text-[0.9375rem] leading-relaxed text-muted">10 to 15 creators first, not 30 at once, so every creator gets real attention.</p>
+              <p className="mt-7 text-[0.9375rem] font-medium text-ink">Limited seats per cohort.</p>
+              <p className="mt-2 max-w-[34ch] text-[0.9375rem] leading-relaxed text-muted">CREO handles about 70 to 80 percent of the analysis, intelligence and drafting. CREO strategists support the rest while it learns you.</p>
             </div>
-            <div className="grid gap-10 p-8 sm:p-10 md:grid-cols-2 lg:p-12">
-              <Terms title="What you get" items={GET} />
-              <Terms title="What we ask" items={ASK} />
+            <div className="grid gap-10 p-8 sm:p-10 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:p-12">
+              <List title="During the cohort" items={DURING} tick />
+              <List title="What we ask" items={ASK} />
             </div>
           </div>
           <p className="border-t border-line px-8 py-6 text-sm leading-relaxed text-muted sm:px-10 lg:px-12">
-            CREO is built to be 70 to 80 percent software and 20 to 30 percent strategist support. Every correction is captured, so the support shrinks as the product learns. We share public progress on days 7, 14, 21 and 30. The founding rate renews only if the product earned continued use.
+            Every script, edit and result becomes part of your Creator Memory, so the product gets more personal every week. We share progress on days 7, 14, 21 and 30.
           </p>
         </div>
       </Reveal>
 
-      <div id="apply" className="mt-20 grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
+      <div id="after-30-days" className="mt-20 scroll-mt-24 lg:mt-28"><AfterCohort applyHref="#apply" /></div>
+
+      <div id="apply" className="mt-20 grid scroll-mt-24 grid-cols-[minmax(0,1fr)] items-start gap-10 lg:mt-28 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
         <Reveal>
-          <h3 className="max-w-[14ch] font-display text-[clamp(1.9rem,3vw,2.6rem)] font-normal leading-tight tracking-[-0.03em]">Apply for a <Accent>founding</Accent> seat.</h3>
-          <p className="mt-4 max-w-[36ch] text-[0.9375rem] leading-relaxed text-muted">A short form. We read every application and reach out to the creators we can help most.</p>
+          <h3 className="max-w-[14ch] font-display text-[clamp(1.9rem,3vw,2.6rem)] font-normal leading-tight tracking-[-0.03em]">Apply for the next <Accent>cohort</Accent>.</h3>
+          <p className="mt-4 max-w-[36ch] text-[0.9375rem] leading-relaxed text-muted">Limited seats per cohort so the team can stay hands-on. We read every application and reach out to the creators we can help most.</p>
         </Reveal>
-        <Reveal delay={0.08}><Panel className="p-7 lg:p-8"><ApplyForm /></Panel></Reveal>
+        <Reveal delay={0.08}><Panel className="p-7 lg:p-8"><ApplyForm variant="full" /></Panel></Reveal>
       </div>
     </Section>
   );
 }
 
-function ApplyForm() {
-  const [v, setV] = useState({ name: "", handle: "", followers: "", niche: "", contact: "", note: "", website: "" });
-  const [focus, setFocus] = useState<string[]>([]);
-  const [agreed, setAgreed] = useState(false);
-  const [errors, setErrors] = useState<ApplicationErrors>({});
-  const [state, setState] = useState<"idle" | "sending" | "done">("idle");
-  const [serverError, setServerError] = useState("");
-  const set = (k: keyof typeof v) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setServerError("");
-    const payload = { ...v, focus, agreed };
-    const check = validateApplication(payload);
-    if (!check.ok) { setErrors(check.errors); return; }
-    setErrors({});
-    setState("sending");
-    try {
-      const res = await fetch("/api/apply", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
-      const data = (await res.json().catch(() => ({}))) as { error?: string; errors?: ApplicationErrors };
-      if (res.ok) { setState("done"); return; }
-      if (data.errors) setErrors(data.errors);
-      setServerError(data.error ?? "Something went wrong. Please try again.");
-    } catch {
-      setServerError("We could not reach the server. Check your connection and try again.");
-    }
-    setState("idle");
-  }
-
-  if (state === "done")
-    return (
-      <div className="flex flex-col items-start gap-3 py-6" role="status">
-        <CheckCircle size={36} weight="fill" className="text-ok" />
-        <h4 className="font-display text-2xl font-semibold">Application received.</h4>
-        <p className="max-w-[44ch] text-sm text-muted">Thank you, {v.name.split(" ")[0]}. We will reach you on {v.contact}.</p>
-      </div>
-    );
-
-  const err = (k: keyof ApplicationErrors) => errors[k] && <span className="text-xs font-medium text-risk" role="alert">{errors[k]}</span>;
+/** Day 30: the cohort is not a disposable trial. What the creator keeps, and for how much. Used on the home page and on /cohort. */
+export function AfterCohort({ applyHref }: { applyHref: string }) {
   return (
-    <form onSubmit={submit} noValidate className="grid gap-5 md:grid-cols-2">
-      <Field label="Your name">{<Input value={v.name} onChange={set("name")} autoComplete="name" aria-invalid={!!errors.name} />}{err("name")}</Field>
-      <Field label="Instagram handle"><Input value={v.handle} onChange={set("handle")} placeholder="@yourhandle" aria-invalid={!!errors.handle} />{err("handle")}</Field>
-      <Field label="Followers"><Select value={v.followers} onChange={set("followers")} aria-invalid={!!errors.followers}><option value="">Choose a range</option>{FOLLOWER_BANDS.map((b) => <option key={b}>{b}</option>)}</Select>{err("followers")}</Field>
-      <Field label="Niche" hint="Optional."><Select value={v.niche} onChange={set("niche")} aria-invalid={!!errors.niche}><option value="">Choose a niche</option>{(Object.keys(NICHES) as NicheKey[]).map((k) => <option key={k} value={k}>{NICHES[k].label}</option>)}</Select>{err("niche")}</Field>
-      <Field label="WhatsApp number or email" className="md:col-span-2"><Input value={v.contact} onChange={set("contact")} autoComplete="email" aria-invalid={!!errors.contact} />{err("contact")}</Field>
-      <div className="flex flex-col gap-1.5 md:col-span-2">
-        <span className="text-[0.8125rem] font-medium text-ink">Start with <span className="font-normal text-muted">(optional)</span></span>
-        <div role="group" aria-label="Start with" className="flex flex-wrap gap-2">
-          {FOCUS.map((f) => {
-            const on = focus.includes(f);
-            return <button key={f} type="button" aria-pressed={on} onClick={() => setFocus((x) => (on ? x.filter((y) => y !== f) : [...x, f]))} className={cn("rounded-full border px-4 py-2 text-sm font-medium leading-5 transition pointer-coarse:min-h-11", on ? "border-transparent bg-mark text-on-mark" : "border-ink/45 text-ink hover:border-ink hover:bg-sunk")}>{f}</button>;
-          })}
+    <>
+      <SectionHead eyebrow="After 30 days" title={<>After 30 days, CREO already knows <Accent>you</Accent>.</>} sub="Your cohort isn't a disposable trial. CREO has spent 30 days learning your content history, style, performance patterns, decisions and goals." />
+      <Reveal>
+        <div className="overflow-hidden rounded-[1.75rem] border border-line bg-surface shadow-panel">
+          <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div className="border-b border-line bg-mark-wash/50 p-8 sm:p-10 lg:border-b-0 lg:border-r lg:p-12">
+              <p className="text-sm font-medium text-ink">Keep your personalized CREO Intelligence</p>
+              <p className="mt-3 font-display text-[clamp(3.5rem,6.5vw,5.5rem)] font-semibold leading-none tracking-[-0.04em] text-ink">₹5,999</p>
+              <p className="mt-2 text-lg text-ink">one-time founding plan</p>
+              <p className="mt-6 max-w-[38ch] text-[0.9375rem] leading-relaxed text-muted">Your personalized CREO Intelligence — built around 30 days of your content, decisions and performance.</p>
+              <div className="mt-7"><Button variant="primary" size="lg" href={applyHref} className="max-sm:h-auto max-sm:min-h-11 max-sm:whitespace-normal max-sm:py-2.5 max-sm:text-center">Build my CREO first — ₹499 cohort</Button></div>
+            </div>
+            <div className="p-8 sm:p-10 lg:p-12">
+              <List title="Included" items={KEEP} tick />
+            </div>
+          </div>
         </div>
-        {err("focus")}
-      </div>
-      <Field label="What should CREO take off your plate?" hint="Optional." className="md:col-span-2"><Textarea rows={3} value={v.note} onChange={set("note")} maxLength={400} /></Field>
-      <div className="hidden" aria-hidden><label>Website<input tabIndex={-1} autoComplete="off" value={v.website} onChange={set("website")} /></label></div>
-      <div className="flex flex-col gap-1.5 md:col-span-2">
-        <label className="flex items-start gap-3 text-sm text-body">
-          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-1 size-4 shrink-0 accent-[var(--ink)] pointer-coarse:size-5" aria-invalid={!!errors.agreed} />
-          <span>I will share weekly feedback and I am happy for CREO to quote my results with my permission.</span>
-        </label>
-        {err("agreed")}
-      </div>
-      {serverError && <p className="rounded-control bg-risk-wash p-3 text-sm font-medium text-risk md:col-span-2" role="alert">{serverError}</p>}
-      <div className="md:col-span-2"><Button type="submit" variant="primary" size="lg" disabled={state === "sending"}>{state === "sending" ? "Sending" : "Apply for the cohort"}</Button></div>
-    </form>
+      </Reveal>
+    </>
   );
 }

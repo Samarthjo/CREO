@@ -27,7 +27,7 @@ export function CollabSection() {
 
   return (
     <Section id="collab">
-      <SectionHead eyebrow="Collab Inbox" title={<>Paste the brand message. Get a <Accent>price</Accent>.</>} sub="CREO reads the terms, flags risks, sets a quote range and a walk-away price, and drafts a reply you approve." />
+      <SectionHead eyebrow="Collab Inbox" title={<>Know what the opportunity is <Accent>worth</Accent> before you reply.</>} sub="Paste the inquiry, or upload it as a text file. CREO pulls out the terms, flags risk signals, sets a quote range and a walk-away price, and drafts a counter you approve." />
       <Pipeline />
       <Reveal>
         <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">

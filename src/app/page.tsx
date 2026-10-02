@@ -1,11 +1,13 @@
+import { AfterCohort } from "@/components/landing/cohort";
 import { Cta } from "@/components/landing/cta";
 import { Footer } from "@/components/landing/footer";
 import { Hero } from "@/components/landing/hero";
 import { Nav } from "@/components/landing/nav";
 import { Rail } from "@/components/landing/rail";
+import { Section } from "@/components/landing/section";
 
-// Short first page: one hero, one five-caption rail, one call to action.
-// The long sections (DNA, Trend, Studio, loop, Collab, HQ, FAQ) are unused on this page and remain in git history and /app.
+// Short first page: the hero, the core story, what you keep after 30 days, and one call to action.
+// Product depth lives on its own pages: /product, /learning-loop, /collab-inbox, /cohort and /faq.
 export default function Home() {
   return (
     <div>
@@ -13,6 +15,7 @@ export default function Home() {
       <main>
         <Hero />
         <Rail />
+        <Section id="after-30-days" className="pt-6 lg:pt-10"><AfterCohort applyHref="#cohort" /></Section>
         <Cta />
       </main>
       <Footer />
