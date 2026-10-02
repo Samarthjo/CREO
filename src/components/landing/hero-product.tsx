@@ -28,9 +28,8 @@ export function HeroProduct() {
   const { brief, ranked, ws } = getDemo();
   const reduce = useReducedMotion();
   const top = brief.actions.find((a) => a.kind === "create")!;
-  const next = brief.actions.filter((a) => a.kind === "create")[1];
   const trendId = top.id.replace("create-", "");
-  const why = ranked.find((r) => r.pattern.id === trendId)?.fit.parts.slice(0, 3).map((p) => p.note) ?? [];
+  const why = ranked.find((r) => r.pattern.id === trendId)?.fit.parts.slice(0, 2).map((p) => p.note) ?? [];
   const q = ws.inquiries[0]!;
   const pkg = useMemo(() => demoPackage({ topic: "competitor research", proof: "6 hours saved a week", lengthSec: 30, language: "English", trendId }), [trendId]);
 
@@ -73,7 +72,7 @@ export function HeroProduct() {
         <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">
           <Logo word={false} />
           <span className="text-xs text-muted">Sample creator: {ws.dna.name}, 27K followers</span>
-          <Chip tone="lime">Demo data</Chip>
+          <Chip tone="lime">Sample data</Chip>
         </div>
 
         <div className="grid md:grid-cols-[13rem_minmax(0,1fr)]">
@@ -104,7 +103,7 @@ export function HeroProduct() {
             </ul>
           </aside>
 
-          <div className="relative min-h-[32rem] min-w-0 p-5 sm:p-7 md:h-[37rem] md:overflow-y-auto scroll-thin">
+          <div className="relative min-h-[26rem] min-w-0 p-5 sm:p-7 md:h-[30rem] md:overflow-y-auto scroll-thin">
             <div className="mb-5 flex gap-1 md:hidden" role="tablist" aria-label="Sample workspace">
               {(["hq", "studio"] as const).map((v) => (
                 <button key={v} type="button" role="tab" aria-selected={view === v} onClick={() => setView(v)} className={cn("rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium", view === v ? "bg-eyebrow text-on-eyebrow" : "text-muted")}>{v === "hq" ? "HQ" : "Studio"}</button>
@@ -114,8 +113,7 @@ export function HeroProduct() {
             <AnimatePresence mode="wait" initial={false}>
               {view === "hq" ? (
                 <motion.div key="hq" {...fade}>
-                  <h2 className="font-display text-[1.75rem] font-medium tracking-tight sm:text-[2rem]">Good morning, Arjun.</h2>
-                  <p className="mt-1 text-[0.8125rem] text-muted">{brief.found.patterns} patterns, {brief.found.drafts} drafts, {brief.found.inquiries} brand inquiry. Recommended next action:</p>
+                  <h2 className="mb-4 font-display text-[1.75rem] font-medium tracking-tight sm:text-[2rem]">Good morning, Arjun.</h2>
 
                   <div className="mt-4 rounded-panel border border-line bg-soft p-5">
                     <div className="flex items-start justify-between gap-4">
@@ -133,18 +131,10 @@ export function HeroProduct() {
                     </ul>
                     <div className="mt-4 flex flex-wrap items-center gap-3">
                       <Button variant="primary" size="md" onClick={() => setView("studio")}>Open in Studio</Button>
-                      <span className="text-xs text-muted">Builds hooks, script and shot list from your history.</span>
                     </div>
                   </div>
 
                   <ul className="mt-3 divide-y divide-line rounded-panel border border-line bg-surface px-5">
-                    {next && (
-                      <li className="flex items-center gap-3 py-3.5">
-                        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sunk text-ink"><FilmSlate size={16} /></span>
-                        <div className="min-w-0 flex-1"><p className="truncate text-[0.8125rem] font-medium text-ink">{next.title}</p><p className="truncate text-xs text-muted">{next.subject}</p></div>
-                        {next.fit ? <span className="tnum text-xs font-medium text-muted">{next.fit} fit</span> : null}
-                      </li>
-                    )}
                     <li className={cn("py-3.5 transition-colors", flash && "bg-eyebrow")}>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sunk text-ink"><Tray size={16} /></span>

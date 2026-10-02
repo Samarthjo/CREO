@@ -35,13 +35,9 @@ export function Footer() {
         <Logo inverse />
         <nav aria-label="Footer" className="flex flex-wrap gap-x-7 gap-y-2 text-sm font-medium">
           <Link href="/app" className="hover:underline">Workspace</Link>
-          <a href="#trend" className="hover:underline">Trend</a>
-          <a href="#studio" className="hover:underline">Studio</a>
-          <a href="#collab" className="hover:underline">Collab Inbox</a>
           <a href="#cohort" className="hover:underline">Cohort</a>
-          <a href="#faq" className="hover:underline">FAQ</a>
         </nav>
-        <p className="w-full text-xs text-[#11140c]/70">The creator, brands and numbers shown on this page are made-up samples running on the real CREO engine. No testimonials yet.</p>
+        <p className="w-full text-xs text-[#11140c]/70">Sample data. Works from what you add. Instagram Reels only. No testimonials yet.</p>
       </div>
     </footer>
   );

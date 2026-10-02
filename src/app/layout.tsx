@@ -5,12 +5,12 @@ import { MotionProvider } from "@/components/motion-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "CREO | Your AI creator strategist", template: "%s | CREO" },
+  title: { default: "CREO | The Intelligence Layer for Creators", template: "%s | CREO" },
   description:
-    "CREO learns how you create. It turns trends into scripts and brand DMs into priced replies, with your approval. Founding Creator Cohort: 10-15 creators, 30 days, Rs 499.",
+    "Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.",
   openGraph: {
-    title: "CREO | Your AI creator strategist",
-    description: "CREO learns how you create, from the content you make to the deals you close.",
+    title: "CREO | The Intelligence Layer for Creators",
+    description: "Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.",
     type: "website",
   },
 };

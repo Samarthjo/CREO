@@ -1,7 +1,7 @@
 import { Cloud } from "../scene/cloud";
 import { Landscape } from "../scene/landscape";
 import { GlassTiles, tileSpots } from "../scene/tiles";
-import { Accent, Button, Eyebrow } from "../ui/kit";
+import { Accent, Button } from "../ui/kit";
 import { HeroProduct } from "./hero-product";
 
 const TILES = tileSpots(3, [
@@ -20,18 +20,15 @@ export function Hero() {
       </Landscape>
 
       <div className="mx-auto flex w-full max-w-[72rem] flex-col items-center px-5 text-center sm:px-6">
-        <Eyebrow>Your AI creator strategist</Eyebrow>
-        <h1 className="mt-6 max-w-[16ch] font-display text-[clamp(2.9rem,7.4vw,6.4rem)] font-normal leading-[0.98] tracking-[-0.045em]">
-          CREO learns how <Accent>you</Accent> create.
+        <h1 className="max-w-[22ch] font-display text-[clamp(2.75rem,7vw,6.2rem)] font-normal leading-[0.98] tracking-[-0.045em]">
+          The Intelligence <br className="hidden sm:block" />Layer for <Accent>Creators.</Accent>
         </h1>
         <p className="mt-6 max-w-[40rem] text-[1.0625rem] leading-relaxed text-muted sm:text-[1.1875rem]">
-          From the content you make to the deals you close, CREO remembers what works for you and tells you what to do next.
+          Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.
         </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Button variant="primary" size="lg" href="#cohort">Join the Founding Creator Cohort</Button>
-          <Button variant="ghost" size="lg" href="#loop" className="bg-bg/60 backdrop-blur">See how CREO works</Button>
+        <div className="mt-8">
+          <Button variant="primary" size="lg" href="#cohort">Apply for the founding cohort</Button>
         </div>
-        <p className="mt-4 text-[0.8125rem] text-muted">Founding price ₹499 for 30 days. 10 to 15 creators.</p>
       </div>
 
       <div id="product" className="mt-24 px-4 sm:px-6 lg:mt-40">
