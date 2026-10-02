@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Language } from "@/lib/engine/types";
 import { LivePackage } from "./live-package";
-import { Field, Input, Panel, Select } from "../ui/kit";
+import { Accent, Field, Input, Panel, Select } from "../ui/kit";
 import { Tabs } from "../ui/interactive";
 import { demoPackage, getDemo } from "./demo";
 import { Reveal } from "./reveal";
@@ -22,7 +22,7 @@ export function StudioSection() {
 
   return (
     <Section id="studio" band>
-      <SectionHead title="A package you can shoot today." sub="Hooks, script, shot plan, caption, CTA and titles in your voice, in English or Hinglish. Gaps only you can fill stay highlighted." />
+      <SectionHead eyebrow="CREO Studio" title={<>A package you can <Accent>shoot</Accent> today.</>} sub="Hooks, script, shot plan, caption, CTA and titles in your voice, in English or Hinglish. Gaps only you can fill stay highlighted." />
       <Reveal>
         <Panel className="overflow-hidden">
           <div className="grid gap-4 border-b border-line bg-sunk/60 p-5 md:grid-cols-[1.35fr_1fr_1.1fr_auto_auto] md:items-end">

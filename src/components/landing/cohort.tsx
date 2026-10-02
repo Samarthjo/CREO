@@ -4,9 +4,9 @@ import { CheckCircle } from "@phosphor-icons/react";
 import { useState } from "react";
 import { FOCUS, FOLLOWER_BANDS, validateApplication, type ApplicationErrors } from "@/lib/apply";
 import { NICHES, type NicheKey } from "@/lib/engine/types";
-import { Button, Field, Input, Mark, Panel, Select, Textarea, cn } from "../ui/kit";
+import { Accent, Button, Field, Input, Mark, Panel, Select, Textarea, cn } from "../ui/kit";
 import { Reveal } from "./reveal";
-import { Section } from "./section";
+import { Section, SectionHead } from "./section";
 
 const GET = [
   "A private group with direct founder and product access",
@@ -22,8 +22,8 @@ const ASK = [
 function Terms({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <h3 className="font-display text-lg font-semibold text-bg">{title}</h3>
-      <ul className="mt-4 space-y-3.5 text-[0.9375rem] leading-snug text-bg/80">
+      <h3 className="font-display text-lg font-semibold text-ink">{title}</h3>
+      <ul className="mt-4 space-y-3.5 text-[0.9375rem] leading-snug text-muted">
         {items.map((i) => <li key={i}>{i}</li>)}
       </ul>
     </div>
@@ -33,34 +33,31 @@ function Terms({ title, items }: { title: string; items: string[] }) {
 export function Cohort() {
   return (
     <Section id="cohort">
-      <Reveal className="mb-12 lg:mb-14">
-        <h2 className="max-w-[17ch] font-display text-[clamp(2.1rem,3.6vw,3.25rem)] font-semibold leading-[1.02] tracking-[-0.025em]">Build it with us for 30 days.</h2>
-        <p className="mt-5 max-w-[54ch] text-[1.0625rem] leading-relaxed text-muted">CREO does most of the work. Our strategists work alongside it on strategy, trends and content while we automate the gaps.</p>
-      </Reveal>
+      <SectionHead eyebrow="Founding Creator Cohort" title={<>Build it with us for <Accent>30 days</Accent>.</>} sub="CREO does most of the work. Our strategists work alongside it on strategy, trends and content while we automate the gaps." />
 
       <Reveal>
-        <div className="on-ink overflow-hidden rounded-[1.75rem] bg-ink text-bg shadow-pop">
-          <div className="grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-            <div className="border-b border-bg/15 p-10 lg:border-b-0 lg:border-r lg:p-12">
-              <p className="text-sm text-bg/70">Founding Creator Cohort</p>
-              <p className="mt-3 font-display text-[clamp(4.5rem,8.5vw,7rem)] font-semibold leading-none tracking-[-0.04em] text-bg">₹499</p>
-              <p className="mt-3 text-xl text-bg">for <Mark>30 days</Mark></p>
-              <p className="mt-7 max-w-[30ch] text-[0.9375rem] leading-relaxed text-bg/75">10 to 15 creators first, not 30 at once, so every creator gets real attention.</p>
+        <div className="overflow-hidden rounded-[1.75rem] border border-line bg-surface shadow-pop">
+          <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+            <div className="border-b border-line p-8 sm:p-10 lg:border-b-0 lg:border-r lg:p-12">
+              <p className="text-sm text-muted">Founding Creator Cohort</p>
+              <p className="mt-3 font-display text-[clamp(4.5rem,8.5vw,7rem)] font-semibold leading-none tracking-[-0.04em] text-accent">₹499</p>
+              <p className="mt-3 text-xl text-ink">for <Mark>30 days</Mark></p>
+              <p className="mt-7 max-w-[30ch] text-[0.9375rem] leading-relaxed text-muted">10 to 15 creators first, not 30 at once, so every creator gets real attention.</p>
             </div>
-            <div className="grid gap-10 p-10 md:grid-cols-2 lg:p-12">
+            <div className="grid gap-10 p-8 sm:p-10 md:grid-cols-2 lg:p-12">
               <Terms title="What you get" items={GET} />
               <Terms title="What we ask" items={ASK} />
             </div>
           </div>
-          <p className="border-t border-bg/15 px-10 py-6 text-sm leading-relaxed text-bg/75 lg:px-12">
+          <p className="border-t border-line px-8 py-6 text-sm leading-relaxed text-muted sm:px-10 lg:px-12">
             CREO is built to be 70 to 80 percent software and 20 to 30 percent strategist support. Every correction is captured, so the support shrinks as the product learns. We share public progress on days 7, 14, 21 and 30. The founding rate renews only if the product earned continued use.
           </p>
         </div>
       </Reveal>
 
-      <div id="apply" className="mt-20 grid items-start gap-10 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
+      <div id="apply" className="mt-20 grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
         <Reveal>
-          <h3 className="max-w-[14ch] font-display text-[clamp(1.75rem,2.6vw,2.25rem)] font-semibold leading-tight tracking-tight">Apply for a founding seat.</h3>
+          <h3 className="max-w-[14ch] font-display text-[clamp(1.9rem,3vw,2.6rem)] font-normal leading-tight tracking-[-0.03em]">Apply for a <Accent>founding</Accent> seat.</h3>
           <p className="mt-4 max-w-[36ch] text-[0.9375rem] leading-relaxed text-muted">A short form. We read every application and reach out to the creators we can help most.</p>
         </Reveal>
         <Reveal delay={0.08}><Panel className="p-7 lg:p-8"><ApplyForm /></Panel></Reveal>

@@ -4,7 +4,7 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, InputHT
 export const cn = (...c: (string | false | null | undefined)[]): string => c.filter(Boolean).join(" ");
 
 const BTN = {
-  primary: "bg-mark text-on-mark hover:brightness-95",
+  primary: "bg-cta text-on-cta hover:brightness-110",
   dark: "bg-ink text-bg hover:opacity-90",
   ghost: "border border-line-strong text-ink hover:bg-sunk",
   quiet: "text-muted hover:text-ink hover:bg-sunk",
@@ -33,6 +33,7 @@ export function Button({ variant = "dark", size = "md", href, className, childre
 const CHIP = {
   neutral: "bg-sunk text-muted",
   mark: "bg-mark text-on-mark",
+  lime: "bg-eyebrow text-on-eyebrow",
   risk: "bg-risk-wash text-risk",
   ok: "bg-ok-wash text-ok",
   outline: "border border-line text-muted",
@@ -40,6 +41,14 @@ const CHIP = {
 export function Chip({ tone = "neutral", className, children }: { tone?: keyof typeof CHIP; className?: string; children: ReactNode }) {
   return <span className={cn("inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium", CHIP[tone], className)}>{children}</span>;
 }
+
+/** Small pill label above a headline. */
+export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
+  return <span className={cn("inline-flex items-center rounded-full bg-eyebrow px-3 py-1 text-[0.8125rem] font-medium text-on-eyebrow", className)}>{children}</span>;
+}
+
+/** The one italic word in a headline. */
+export const Accent = ({ children }: { children: ReactNode }) => <em className="accent">{children}</em>;
 
 export function Panel({ className, children, as: As = "div" }: { className?: string; children: ReactNode; as?: "div" | "section" | "article" | "li" }) {
   return <As className={cn("rounded-panel border border-line bg-surface shadow-panel", className)}>{children}</As>;

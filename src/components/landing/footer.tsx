@@ -1,35 +1,47 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import { Logo } from "../product/logo";
-import { Button } from "../ui/kit";
-import { Reveal } from "./reveal";
+import { Cloud } from "../scene/cloud";
+import { Landscape } from "../scene/landscape";
+import { GlassTiles, tileSpots } from "../scene/tiles";
+import { Accent, Button, Eyebrow } from "../ui/kit";
 
+const TILES = tileSpots(21, [{ x: 7, y: 64, n: 3, spread: 8 }, { x: 93, y: 58, n: 3, spread: 7 }, { x: 50, y: 84, n: 2, spread: 10 }]);
+
+/** Section 12: the closing CTA, on the night scene, in a frosted panel. */
 export function FinalCta() {
   return (
-    <section className="border-t border-line">
-      <Reveal className="mx-auto flex w-full max-w-[1240px] flex-col items-start gap-8 px-6 py-24 lg:flex-row lg:items-end lg:justify-between lg:py-28">
-        <div>
-          <h2 className="max-w-[16ch] font-display text-[clamp(2.25rem,4.4vw,4rem)] font-semibold leading-[1] tracking-[-0.03em]">Build your manager with us.</h2>
-          <p className="mt-5 max-w-[44ch] text-[1.0625rem] text-muted">Seats are limited to 10 to 15 creators.</p>
+    <section className="night relative bg-bg">
+      <Landscape time="night" fadeTop={false} className="h-[44rem] sm:h-[48rem] lg:h-[54rem]">
+        <Cloud time="night" seed={11} className="drift-x absolute -left-[5%] top-[6%] w-[16rem] opacity-80 sm:w-[24rem]" style={{ "--dur": "120s" } as CSSProperties} />
+        <GlassTiles spots={TILES} />
+        <div className="absolute inset-0 grid place-items-center px-4 pb-16">
+          <div className="glass w-full max-w-[46rem] rounded-[2.25rem] px-6 py-12 text-center sm:px-12 sm:py-16">
+            <Eyebrow>Founding Creator Cohort</Eyebrow>
+            <h2 className="mx-auto mt-5 max-w-[13ch] font-display text-[clamp(2.4rem,5.6vw,4.75rem)] font-normal leading-[1] tracking-[-0.04em]">Stop guessing what to <Accent>post</Accent>.</h2>
+            <p className="mx-auto mt-5 max-w-[30rem] text-[1.0625rem] leading-relaxed text-body">10 to 15 creators. 30 days. ₹499. Direct access to the team, and a say in what we build.</p>
+            <div className="mt-8 flex justify-center"><Button variant="primary" size="lg" href="#apply">Join the Founding Cohort</Button></div>
+          </div>
         </div>
-        <Button variant="primary" size="lg" href="#apply">Apply for the cohort</Button>
-      </Reveal>
+      </Landscape>
     </section>
   );
 }
 
 export function Footer() {
   return (
-    <footer className="border-t border-line">
-      <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center justify-between gap-6 px-6 py-10">
-        <Logo />
-        <nav aria-label="Footer" className="flex flex-wrap gap-x-7 gap-y-2 text-sm text-muted">
-          <Link href="/app" className="hover:text-ink">Workspace</Link>
-          <a href="#trend" className="hover:text-ink">Trend</a>
-          <a href="#studio" className="hover:text-ink">Studio</a>
-          <a href="#collab" className="hover:text-ink">Collab Inbox</a>
-          <a href="#memory" className="hover:text-ink">Memory</a>
+    <footer className="relative -mt-8 rounded-t-[2rem] bg-lime-400 text-[#11140c]">
+      <div className="mx-auto flex w-full max-w-[76rem] flex-wrap items-center justify-between gap-6 px-5 pb-10 pt-12 sm:px-6">
+        <Logo inverse />
+        <nav aria-label="Footer" className="flex flex-wrap gap-x-7 gap-y-2 text-sm font-medium">
+          <Link href="/app" className="hover:underline">Workspace</Link>
+          <a href="#trend" className="hover:underline">Trend</a>
+          <a href="#studio" className="hover:underline">Studio</a>
+          <a href="#collab" className="hover:underline">Collab Inbox</a>
+          <a href="#cohort" className="hover:underline">Cohort</a>
+          <a href="#faq" className="hover:underline">FAQ</a>
         </nav>
-        <p className="w-full text-xs text-faint">The creator, brands and numbers shown on this page are made-up samples running on the real CREO engine.</p>
+        <p className="w-full text-xs text-[#11140c]/70">The creator, brands and numbers shown on this page are made-up samples running on the real CREO engine. No testimonials yet.</p>
       </div>
     </footer>
   );

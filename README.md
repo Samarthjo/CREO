@@ -27,7 +27,7 @@ Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `CREO_APPLICATIO
 
 ## Stack
 
-Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Motion, Phosphor icons, Geist and Bricolage Grotesque (self-hosted via Fontsource). No UI kit, no state library, no test framework.
+Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Motion, Phosphor icons, Instrument Sans (self-hosted via Fontsource). No UI kit, no state library, no test framework.
 
 ## How it is organised
 
@@ -45,7 +45,8 @@ src/lib/store/    Workspace reducer, localStorage persistence, sample workspace 
 src/components/
   product/        Shared product components, used by the app and the landing page
   landing/        Landing sections. They run the real engines on a sample creator.
-  ui/             Buttons, panels, the marker, fit ring, form fields
+  scene/          The painted landscape, clouds and glass tiles (server components, seeded, original art)
+  ui/             Buttons, panels, the marker, fit ring, tickets, count-up, form fields
 src/app/          Routes: / (landing), /app/* (workspace), /api/apply
 tests/            Engine tests and application validation tests
 ```
@@ -54,7 +55,7 @@ The landing page does not use screenshots. Each section renders the same compone
 
 ## Design
 
-One accent, the marker. CREO highlights what matters, in trend scripts, in a brand's own message and in the daily brief. The marker is only ever a fill behind text, never a text color. Light and dark themes share the same tokens (`src/app/globals.css`). Shape rule: panels 20px, controls 12px, buttons and chips fully round.
+See `docs/design-research.md` and `docs/design-direction.md`. The landing page is one day with CREO: a painted mountain-and-lake scene that moves from dawn (hero) to night (closing CTA) as you scroll, with the real product UI in front of it. Olive and lime on warm paper; the marker (a soft lime wash behind text) is CREO's own device and is only ever a fill, never a text color. Tokens live in `src/app/globals.css`; the scene in `src/components/scene/`. Shape rule: panels 24px, controls 12px, glass tiles 16px, tickets 28px, buttons and chips fully round.
 
 ## How the numbers work
 

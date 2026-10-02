@@ -1,23 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import "@fontsource-variable/geist";
-import "@fontsource-variable/bricolage-grotesque/opsz.css";
+import "@fontsource-variable/instrument-sans";
+import "@fontsource-variable/instrument-sans/wght-italic.css";
+import { MotionProvider } from "@/components/motion-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "CREO | The AI Creator Manager", template: "%s | CREO" },
+  title: { default: "CREO | Your AI creator strategist", template: "%s | CREO" },
   description:
-    "CREO turns trends into scripts and brand DMs into priced replies, with your approval. Founding Creator Cohort: 10-15 creators, 30 days, Rs 499.",
+    "CREO learns how you create. It turns trends into scripts and brand DMs into priced replies, with your approval. Founding Creator Cohort: 10-15 creators, 30 days, Rs 499.",
   openGraph: {
-    title: "CREO | The AI Creator Manager",
-    description: "Know what to post. Know what to charge.",
+    title: "CREO | Your AI creator strategist",
+    description: "CREO learns how you create, from the content you make to the deals you close.",
     type: "website",
   },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4f5f6" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0e11" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfbf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0c1030" },
   ],
 };
 
@@ -30,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
-      <body>{children}</body>
+      <body><MotionProvider>{children}</MotionProvider></body>
     </html>
   );
 }

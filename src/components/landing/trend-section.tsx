@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { adaptations } from "@/lib/engine/trend";
 import { AdaptationList, FitBreakdown, MechanismGrid, TrendRow } from "../product/trend";
-import { FitScore, Panel } from "../ui/kit";
+import { Accent, Button, FitScore, Panel } from "../ui/kit";
 import { getDemo } from "./demo";
 import { Reveal } from "./reveal";
 import { Section, SectionHead } from "./section";
@@ -17,9 +17,9 @@ export function TrendSection() {
 
   return (
     <Section id="trend">
-      <SectionHead title="Trends scored against your own numbers." sub="CREO explains the mechanism behind a pattern, how well it fits your history, and three original ways to make it." />
+      <SectionHead eyebrow="CREO Trend" title={<>Trends scored against <Accent>your</Accent> numbers.</>} sub="CREO explains why a pattern works, how well it fits your history, and gives you original ways to make it." />
       <Reveal>
-        <div className="grid items-start gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
           <ul className="flex flex-col gap-2.5" aria-label="Trends ranked by creator fit">
             {list.map((r, i) => <li key={r.pattern.id}><TrendRow pattern={r.pattern} fit={r.fit.score} selected={sel === i} onSelect={() => setSel(i)} /></li>)}
           </ul>
@@ -44,6 +44,7 @@ export function TrendSection() {
             <div className="mt-6 border-t border-line pt-5">
               <h4 className="text-sm font-semibold text-ink">Original versions for you</h4>
               <AdaptationList items={ideas} />
+              <div className="mt-5"><Button variant="primary" href="#studio">Turn this into my content</Button></div>
             </div>
           </Panel>
         </div>

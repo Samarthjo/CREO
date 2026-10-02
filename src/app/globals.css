@@ -1,86 +1,116 @@
 @import "tailwindcss";
 
 /*
-  CREO design tokens.
-  One accent: the marker. It is only ever a fill or a wash behind text, never text color,
-  so ink stays the reading color in both themes.
-  Shape rule: panels 20px, controls 12px, buttons and chips fully round.
+  CREO design tokens (see docs/design-direction.md).
+  Warm paper, olive and lime. The marker (a soft lime wash behind text) is CREO's own device:
+  it is only ever a fill behind text, never a text color.
+  Shape rule: panels 24px, controls 12px, glass tiles 16px, tickets 28px, buttons and chips fully round.
+  Old token names (--bg, --surface, --mark ...) are kept so /app keeps working until Phases 3 and 4.
 */
 :root {
   color-scheme: light;
-  --bg: #f4f5f6;
-  --surface: #fbfbfc;
-  --raised: #fdfdfe;
-  --sunk: #eceef0;
-  --line: #dfe2e6;
-  --line-strong: #c9ced5;
-  --ink: #12151a;
-  --text: #272c34;
-  --muted: #5a626d;
-  --faint: #838b96;
-  --mark: #f3e26b;
-  --on-mark: #14161a;
-  --mark-wash: rgb(243 226 107 / 0.6);
+  --bg: #fbfbf7;
+  --surface: #fefefb;
+  --raised: #ffffff;
+  --sunk: #f3f4ec;
+  --line: #e2e5d6;
+  --line-strong: #cdd2bb;
+  --ink: #11140c;
+  --text: #2b3022;
+  --muted: #586049;
+  --faint: #7b8369;
+  --mark: #b5cf4f;
+  --on-mark: #11140c;
+  --mark-wash: rgb(181 207 79 / 0.55);
+  --cta: #4b6a0e;
+  --on-cta: #ffffff;
+  --accent: #4b6a0e;
+  --eyebrow-bg: #e3ecc5;
+  --eyebrow-fg: #3f5a0c;
+  --sky-tint: #e8f1f3;
+  --soft: #f0f5df;
   --risk: #b4321e;
   --risk-wash: rgb(180 50 30 / 0.09);
-  --ok: #1f7a4d;
-  --ok-wash: rgb(31 122 77 / 0.09);
-  --shadow-panel: 0 1px 0 rgb(18 24 34 / 0.04), 0 18px 40px -24px rgb(22 30 44 / 0.24);
-  --shadow-pop: 0 2px 4px rgb(18 24 34 / 0.05), 0 28px 60px -20px rgb(22 30 44 / 0.3);
+  --ok: #2f7a3a;
+  --ok-wash: rgb(47 122 58 / 0.1);
+  --shadow-panel: 0 1px 0 rgb(17 20 12 / 0.04), 0 24px 48px -28px rgb(17 20 12 / 0.22);
+  --shadow-pop: 0 2px 4px rgb(17 20 12 / 0.05), 0 32px 64px -24px rgb(17 20 12 / 0.28);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Fixed palette (not themed): used for numerals, tickets and the scene. */
+  --olive-800: #3f5a0c;
+  --olive-700: #4b6a0e;
+  --fern-500: #7ba10c;
+  --lime-400: #b5cf4f;
+  --lime-100: #e3ecc5;
+  --lime-50: #f0f5df;
+  --night-900: #1b2252;
+  --night-700: #2f3d8f;
 }
 
+/* Night: the same token names on a deep indigo ground. Used by the dark theme and by .night sections. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0c0e11;
-    --surface: #13161a;
-    --raised: #1a1e24;
-    --sunk: #0a0c0e;
-    --line: #242932;
-    --line-strong: #343a45;
-    --ink: #f0f2f5;
-    --text: #d5d9df;
-    --muted: #9aa2ae;
-    --faint: #707885;
-    --mark: #f0de62;
-    --on-mark: #14161a;
-    --mark-wash: rgb(240 222 98 / 0.36);
+    --bg: #0c1030;
+    --surface: #121741;
+    --raised: #181e4e;
+    --sunk: #090c24;
+    --line: #232a63;
+    --line-strong: #343d84;
+    --ink: #f4f6ec;
+    --text: #d9ddf0;
+    --muted: #a6acd0;
+    --faint: #7e86b3;
+    --mark-wash: rgb(181 207 79 / 0.32);
+    --cta: #b5cf4f;
+    --on-cta: #11140c;
+    --accent: #c8df6b;
+    --eyebrow-bg: rgb(181 207 79 / 0.16);
+    --eyebrow-fg: #cfe27a;
+    --sky-tint: #121a4a;
+    --soft: rgb(181 207 79 / 0.1);
     --risk: #ff8b78;
-    --risk-wash: rgb(255 139 120 / 0.13);
-    --ok: #6fd69e;
-    --ok-wash: rgb(111 214 158 / 0.12);
-    --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.03), 0 24px 48px -28px rgb(0 0 0 / 0.7);
+    --risk-wash: rgb(255 139 120 / 0.14);
+    --ok: #7fdc95;
+    --ok-wash: rgb(127 220 149 / 0.13);
+    --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 48px -28px rgb(0 0 0 / 0.7);
     --shadow-pop: 0 2px 4px rgb(0 0 0 / 0.3), 0 32px 64px -24px rgb(0 0 0 / 0.8);
   }
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+.night {
   color-scheme: dark;
-  --bg: #0c0e11;
-  --surface: #13161a;
-  --raised: #1a1e24;
-  --sunk: #0a0c0e;
-  --line: #242932;
-  --line-strong: #343a45;
-  --ink: #f0f2f5;
-  --text: #d5d9df;
-  --muted: #9aa2ae;
-  --faint: #707885;
-  --mark: #f0de62;
-  --on-mark: #14161a;
-  --mark-wash: rgb(240 222 98 / 0.36);
+  --bg: #0c1030;
+  --surface: #121741;
+  --raised: #181e4e;
+  --sunk: #090c24;
+  --line: #232a63;
+  --line-strong: #343d84;
+  --ink: #f4f6ec;
+  --text: #d9ddf0;
+  --muted: #a6acd0;
+  --faint: #7e86b3;
+  --mark-wash: rgb(181 207 79 / 0.32);
+  --cta: #b5cf4f;
+  --on-cta: #11140c;
+  --accent: #c8df6b;
+  --eyebrow-bg: rgb(181 207 79 / 0.16);
+  --eyebrow-fg: #cfe27a;
+  --sky-tint: #121a4a;
+  --soft: rgb(181 207 79 / 0.1);
   --risk: #ff8b78;
-  --risk-wash: rgb(255 139 120 / 0.13);
-  --ok: #6fd69e;
-  --ok-wash: rgb(111 214 158 / 0.12);
-  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.03), 0 24px 48px -28px rgb(0 0 0 / 0.7);
+  --risk-wash: rgb(255 139 120 / 0.14);
+  --ok: #7fdc95;
+  --ok-wash: rgb(127 220 149 / 0.13);
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 48px -28px rgb(0 0 0 / 0.7);
   --shadow-pop: 0 2px 4px rgb(0 0 0 / 0.3), 0 32px 64px -24px rgb(0 0 0 / 0.8);
 }
 
 @theme inline {
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Bricolage Grotesque Variable", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-raised: var(--raised);
@@ -94,12 +124,28 @@
   --color-mark: var(--mark);
   --color-on-mark: var(--on-mark);
   --color-mark-wash: var(--mark-wash);
+  --color-cta: var(--cta);
+  --color-on-cta: var(--on-cta);
+  --color-accent: var(--accent);
+  --color-soft: var(--soft);
+  --color-eyebrow: var(--eyebrow-bg);
+  --color-on-eyebrow: var(--eyebrow-fg);
   --color-risk: var(--risk);
   --color-risk-wash: var(--risk-wash);
   --color-ok: var(--ok);
   --color-ok-wash: var(--ok-wash);
-  --radius-panel: 1.25rem;
+  --color-olive-800: var(--olive-800);
+  --color-olive-700: var(--olive-700);
+  --color-fern-500: var(--fern-500);
+  --color-lime-400: var(--lime-400);
+  --color-lime-100: var(--lime-100);
+  --color-lime-50: var(--lime-50);
+  --color-night-900: var(--night-900);
+  --color-night-700: var(--night-700);
+  --radius-panel: 1.5rem;
   --radius-control: 0.75rem;
+  --radius-glass: 1rem;
+  --radius-ticket: 1.75rem;
   --shadow-panel: var(--shadow-panel);
   --shadow-pop: var(--shadow-pop);
 }
@@ -112,9 +158,9 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 5.5rem;
   }
-  body { min-height: 100dvh; font-size: 0.9375rem; line-height: 1.55; }
+  body { min-height: 100dvh; font-size: 0.9375rem; line-height: 1.55; overflow-x: clip; }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
     font-optical-sizing: auto;
@@ -125,6 +171,7 @@
   p { text-wrap: pretty; }
   ::selection { background: var(--mark); color: var(--on-mark); }
   :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .night :focus-visible, [data-theme="dark"] :focus-visible { outline-color: var(--lime-400); }
   button, [role="button"] { cursor: pointer; }
   button:disabled { cursor: not-allowed; }
   textarea, input, select { font: inherit; color: var(--ink); }
@@ -150,14 +197,70 @@
   @keyframes sweep { from { background-size: 0% 64%; } to { background-size: 100% 64%; } }
 }
 
+/* One italic accent word per headline, in olive (lime at night). */
+.accent { font-style: italic; color: var(--accent); font-weight: inherit; }
+
+/* Frosted glass: small tiles and the closing CTA panel only. */
+.glass {
+  background: rgb(255 255 255 / 0.2);
+  border: 1px solid rgb(255 255 255 / 0.45);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35);
+}
+
+/* Ticket: lime card with a circular bite on each side edge, so tickets in a strip read as torn off one roll. */
+.ticket {
+  --bite: 1.15rem;
+  -webkit-mask:
+    radial-gradient(circle at 0 50%, #0000 calc(var(--bite) - 0.5px), #000 var(--bite)) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, #0000 calc(var(--bite) - 0.5px), #000 var(--bite)) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle at 0 50%, #0000 calc(var(--bite) - 0.5px), #000 var(--bite)) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, #0000 calc(var(--bite) - 0.5px), #000 var(--bite)) right / 51% 100% no-repeat;
+}
+
+/* Scene motion. Only transform and opacity animate. */
+@keyframes drift-x { from { transform: translate3d(-2.5%, 0, 0); } to { transform: translate3d(2.5%, 0, 0); } }
+@keyframes drift-y { from { transform: translate3d(0, -6px, 0); } to { transform: translate3d(0, 6px, 0); } }
+@keyframes bird { from { transform: translate3d(-4vw, 2vh, 0); opacity: 0; } 15%, 85% { opacity: 0.7; } to { transform: translate3d(110vw, -6vh, 0); opacity: 0; } }
+.drift-x { animation: drift-x var(--dur, 60s) ease-in-out infinite alternate; animation-delay: var(--delay, 0s); }
+.drift-y { animation: drift-y var(--dur, 9s) ease-in-out infinite alternate; animation-delay: var(--delay, 0s); }
+@keyframes twinkle { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+.twinkle { animation: twinkle 4.5s ease-in-out infinite; }
+
+/* The sky of a scene fades into the page so it never ends in a hard edge at the top. */
+.scene-fade-top {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 24%);
+}
+
+/* A little paper grain over the painted layers. */
+.grain {
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* Scene parallax: pure CSS scroll-driven animation. Browsers without support just show a still scene. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .px { animation: px-shift linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; will-change: transform; }
+    @keyframes px-shift {
+      from { transform: translate3d(0, calc(var(--px) * -0.9), 0); }
+      to { transform: translate3d(0, calc(var(--px) * 0.9), 0); }
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 
 /* Inside an inverted (ink) panel the marker becomes a solid fill so text stays readable in both themes. */
+.on-ink { --cta: #b5cf4f; --on-cta: #11140c; }
 .on-ink .mark {
   background-image: linear-gradient(var(--mark), var(--mark));
   color: var(--on-mark);

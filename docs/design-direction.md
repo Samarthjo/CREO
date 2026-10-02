@@ -232,3 +232,22 @@ Existing tokens (`--mark`, `--bg`, `--surface`) are aliased during migration so 
 ## 15. Decisions still open
 
 See `design-research.md` section 10 (D1 to D7). The four that block Phase 1: **D1 color, D2 how the scene is made, D3 headline, D5 the dawn-to-night concept.**
+
+## 16. Phase 1 as built (deviations from this plan)
+
+Written after the landing page was implemented, so the doc matches the code.
+
+| Topic | What was decided or changed |
+|---|---|
+| Typeface (D4) | **Instrument Sans** for display and body, including its true italic for the accent word. Chosen from a three-way specimen (Instrument Sans, Hanken Grotesk, Inter Tight): softest feel, chunkiest numerals for the 1-2-3 section, clean `₹`. No monospace face is used yet. Geist and Bricolage were removed |
+| Night ground | The dark theme and `.night` sections use a deep **indigo** (`#0c1030`) rather than the blue-green near-black proposed in section 4.5, so the page matches the night scene's sky. Dark values are still finalized in Phase 3 |
+| New tokens | `--cta` / `--on-cta` (primary button; olive in light, lime at night), `--accent` (italic word), `--eyebrow-*` (pill labels), `--soft` (tinted panel), `--sky-tint` (loop section sky) |
+| Scene (D2) | Built in code as three SVG layers (sky and mountains and lake, far shore, near bank) plus separate clouds and glass tiles, drawn procedurally from seeded noise so server and client match. Each layer is its own element, so painted PNG or WebP layers can replace it. Four times of day: dawn, day, dusk, night |
+| Parallax | Pure CSS scroll-driven animation (`animation-timeline: view()`), no JavaScript. Browsers without support show a still scene |
+| Pinned stories | The learning loop and the Human + AI numerals use a tall section with a sticky stage on large screens with motion allowed. Scroll position picks the step; scroll speed is never changed. Below 1024 px or with reduced motion they are plain click and keyboard steppers |
+| Reduced motion | One `MotionConfig reducedMotion="user"` at the root. Components never branch their markup on the preference (the server cannot know it, and hydration would mismatch). Verified: zero console errors with reduced motion on |
+| Tickets | `.ticket` uses a CSS mask for the circular bites; no images |
+| Honest proof | There are no customers yet, so section 9 shows open "Founding Creator" seats instead of quotes or logos. Illustrative sequences are labelled "Illustrative" |
+| Removed | The earlier "One manager, one memory" walkthrough and the approvals/memory demo were removed from the landing page. The approvals and memory screens remain in `/app` |
+
+Measured on the production build: LCP 424 ms on desktop and 1.3 s on a throttled mobile profile (4x CPU, 1.6 Mbps, 150 ms latency); CLS 0.006; page HTML 151 KB gzipped including all three scenes.

@@ -1,10 +1,11 @@
 "use client";
 
+import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { SAMPLE_INQUIRY, SAMPLE_SCAM, makeInquiry } from "@/lib/store/seed";
 import { HEALTH_LABEL, healthTone } from "../product/brief";
 import { MessageHighlight, QuotePanel, SignalList, TermsList } from "../product/collab";
-import { Button, Chip, Panel, Textarea } from "../ui/kit";
+import { Accent, Button, Chip, Panel, Textarea } from "../ui/kit";
 import { Tabs } from "../ui/interactive";
 import { getDemo } from "./demo";
 import { Reveal } from "./reveal";
@@ -26,11 +27,16 @@ export function CollabSection() {
 
   return (
     <Section id="collab">
-      <SectionHead title="Paste the brand message. Get a price." sub="CREO reads the terms, flags risks, sets a quote range and walk-away price, and drafts a reply you approve." />
+      <SectionHead eyebrow="Collab Inbox" title={<>Paste the brand message. Get a <Accent>price</Accent>.</>} sub="CREO reads the terms, flags risks, sets a quote range and a walk-away price, and drafts a reply you approve." />
+      <Pipeline />
       <Reveal>
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+        <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="flex flex-col gap-6">
             <Panel className="p-6">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-full bg-sunk font-display text-sm font-semibold text-ink" aria-hidden>{which === "offer" ? "T" : "?"}</span>
+                <div className="min-w-0"><p className="text-sm font-medium text-ink">{which === "offer" ? "Meera Rao, Tessera" : "Unknown sender"}</p><p className="text-xs text-muted">Sample brand message</p></div>
+              </div>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <Tabs<Which> label="Sample message" value={which} onChange={choose} items={[{ id: "offer", label: "Brand offer" }, { id: "scam", label: "Pay-to-join message" }]} />
                 <Button size="sm" variant="ghost" onClick={() => { setEditing((e) => !e); setDraftText(raw); }}>{editing ? "Cancel" : "Edit the message"}</Button>
@@ -79,5 +85,21 @@ export function CollabSection() {
         </div>
       </Reveal>
     </Section>
+  );
+}
+
+const PIPE = ["Message", "Terms", "Usage rights", "Budget", "Price", "Reply"];
+
+/** The route a message takes through CREO. Lights up in order once, as it scrolls into view. */
+function Pipeline() {
+  return (
+    <ol aria-label="What CREO does with a brand message" className="mx-auto -mt-4 mb-10 flex max-w-[52rem] flex-wrap items-center justify-center gap-x-2 gap-y-2 lg:mb-12">
+      {PIPE.map((p, i) => (
+        <motion.li key={p} className="flex items-center gap-2" initial={{ opacity: 0.25, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 1 }} transition={{ duration: 0.4, delay: i * 0.28 }}>
+          <Chip tone={i === PIPE.length - 1 ? "mark" : "lime"}>{p}</Chip>
+          {i < PIPE.length - 1 && <span aria-hidden className="text-faint">→</span>}
+        </motion.li>
+      ))}
+    </ol>
   );
 }
