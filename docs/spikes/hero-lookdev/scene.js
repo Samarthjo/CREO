@@ -73,14 +73,14 @@ function dm() {
     g.fillStyle = '#7b7f88'; g.font = '13px GM, monospace'; g.fillText('brand message · sample', 58, 50);
     g.fillStyle = '#1b2029'; rr(g, 24, 74, w - 70, 118, 16); g.fill();
     g.fillStyle = '#d7d6cf'; g.font = '16px IS, sans-serif';
-    ['Hey Arjun! We would love to work', 'with you on a launch campaign.', '1 Reel + 3 Stories · paid usage 90 days'].forEach((t, i) => g.fillText(t, 42, 108 + i * 28));
-    g.fillStyle = '#c6ff3d'; g.font = '600 15px GM, monospace'; g.fillText('BUDGET  ₹12,000', 26, 236);
+    ['Hey Arjun! We would love to work', 'with you on a launch campaign.', '1 Reel + 2 Stories · paid usage 30 days'].forEach((t, i) => g.fillText(t, 42, 108 + i * 28));
+    g.fillStyle = '#c6ff3d'; g.font = '600 15px GM, monospace'; g.fillText('OFFER  ₹12,000', 26, 236);
   });
 }
 function stat(big, small, acc) {
   return tex(960, 576, (g, w, h) => { g.scale(2, 2); w /= 2; h /= 2;
     g.fillStyle = '#0e1117'; g.fillRect(0, 0, w, h);
-    g.fillStyle = acc ? '#c6ff3d' : '#f3f0e8'; g.font = '500 108px IS, sans-serif'; g.fillText(big, 28, 160);
+    g.fillStyle = acc ? '#c6ff3d' : '#f3f0e8'; g.font = (big.length > 6 ? '500 84px' : '500 108px') + ' IS, sans-serif'; g.fillText(big, 28, 160);
     g.fillStyle = '#8c909a'; g.font = '15px GM, monospace'; g.fillText(small, 30, 214);
     g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 2; g.beginPath(); g.moveTo(28, 242); g.lineTo(w - 28, 242); g.stroke();
   });
@@ -88,23 +88,23 @@ function stat(big, small, acc) {
 function spark() {
   return tex(960, 576, (g, w, h) => { g.scale(2, 2); w /= 2; h /= 2;
     g.fillStyle = '#0e1117'; g.fillRect(0, 0, w, h);
-    g.fillStyle = '#8c909a'; g.font = '15px GM, monospace'; g.fillText('TREND · RISING', 28, 40);
+    g.fillStyle = '#8c909a'; g.font = '15px GM, monospace'; g.fillText('PATTERN · EMERGING', 28, 40);
     g.strokeStyle = '#c6ff3d'; g.lineWidth = 4; g.beginPath();
     const pts = [200, 190, 196, 170, 176, 150, 128, 138, 96, 88, 56];
     pts.forEach((y, i) => { const x = 28 + (i * (w - 56)) / (pts.length - 1); i ? g.lineTo(x, y + 40) : g.moveTo(x, y + 40); }); g.stroke();
-    g.fillStyle = '#f3f0e8'; g.font = '500 24px IS, sans-serif'; g.fillText('AI replaced X for 7 days', 28, 262);
+    g.fillStyle = '#f3f0e8'; g.font = '500 24px IS, sans-serif'; g.fillText('I replaced X with AI for 7 days', 28, 262);
   });
 }
 function audience() {
   return tex(960, 576, (g, w, h) => { g.scale(2, 2); w /= 2; h /= 2;
     g.fillStyle = '#0e1117'; g.fillRect(0, 0, w, h);
     for (let y = 0; y < 8; y++) for (let x = 0; x < 15; x++) { const hot = Math.hypot(x - 6, y - 3) < 3.2; g.fillStyle = hot ? '#c6ff3d' : '#2a2f3a'; g.beginPath(); g.arc(40 + x * 28, 50 + y * 25, hot ? 5 : 3.6, 0, 7); g.fill(); }
-    g.fillStyle = '#f3f0e8'; g.font = '500 26px IS, sans-serif'; g.fillText('27K · 22 to 34 · Bengaluru', 28, 268);
+    g.fillStyle = '#f3f0e8'; g.font = '500 26px IS, sans-serif'; g.fillText('27.4K · 22 to 34 · Pune', 28, 268);
   });
 }
 
 /* ---------- floor (reflective, roughened by a dark veil) ---------- */
-const mirror = new Reflector(new THREE.PlaneGeometry(80, 80), { color: 0x23262e, textureWidth: W / 2, textureHeight: H / 2, clipBias: 0.003 });
+const mirror = new Reflector(new THREE.PlaneGeometry(80, 80), { color: 0x14161b, textureWidth: W / 2, textureHeight: H / 2, clipBias: 0.003 });
 mirror.rotation.x = -Math.PI / 2;
 scene.add(mirror);
 
@@ -130,9 +130,9 @@ function addTile({ w, h, map, x, y, z, ry = 0, rx = 0, rim = false, key }) {
 }
 const reelTex = [0, 1, 2, 3, 4, 5, 6, 7].map(reel);
 const dmTex = dm(), trendTex = spark(), audTex = audience();
-const perfTex = stat('1.8x', 'PROOF-FIRST HOOKS · VS YOUR BASELINE', true);
-const priceTex = stat('₹24,000', 'COUNTER · WALK AWAY BELOW ₹15,500', false);
-const lenTex = stat('18–32s', 'YOUR BEST-PERFORMING LENGTH', false);
+const perfTex = stat('1.8x', 'PROOF-FIRST HOOKS · 2 POSTS', true);
+const priceTex = stat('₹17.5K–24K', 'COUNTER · WALK AWAY BELOW ₹15,500', false);
+const lenTex = stat('21s', 'YOUR BEST POSTS RUN ABOUT 21 SEC', false);
 
 // the five hero signals (each gets an accent rim and a chip)
 addTile({ w: 0.95, h: 1.7, map: reelTex[0], x: -3.1, y: 0.85, z: 0.5, ry: 0.3, rx: -0.1, rim: true, key: 'content' });
@@ -201,18 +201,17 @@ composer.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), 0.34, 0.45, 0.9));
 composer.addPass(new OutputPass());
 
 /* ---------- DOM chips pinned to the five signals ---------- */
-const CHIPS = [
-  ['content', 'CONTENT', '142 posts read'], ['audience', 'AUDIENCE', '27K · 22 to 34'], ['trends', 'TRENDS', '5 patterns rising'], ['deals', 'DEALS', '1 offer, priced'], ['perf', 'PERFORMANCE', '1.8x on proof-first'],
-];
+const CHIPS = [['content', 'CONTENT'], ['audience', 'AUDIENCE'], ['trends', 'TRENDS'], ['deals', 'DEALS'], ['perf', 'PERFORMANCE']];
 const chipsEl = document.getElementById('chips'), lead = document.getElementById('leaders');
 function place() {
   camera.updateMatrixWorld();
+  { const gp = new THREE.Vector3(); glass.getWorldPosition(gp); gp.y += 0.1; gp.project(camera); const m = document.getElementById('mark'); m.style.left = ((gp.x * 0.5 + 0.5) * W) + 'px'; m.style.top = ((-gp.y * 0.5 + 0.5) * H) + 'px'; }
   lead.innerHTML = ''; chipsEl.innerHTML = '';
-  CHIPS.forEach(([k, name, val], i) => {
+  CHIPS.forEach(([k, name], i) => {
     const m = KEY[k]; const wp = new THREE.Vector3(); m.getWorldPosition(wp); const p = wp.clone().add(new THREE.Vector3(0, k === 'content' ? 1.15 : 0.78, 0.1)).project(camera);
     const x = (p.x * 0.5 + 0.5) * W, y = (-p.y * 0.5 + 0.5) * H;
     const base = wp.clone().project(camera); const bx = (base.x * 0.5 + 0.5) * W, by = (-base.y * 0.5 + 0.5) * H;
-    const d = document.createElement('div'); d.className = 'chip'; d.style.left = x + 'px'; d.style.top = y + 'px'; d.innerHTML = `<span>${name}</span><b>${val}</b>`; chipsEl.appendChild(d);
+    const d = document.createElement('div'); d.className = 'chip'; d.style.left = x + 'px'; d.style.top = y + 'px'; d.innerHTML = `<span>${name}</span>`; chipsEl.appendChild(d);
     lead.insertAdjacentHTML('beforeend', `<line x1="${x}" y1="${y + 26}" x2="${bx}" y2="${by - 10}" stroke="rgba(198,255,61,.55)" stroke-width="1"/><circle cx="${bx}" cy="${by - 10}" r="2.6" fill="#c6ff3d"/>`);
   });
 }

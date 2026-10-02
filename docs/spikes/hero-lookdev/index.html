@@ -26,19 +26,20 @@ h1 em{font-style:italic;color:var(--acc)}
 .chip b{font-family:"IS";font-weight:500;font-size:15px;letter-spacing:-.01em;color:var(--ink)}
 .chip span{color:var(--acc)}
 svg.leaders{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+#mark{position:fixed;transform:translate(-50%,-50%);font-family:"IS";font-weight:500;font-size:clamp(70px,9vw,140px);letter-spacing:.32em;padding-left:.32em;color:transparent;-webkit-text-stroke:1px rgba(198,255,61,.34);pointer-events:none;white-space:nowrap}
 .badge{position:fixed;right:22px;bottom:20px;font-family:"GM",monospace;font-size:11px;color:var(--mute)}
 </style>
 <script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
 </head><body>
 <div class="grain"></div><div class="vig"></div>
 <svg class="leaders" id="leaders"></svg>
-<div id="chips"></div>
-<div class="nav"><div class="logo"><i></i>CREO</div><span style="color:#9a9c95">Product</span><span style="color:#9a9c95">Founding cohort</span><span class="btn">Join the cohort</span></div>
+<div id="mark">CREO</div><div id="chips"></div>
+<div class="nav"><div class="logo"><i></i>CREO</div><span class="btn">Apply for the cohort</span></div>
 <div class="copy">
-  <h1>The Intelligence<br>Layer for <em>Creators.</em></h1>
+  <h1>The Intelligence <br>Layer for <em>Creators.</em></h1>
   <p class="tag">Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.</p>
-  <div class="cta"><span class="btn">Join the Founding Creator Cohort</span><small>₹499 · 30 days · 10–15 creators</small></div>
+  <div class="cta"><span class="btn">Apply for the founding cohort</span></div>
 </div>
-<div class="badge">look-dev spike · software-rendered</div>
+<div class="badge">SAMPLE DATA · LOOK-DEV · SOFTWARE-RENDERED</div>
 <script type="module" src="./scene.js"></script>
 </body></html>
