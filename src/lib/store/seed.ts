@@ -25,7 +25,7 @@ const POSTS: PastPost[] = [
   post(12, "I replaced my morning routine with AI for 5 days", "transformation", "facecam", 20, 16300, 1100, 450, 190, "2026-08-12"),
 ];
 
-export const SAMPLE_INQUIRY = `Hi Arjun,
+export const SAMPLE_INQUIRY = `Hi Creator,
 
 I'm Meera from Tessera, an AI meeting-notes app for freelancers and small teams. Loved your reel on replacing weekly planning with AI, it is exactly the audience we want.
 
@@ -51,9 +51,9 @@ Team Glowmax`;
 
 export function sampleDna(): CreatorDNA {
   return {
-    id: "arjun",
-    name: "Arjun Kulkarni",
-    handle: "@arjunbuilds",
+    id: "creator",
+    name: "Creator",
+    handle: "@creator",
     city: "Pune",
     followers: 27400,
     avgViews: Math.round(mean(POSTS.map((p) => p.views))),

@@ -31,7 +31,7 @@ export function validateApplication(input: unknown): { ok: true; value: Applicat
 
   if (name.length < 2) errors.name = "Add your name.";
   handle = handle.replace(/^@/, "");
-  if (!/^[A-Za-z0-9._]{1,30}$/.test(handle)) errors.handle = "Use your Instagram handle, like @arjunbuilds.";
+  if (!/^[A-Za-z0-9._]{1,30}$/.test(handle)) errors.handle = "Use your Instagram handle, like @yourhandle.";
   const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(contact);
   const isPhone = /^\+?[\d\s-]{10,16}$/.test(contact) && contact.replace(/\D/g, "").length >= 10;
   if (!isEmail && !isPhone) errors.contact = "Add a WhatsApp number or an email so we can reach you.";

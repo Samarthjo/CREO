@@ -72,15 +72,15 @@ export function HeroProduct() {
       <div className="overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop">
         <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">
           <Logo word={false} />
-          <span className="text-xs text-muted">Sample creator: {ws.dna.name}, 27K followers</span>
+          <span className="text-xs text-muted">Sample creator, 27K followers</span>
           <Chip tone="lime">Demo data</Chip>
         </div>
 
         <div className="grid md:grid-cols-[13rem_minmax(0,1fr)]">
           <aside className="hidden border-r border-line bg-surface/60 p-4 md:block" aria-label="Sample workspace navigation">
             <div className="mb-5 flex items-center gap-2.5 px-1.5">
-              <span className="grid size-8 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg">AK</span>
-              <span className="text-sm font-medium text-ink">Arjun</span>
+              <span className="grid size-8 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg">C</span>
+              <span className="text-sm font-medium text-ink">Creator</span>
             </div>
             <ul className="flex flex-col gap-0.5">
               {SIDE.map((s) => {
@@ -114,7 +114,7 @@ export function HeroProduct() {
             <AnimatePresence mode="wait" initial={false}>
               {view === "hq" ? (
                 <motion.div key="hq" {...fade}>
-                  <h2 className="font-display text-[1.75rem] font-medium tracking-tight sm:text-[2rem]">Good morning, Arjun.</h2>
+                  <h2 className="font-display text-[1.75rem] font-medium tracking-tight sm:text-[2rem]">Good morning, Creator.</h2>
                   <p className="mt-1 text-[0.8125rem] text-muted">{brief.found.patterns} patterns, {brief.found.drafts} drafts, {brief.found.inquiries} brand inquiry. Recommended next action:</p>
 
                   <div className="mt-4 rounded-panel border border-line bg-soft p-5">

@@ -43,7 +43,7 @@ export function DnaSection() {
         <Panel className="p-6 sm:p-8">
           <div className="flex items-center justify-between gap-3">
             <h3 className="font-display text-xl font-medium tracking-tight">Creator DNA</h3>
-            <span className="text-xs text-muted">Sample creator: {dna.name}</span>
+            <span className="text-xs text-muted">Sample creator</span>
           </div>
           <dl className="mt-5 divide-y divide-line">
             {rows.map(([k, v], i) => (

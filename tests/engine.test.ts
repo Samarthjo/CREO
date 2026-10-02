@@ -79,7 +79,7 @@ test("scam message: flagged, avoided, no reply drafted", () => {
 });
 
 test("gifting-only is blocked by deal rules and gets a paid counter lever", () => {
-  const raw = "Hi Arjun, we're Brewline Coffee. We'd send you free product in exchange for 1 Reel and 2 Stories. No budget, but great exposure!";
+  const raw = "Hi Creator, we're Brewline Coffee. We'd send you free product in exchange for 1 Reel and 2 Stories. No budget, but great exposure!";
   const q = makeInquiry(raw, dna);
   assert.equal(q.extraction.budgetKind, "barter");
   assert.ok(q.evaluation.levers.some((l) => l.label === "Gifting"));
@@ -95,14 +95,14 @@ test("counter terms respect deal rules and the draft quotes those terms", () => 
 });
 
 test("a fair, rule-compliant offer is accepted", () => {
-  const raw = "Hi Arjun, I'm Kabir from Slate, a productivity app. Budget is ₹30,000 for 1 Reel. Organic use only, no exclusivity. Go live by 25 Oct. We pay within 15 days of posting, with 2 revisions. Brief attached.";
+  const raw = "Hi Creator, I'm Kabir from Slate, a productivity app. Budget is ₹30,000 for 1 Reel. Organic use only, no exclusivity. Go live by 25 Oct. We pay within 15 days of posting, with 2 revisions. Brief attached.";
   const q = makeInquiry(raw, dna);
   assert.equal(q.evaluation.recommendation, "accept");
   assert.ok(["strong", "workable"].includes(q.evaluation.health));
 });
 
 test("missing budget leads to a clarifying question, not a quote", () => {
-  const q = makeInquiry("Hi Arjun, we're Zenly, an AI tool. We'd love 1 Reel with you.", dna);
+  const q = makeInquiry("Hi Creator, we're Zenly, an AI tool. We'd love 1 Reel with you.", dna);
   assert.equal(q.evaluation.recommendation, "clarify");
   assert.ok(q.draft!.body.includes("Budget"));
 });

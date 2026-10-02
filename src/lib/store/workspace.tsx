@@ -6,7 +6,7 @@ import { deriveDna, type DnaInsights } from "../engine/dna.ts";
 import { isoNow, uid } from "../engine/format.ts";
 import { rankPatterns } from "../engine/trend.ts";
 import type { Approval, CreatorDNA, Draft, Inquiry, MemoryItem, PastDeal, PastPost, StudioPackage, TrendPattern, Workspace } from "../engine/types.ts";
-import { blankWorkspace, makeInquiry, sampleWorkspace } from "./seed.ts";
+import { blankWorkspace, makeInquiry, sampleDna, sampleWorkspace } from "./seed.ts";
 
 const KEY = "creo.workspace.v1";
 
@@ -119,6 +119,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       if (raw) {
         const p = JSON.parse(raw) as Workspace;
         if (p?.version === 1 && p.dna && Array.isArray(p.patterns) && Array.isArray(p.packages) && Array.isArray(p.inquiries) && Array.isArray(p.memory) && Array.isArray(p.approvals)) loaded = p;
+        // A sample workspace saved before the sample creator was renamed is replaced by the current sample.
+        if (loaded?.mode === "sample" && loaded.dna.id !== sampleDna().id) loaded = null;
       }
     } catch {
       loaded = null;
