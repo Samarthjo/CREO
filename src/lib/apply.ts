@@ -8,7 +8,7 @@ export interface Application {
   name: string;
   handle: string;
   followers: (typeof FOLLOWER_BANDS)[number];
-  niche: NicheKey;
+  niche?: NicheKey;
   contact: string;
   focus: (typeof FOCUS)[number][];
   note: string;
@@ -27,6 +27,7 @@ export function validateApplication(input: unknown): { ok: true; value: Applicat
   const note = clean(b.note, 400);
   const followers = FOLLOWER_BANDS.find((x) => x === b.followers);
   const niche = (Object.keys(NICHES) as NicheKey[]).find((x) => x === b.niche);
+  const nicheGiven = typeof b.niche === "string" && b.niche.trim() !== "";
   const focus = Array.isArray(b.focus) ? FOCUS.filter((f) => (b.focus as unknown[]).includes(f)) : [];
 
   if (name.length < 2) errors.name = "Add your name.";
@@ -36,9 +37,8 @@ export function validateApplication(input: unknown): { ok: true; value: Applicat
   const isPhone = /^\+?[\d\s-]{10,16}$/.test(contact) && contact.replace(/\D/g, "").length >= 10;
   if (!isEmail && !isPhone) errors.contact = "Add a WhatsApp number or an email so we can reach you.";
   if (!followers) errors.followers = "Pick your follower range.";
-  if (!niche) errors.niche = "Pick your niche.";
-  if (!focus.length) errors.focus = "Pick what you want to start with.";
+  if (nicheGiven && !niche) errors.niche = "Pick your niche from the list.";
   if (b.agreed !== true) errors.agreed = "Please confirm you are happy to give weekly feedback.";
   if (Object.keys(errors).length) return { ok: false, errors };
-  return { ok: true, value: { name, handle: `@${handle}`, followers: followers!, niche: niche!, contact, focus, note, agreed: true } };
+  return { ok: true, value: { name, handle: `@${handle}`, followers: followers!, ...(niche ? { niche } : {}), contact, focus, note, agreed: true } };
 }

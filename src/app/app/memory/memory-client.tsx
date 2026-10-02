@@ -28,7 +28,7 @@ export function MemoryClient() {
   return (
     <>
       <PageHeader title="Memory" sub="Everything CREO learned from your decisions, edits and results. Preferences marked as active change every draft Studio writes." />
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <section aria-label="Memory log">
           <div className="mb-3"><Tabs<Filter> label="Filter memory" value={filter} onChange={setFilter} items={[{ id: "all", label: "All" }, { id: "preference", label: "Preferences" }, { id: "decision", label: "Decisions" }, { id: "correction", label: "Corrections" }, { id: "outcome", label: "Results" }]} /></div>
           <Panel className="px-6">

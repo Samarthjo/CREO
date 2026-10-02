@@ -2,14 +2,12 @@
 
 import { CheckCircle } from "@phosphor-icons/react";
 import { useState } from "react";
-import { FOCUS, FOLLOWER_BANDS, validateApplication, type ApplicationErrors } from "@/lib/apply";
-import { NICHES, type NicheKey } from "@/lib/engine/types";
-import { Button, Field, Input, Select, cn } from "../ui/kit";
+import { FOLLOWER_BANDS, validateApplication, type ApplicationErrors } from "@/lib/apply";
+import { Button, Field, Input, Select } from "../ui/kit";
 
-/** The founding-cohort application. Short on purpose: five fields and one consent line. */
+/** The founding-cohort application. Short on purpose: four fields and one consent line. */
 export function ApplyForm() {
-  const [v, setV] = useState({ name: "", handle: "", followers: "", niche: "", contact: "", note: "", website: "" });
-  const [focus, setFocus] = useState<string[]>([]);
+  const [v, setV] = useState({ name: "", handle: "", followers: "", contact: "", website: "" });
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<ApplicationErrors>({});
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
@@ -19,7 +17,7 @@ export function ApplyForm() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setServerError("");
-    const payload = { ...v, focus, agreed };
+    const payload = { ...v, agreed };
     const check = validateApplication(payload);
     if (!check.ok) { setErrors(check.errors); return; }
     setErrors({});
@@ -50,19 +48,8 @@ export function ApplyForm() {
     <form onSubmit={submit} noValidate className="grid gap-5 md:grid-cols-2">
       <Field label="Your name">{<Input value={v.name} onChange={set("name")} autoComplete="name" aria-invalid={!!errors.name} />}{err("name")}</Field>
       <Field label="Instagram handle"><Input value={v.handle} onChange={set("handle")} placeholder="@yourhandle" aria-invalid={!!errors.handle} />{err("handle")}</Field>
+      <Field label="WhatsApp number or email"><Input value={v.contact} onChange={set("contact")} autoComplete="email" aria-invalid={!!errors.contact} />{err("contact")}</Field>
       <Field label="Followers"><Select value={v.followers} onChange={set("followers")} aria-invalid={!!errors.followers}><option value="">Choose a range</option>{FOLLOWER_BANDS.map((b) => <option key={b}>{b}</option>)}</Select>{err("followers")}</Field>
-      <Field label="Niche"><Select value={v.niche} onChange={set("niche")} aria-invalid={!!errors.niche}><option value="">Choose a niche</option>{(Object.keys(NICHES) as NicheKey[]).map((k) => <option key={k} value={k}>{NICHES[k].label}</option>)}</Select>{err("niche")}</Field>
-      <Field label="WhatsApp number or email" className="md:col-span-2"><Input value={v.contact} onChange={set("contact")} autoComplete="email" aria-invalid={!!errors.contact} />{err("contact")}</Field>
-      <div className="flex flex-col gap-1.5 md:col-span-2">
-        <span className="text-[0.8125rem] font-medium text-ink">Start with</span>
-        <div role="group" aria-label="Start with" className="flex flex-wrap gap-2">
-          {FOCUS.map((f) => {
-            const on = focus.includes(f);
-            return <button key={f} type="button" aria-pressed={on} onClick={() => setFocus((x) => (on ? x.filter((y) => y !== f) : [...x, f]))} className={cn("rounded-full border px-4 py-2 text-sm font-medium transition", on ? "border-transparent bg-mark text-on-mark" : "border-line-strong text-muted hover:text-ink")}>{f}</button>;
-          })}
-        </div>
-        {err("focus")}
-      </div>
       <div className="hidden" aria-hidden><label>Website<input tabIndex={-1} autoComplete="off" value={v.website} onChange={set("website")} /></label></div>
       <div className="flex flex-col gap-1.5 md:col-span-2">
         <label className="flex items-start gap-3 text-sm text-body">

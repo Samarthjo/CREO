@@ -16,7 +16,7 @@ export function HqSection() {
           <ul className="rounded-panel border border-line bg-surface px-5">
             {brief.actions.slice(1, 4).map((a, i) => <ActionRow key={a.id} action={a} rank={i + 2} compact />)}
           </ul>
-          <p className="text-center text-xs text-muted">Sample creator on the real CREO engine. Nothing here is live data.</p>
+          <p className="text-center text-[0.8125rem] text-body">Sample creator on the real CREO engine. Nothing here is live data.</p>
         </div>
       </Reveal>
     </Section>

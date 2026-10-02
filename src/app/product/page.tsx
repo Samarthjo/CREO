@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Cloud } from "@/components/scene/cloud";
 import { Landscape } from "@/components/scene/landscape";
 import { GlassTiles, tileSpots } from "@/components/scene/tiles";
-import { HeroProduct } from "@/components/landing/classic/hero-product";
+import { HeroProduct } from "@/components/landing/hero-product";
 import { StudioSection } from "@/components/landing/studio-section";
 import { SubPage } from "@/components/landing/subpage";
 import { TrendSection } from "@/components/landing/trend-section";

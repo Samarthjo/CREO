@@ -34,7 +34,7 @@ export function StudioClient() {
   useEffect(() => { if (ws) setLang(ws.dna.languages[0] ?? "English"); }, [ws?.dna.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const current = useMemo(() => ws?.packages.find((p) => p.id === sel) ?? ws?.packages[0], [ws, sel]);
-  if (!ws || !insights) return <div className="grid gap-6 xl:grid-cols-[22rem_1fr]"><Skeleton className="h-[34rem]" /><Skeleton className="h-[34rem]" /></div>;
+  if (!ws || !insights) return <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[22rem_1fr]"><Skeleton className="h-[34rem]" /><Skeleton className="h-[34rem]" /></div>;
 
   const generate = () => {
     if (topic.trim().length < 3) { setErr("Tell CREO what the video is about, in a few words."); return; }
@@ -53,7 +53,7 @@ export function StudioClient() {
         )}
       </PageHeader>
 
-      <div className="grid items-start gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 xl:grid-cols-[22rem_minmax(0,1fr)]">
         <div className="flex flex-col gap-6">
           <Panel as="section" className="p-5">
             <h2 className="mb-4 font-display text-lg font-semibold">New package</h2>

@@ -88,7 +88,7 @@ export function DnaSection() {
               </li>
             ))}
           </ul>
-          <p className="mt-5 text-xs text-muted">The line marks 1.0x, your usual. Hooks and formats come from {dna.posts.length} sample posts, so CREO would say "not enough data" before it guessed.</p>
+          <p className="mt-5 text-[0.8125rem] text-body">The line marks 1.0x, your usual. Hooks and formats come from {dna.posts.length} sample posts, so CREO would say "not enough data" before it guessed.</p>
         </Panel>
       </div>
 
@@ -99,7 +99,7 @@ export function DnaSection() {
           <Ticket label="Best format lift" note={FORMATS[bestFormat.key as keyof typeof FORMATS]}><CountUp to={bestFormat.lift} decimals={1} suffix="x" /></Ticket>
           <Ticket label="Your sweet spot" note="Median of your top posts"><CountUp to={insights.typicalDurationSec} suffix=" sec" /></Ticket>
         </TicketStrip>
-        <p className="mt-4 text-center text-xs text-muted">Sample creator, real CREO engine. These are not results from live creators.</p>
+        <p className="mt-4 text-center text-[0.8125rem] text-body">Sample creator, real CREO engine. These are not results from live creators.</p>
       </div>
     </Section>
   );

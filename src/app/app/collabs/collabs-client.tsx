@@ -27,7 +27,7 @@ export function CollabsClient() {
   const [err, setErr] = useState("");
   const file = useRef<HTMLInputElement>(null);
 
-  if (!ws) return <div className="grid gap-6 xl:grid-cols-[19rem_1fr]"><Skeleton className="h-[36rem]" /><Skeleton className="h-[36rem]" /></div>;
+  if (!ws) return <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[19rem_1fr]"><Skeleton className="h-[36rem]" /><Skeleton className="h-[36rem]" /></div>;
   const current = ws.inquiries.find((q) => q.id === sel) ?? ws.inquiries[0];
 
   const submit = (text: string, source: Inquiry["source"] = "paste") => {
@@ -66,7 +66,7 @@ export function CollabsClient() {
         </Panel>
       )}
 
-      <div className="grid items-start gap-6 xl:grid-cols-[19rem_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 xl:grid-cols-[19rem_minmax(0,1fr)]">
         <section aria-label="Inbox" className="flex flex-col gap-2">
           {ws.inquiries.map((q) => (
             <button key={q.id} type="button" aria-pressed={current?.id === q.id} onClick={() => setSel(q.id)} className={cn("rounded-panel border p-4 text-left transition", current?.id === q.id ? "border-ink bg-surface shadow-panel" : "border-line bg-surface hover:border-line-strong")}>
@@ -103,7 +103,7 @@ function Deal({ q, dna, dispatch, requestApproval, onDelete }: { q: Inquiry; dna
         <button type="button" aria-label="Delete this inquiry" onClick={onDelete} className="ml-auto text-muted transition hover:text-risk"><Trash size={17} /></button>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
         <Panel as="section" className="p-6">
           <h3 className="mb-3 font-display text-lg font-semibold">Their message</h3>
           <MessageHighlight raw={q.raw} spans={q.extraction.spans} sweep />
@@ -116,7 +116,7 @@ function Deal({ q, dna, dispatch, requestApproval, onDelete }: { q: Inquiry; dna
         </Panel>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
         <Panel as="section" className="p-6"><QuotePanel ev={ev} /></Panel>
         <Panel as="section" className="p-6">
           <h3 className="font-display text-lg font-semibold">Why, and what to ask for</h3>
@@ -136,7 +136,7 @@ function Deal({ q, dna, dispatch, requestApproval, onDelete }: { q: Inquiry; dna
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h3 className="font-display text-lg font-semibold">Draft reply</h3>
               {!locked && (
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex min-w-0 max-w-full flex-wrap items-center gap-3">
                   <Tabs<DraftKind> label="Reply type" value={q.draft.kind} onChange={(k) => setDraft(k, q.draft!.tone)} items={[{ id: "counter", label: "Counter" }, { id: "clarify", label: "Ask questions" }, { id: "accept", label: "Accept" }, { id: "decline", label: "Decline" }]} />
                   <Tabs<"warm" | "direct"> label="Tone" value={q.draft.tone} onChange={(t) => setDraft(q.draft!.kind, t)} items={[{ id: "warm", label: "Warm" }, { id: "direct", label: "Direct" }]} />
                 </div>

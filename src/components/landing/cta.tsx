@@ -19,7 +19,7 @@ export function Cta() {
             <h2 className="font-display text-[clamp(2.2rem,4.6vw,3.6rem)] font-normal leading-[1] tracking-[-0.04em]">Tomorrow, it starts <Accent>smarter</Accent>.</h2>
             <p className="mt-4 text-[1.0625rem] leading-relaxed text-body">₹499 for 30 days. 10 to 15 creators. Direct access to the team.</p>
             <div className="mt-7"><ApplyForm /></div>
-            <p className="mt-5 text-xs text-muted">Nothing leaves CREO without your approval.</p>
+            <p className="mt-5 text-[0.8125rem] text-body">Nothing leaves CREO without your approval.</p>
           </div>
         </div>
       </Landscape>

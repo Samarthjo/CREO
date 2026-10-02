@@ -104,7 +104,7 @@ export function LoopSection() {
             </div>
           </div>
         </div>
-        <p className="relative mx-auto mt-10 max-w-[76rem] px-5 text-center text-xs text-muted sm:px-6 lg:mt-0 lg:absolute lg:bottom-6 lg:left-0 lg:right-0">A sequence on the sample creator to show the mechanism. It is not a result from a live creator.</p>
+        <p className="relative mx-auto mt-10 max-w-[76rem] px-5 text-center text-[0.8125rem] text-body sm:px-6 lg:mt-0 lg:absolute lg:bottom-6 lg:left-0 lg:right-0">A sequence on the sample creator to show the mechanism. It is not a result from a live creator.</p>
       </div>
     </section>
   );

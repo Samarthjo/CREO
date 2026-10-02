@@ -25,7 +25,7 @@ export default function HqPage() {
       <PageHeader title={`${hello}, ${first}`} sub="One manager across growth, content and revenue. Everything below comes from your own numbers." />
       <HeroAction action={brief.recommended} found={brief.found} name={first} date={date} />
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
         <Panel as="section" className="p-6">
           <h2 className="font-display text-lg font-semibold">Next best actions</h2>
           {rest.length ? (

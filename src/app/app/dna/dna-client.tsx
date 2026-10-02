@@ -52,7 +52,7 @@ export function DnaClient() {
             </div>
           </Panel>
 
-          <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
             <Panel as="section" className="p-6">
               <h3 className="font-display text-lg font-semibold">What works for you</h3>
               {insights.hooksRanked.length ? (
@@ -99,7 +99,7 @@ export function DnaClient() {
                 </tbody>
               </table>
             </div>
-            <div className="mt-5 grid gap-3 border-t border-line pt-5 md:grid-cols-[minmax(0,2fr)_1fr_1fr_6rem_6rem_auto] md:items-end">
+            <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-3 border-t border-line pt-5 md:grid-cols-[minmax(0,2fr)_1fr_1fr_6rem_6rem_auto] md:items-end">
               <Field label="Add a post"><Input value={post.title} onChange={(e) => setPost({ ...post, title: e.target.value })} placeholder="Title or first line" /></Field>
               <Field label="Hook"><Select value={post.hook} onChange={(e) => setPost({ ...post, hook: e.target.value as HookType })}>{(Object.keys(HOOK_TYPES) as HookType[]).map((k) => <option key={k} value={k}>{HOOK_TYPES[k]}</option>)}</Select></Field>
               <Field label="Format"><Select value={post.format} onChange={(e) => setPost({ ...post, format: e.target.value as FormatKey })}>{(Object.keys(FORMATS) as FormatKey[]).map((k) => <option key={k} value={k}>{FORMATS[k]}</option>)}</Select></Field>
@@ -124,7 +124,7 @@ export function DnaClient() {
                 ))}
               </ul>
             ) : <p className="mt-2 text-sm text-muted">No deals yet. Add past deals so CREO can compare new offers with what you have actually earned.</p>}
-            <div className="mt-5 grid gap-3 border-t border-line pt-5 md:grid-cols-[1fr_1fr_minmax(0,1.5fr)_7rem_8rem_auto] md:items-end">
+            <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-3 border-t border-line pt-5 md:grid-cols-[1fr_1fr_minmax(0,1.5fr)_7rem_8rem_auto] md:items-end">
               <Field label="Add a deal"><Input value={deal.brand} onChange={(e) => setDeal({ ...deal, brand: e.target.value })} placeholder="Brand" /></Field>
               <Field label="Category"><Input value={deal.category} onChange={(e) => setDeal({ ...deal, category: e.target.value })} /></Field>
               <Field label="Deliverables"><Input value={deal.deliverables} onChange={(e) => setDeal({ ...deal, deliverables: e.target.value })} placeholder="1 Reel + 1 Story" /></Field>

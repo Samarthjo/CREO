@@ -17,8 +17,8 @@
   --line-strong: #cdd2bb;
   --ink: #11140c;
   --text: #2b3022;
-  --muted: #586049;
-  --faint: #7b8369;
+  --muted: #4d5540;
+  --faint: #66704f;
   --mark: #b5cf4f;
   --on-mark: #11140c;
   --mark-wash: rgb(181 207 79 / 0.55);
@@ -233,6 +233,20 @@
 .scene-fade-top {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 24%);
+}
+
+/* In the dark theme the pale scenes (dawn, day, dusk) take a night wash, so light text stays readable where it crosses them. */
+[data-time]:not([data-time="night"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to bottom, rgb(12 16 48 / 0.84) 0%, rgb(12 16 48 / 0.8) 42%, rgb(12 16 48 / 0.5) 100%);
+}
+:root[data-theme="dark"] [data-time]:not([data-time="night"])::after { opacity: 1; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) [data-time]:not([data-time="night"])::after { opacity: 1; }
 }
 
 /* A little paper grain over the painted layers. */

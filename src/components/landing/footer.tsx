@@ -38,7 +38,7 @@ export function Footer() {
           <Link href="/app" className="hover:underline">Workspace</Link>
           {NAV_LINKS.map((l) => <Link key={l.href} href={l.href} className="hover:underline">{l.label}</Link>)}
         </nav>
-        <p className="w-full text-xs text-[#11140c]/70">Sample data. Works from what you add. Instagram Reels only. No testimonials yet.</p>
+        <p className="w-full text-sm font-medium text-[#11140c]">Sample data. Works from what you add. Instagram Reels only. No testimonials yet.</p>
       </div>
     </footer>
   );

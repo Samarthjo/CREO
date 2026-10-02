@@ -38,7 +38,7 @@ export function HeroAction({ action, found, name, date }: { action: Action | nul
   ];
   return (
     <section className="on-ink overflow-hidden rounded-panel bg-ink text-bg shadow-pop" aria-label="Morning brief">
-      <div className="grid gap-8 p-8 lg:grid-cols-[minmax(0,1fr)_auto]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_auto]">
         <div>
           <p className="text-sm text-bg/70">{date}. Recommended next action</p>
           {action ? (
@@ -46,7 +46,7 @@ export function HeroAction({ action, found, name, date }: { action: Action | nul
               <h2 className="mt-3 max-w-[18ch] font-display text-[2.5rem] font-semibold leading-[1.02] tracking-tight text-bg">{action.title}</h2>
               {action.subject && <p className="mt-3 max-w-[40ch] font-display text-[1.25rem] font-medium leading-snug text-bg/90">{action.subject}</p>}
               <p className="mt-3 max-w-[56ch] text-[0.9375rem] leading-relaxed text-bg/80">
-                <span className="mark">Why now</span>: {action.why}
+                <span className="font-semibold text-bg">Why now:</span> {action.why}
               </p>
               <div className="mt-6 flex items-center gap-3">
                 <Button variant="primary" size="lg" href={action.href}>{action.cta}</Button>
@@ -60,9 +60,9 @@ export function HeroAction({ action, found, name, date }: { action: Action | nul
       </div>
       <dl className="grid grid-cols-3 border-t border-bg/15">
         {stats.map((s, i) => (
-          <a key={s.label} href={s.href} className={cn("group px-8 py-5 transition hover:bg-bg/5", i > 0 && "border-l border-bg/15")}>
+          <a key={s.label} href={s.href} className={cn("group px-4 py-4 transition hover:bg-bg/5 sm:px-8 sm:py-5", i > 0 && "border-l border-bg/15")}>
             <dt className="sr-only">{s.label}</dt>
-            <dd className="flex items-baseline gap-3">
+            <dd className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-3">
               <span className="tnum font-display text-[2rem] font-semibold leading-none text-bg">{s.n}</span>
               <span className="text-[0.8125rem] text-bg/70">{s.label}</span>
             </dd>

@@ -1,15 +1,18 @@
 "use client";
 
-import { Brain, CaretLeft, Check, FilmSlate, SquaresFour, Tray, TrendUp, X } from "@phosphor-icons/react";
+import { Brain, CaretLeft, Check, FilmSlate, SquaresFour, Tray, TrendUp } from "@phosphor-icons/react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { scopeText } from "@/lib/engine/evaluate";
 import { inr, round500 } from "@/lib/engine/format";
+import { USAGE_LABEL } from "@/lib/engine/pricing";
+import { HEALTH_LABEL, healthTone } from "../product/brief";
 import { Logo } from "../product/logo";
-import { Button, Chip, FitScore, Mark, Slots, cn } from "../ui/kit";
+import { Button, Chip, FitScore, Slots, cn } from "../ui/kit";
 import { demoPackage, getDemo } from "./demo";
 
-type View = "hq" | "studio";
+type View = "collab" | "hq" | "studio";
 
 const SIDE = [
   { id: "hq", label: "HQ", icon: SquaresFour },
@@ -19,10 +22,16 @@ const SIDE = [
   { id: "memory", label: "Memory", icon: Brain },
 ] as const;
 
+const TABS: { id: View; label: string }[] = [
+  { id: "collab", label: "Collab Inbox" },
+  { id: "hq", label: "HQ" },
+  { id: "studio", label: "Studio" },
+];
+
 /**
  * The hero is the product: a working CREO window on a sample creator.
- * Notification arrives, the trend card opens on its reasons, and "Open in Studio" builds the package in front of you.
- * Every number comes from the same engines the app uses.
+ * It opens on the brand-deal moment, the most concrete thing CREO does: a brand offers a price, CREO prices it and
+ * sets a walk-away number. HQ and Studio are one click away. Every number comes from the same engines the app uses.
  */
 export function HeroProduct() {
   const { brief, ranked, ws } = getDemo();
@@ -31,24 +40,15 @@ export function HeroProduct() {
   const trendId = top.id.replace("create-", "");
   const why = ranked.find((r) => r.pattern.id === trendId)?.fit.parts.slice(0, 2).map((p) => p.note) ?? [];
   const q = ws.inquiries[0]!;
+  const ex = q.extraction;
+  const quote = q.evaluation.quote;
   const pkg = useMemo(() => demoPackage({ topic: "competitor research", proof: "6 hours saved a week", lengthSec: 30, language: "English", trendId }), [trendId]);
 
-  const [view, setView] = useState<View>("hq");
-  const [toast, setToast] = useState(false);
-  const [flash, setFlash] = useState(false);
+  const [view, setView] = useState<View>("collab");
   const [approved, setApproved] = useState(false);
   const [stage, setStage] = useState(0);
   const [hookId, setHookId] = useState(pkg.chosenHook);
 
-  useEffect(() => {
-    const t = setTimeout(() => setToast(true), reduce ? 0 : 2400);
-    return () => clearTimeout(t);
-  }, [reduce]);
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(false), 9000);
-    return () => clearTimeout(t);
-  }, [toast]);
   useEffect(() => {
     if (view !== "studio") { setStage(0); return; }
     if (reduce) { setStage(3); return; }
@@ -58,8 +58,14 @@ export function HeroProduct() {
 
   const hook = pkg.hooks.find((h) => h.id === hookId) ?? pkg.hooks[0]!;
   const beats = pkg.script.map((b) => (b.id === "hook" ? { ...b, line: hook.text } : b)).slice(0, 4);
-  const review = () => { setToast(false); setView("hq"); setFlash(true); setTimeout(() => setFlash(false), 2200); };
   const fade = { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.28 } };
+  const terms = [scopeText(ex.reels, ex.stories, ex.posts), USAGE_LABEL[ex.usage], ex.exclusivityDays ? `${ex.exclusivityDays} days exclusivity` : null].filter(Boolean).join(" · ");
+  const approve = (
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <Button size="md" variant={approved ? "ghost" : "primary"} aria-pressed={approved} onClick={() => setApproved((a) => !a)}>{approved ? "Approved" : "Approve counter"}</Button>
+      <span className="text-[0.8125rem] text-body">{approved ? "You send it. CREO never sends for you." : "Nothing is sent until you approve."}</span>
+    </div>
+  );
 
   return (
     <motion.div
@@ -71,7 +77,7 @@ export function HeroProduct() {
       <div className="overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop">
         <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">
           <Logo word={false} />
-          <span className="text-xs text-muted">Sample creator, 27K followers</span>
+          <span className="text-[0.8125rem] text-muted">Sample creator, 27K followers</span>
           <Chip tone="lime">Sample data</Chip>
         </div>
 
@@ -84,7 +90,7 @@ export function HeroProduct() {
             <ul className="flex flex-col gap-0.5">
               {SIDE.map((s) => {
                 const Icon = s.icon;
-                const live = s.id === "hq" || s.id === "studio";
+                const live = s.id === "hq" || s.id === "studio" || s.id === "collab";
                 const on = s.id === view;
                 const row = (
                   <>
@@ -103,15 +109,38 @@ export function HeroProduct() {
             </ul>
           </aside>
 
-          <div className="relative min-h-[26rem] min-w-0 p-5 sm:p-7 md:h-[30rem] md:overflow-y-auto scroll-thin">
-            <div className="mb-5 flex gap-1 md:hidden" role="tablist" aria-label="Sample workspace">
-              {(["hq", "studio"] as const).map((v) => (
-                <button key={v} type="button" role="tab" aria-selected={view === v} onClick={() => setView(v)} className={cn("rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium", view === v ? "bg-eyebrow text-on-eyebrow" : "text-muted")}>{v === "hq" ? "HQ" : "Studio"}</button>
+          <div className="relative min-h-[22rem] min-w-0 p-5 sm:p-6 md:h-[27rem] md:overflow-y-auto scroll-thin">
+            <div className="mb-4 flex gap-1 md:hidden" role="tablist" aria-label="Sample workspace">
+              {TABS.map((t) => (
+                <button key={t.id} type="button" role="tab" aria-selected={view === t.id} onClick={() => setView(t.id)} className={cn("rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium", view === t.id ? "bg-eyebrow text-on-eyebrow" : "text-muted")}>{t.label}</button>
               ))}
             </div>
 
             <AnimatePresence mode="wait" initial={false}>
-              {view === "hq" ? (
+              {view === "collab" ? (
+                <motion.div key="collab" {...fade}>
+                  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                    <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight sm:text-[1.75rem]">{ex.brand} offers <span className="tnum">{inr(ex.budgetInr ?? 0)}</span></h2>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Chip tone="mark">New brand inquiry</Chip>
+                      <Chip tone={healthTone(q.evaluation.health)}>{HEALTH_LABEL[q.evaluation.health]}, {q.evaluation.score} of 100</Chip>
+                    </div>
+                  </div>
+                  <p className="mt-1 text-[0.8125rem] text-muted">{terms}</p>
+
+                  <div className="mt-4 rounded-panel border border-line bg-soft p-4 sm:p-5">
+                    <p className="text-[0.8125rem] font-medium text-accent">CREO prices it at</p>
+                    <div className="mt-1 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+                      <p className="tnum font-display text-[1.75rem] font-semibold leading-none tracking-tight text-ink sm:text-[2.5rem]">{inr(quote.lowInr)} to {inr(quote.highInr)}</p>
+                      <dl className="flex gap-6 text-[0.8125rem] text-body">
+                        <div><dt>Open with</dt><dd className="tnum text-[1.0625rem] font-semibold text-ink">{inr(round500(quote.highInr))}</dd></div>
+                        <div><dt>Walk away below</dt><dd className="tnum text-[1.0625rem] font-semibold text-ink">{inr(round500(quote.walkAwayInr))}</dd></div>
+                      </dl>
+                    </div>
+                    <div className="mt-4">{approve}</div>
+                  </div>
+                </motion.div>
+              ) : view === "hq" ? (
                 <motion.div key="hq" {...fade}>
                   <h2 className="mb-4 font-display text-[1.75rem] font-medium tracking-tight sm:text-[2rem]">Good morning, Creator.</h2>
 
@@ -123,10 +152,10 @@ export function HeroProduct() {
                       </div>
                       {top.fit ? <FitScore score={top.fit} size={56} /> : null}
                     </div>
-                    <p className="mt-4 text-[0.8125rem] font-medium text-ink"><Mark sweep delay={500}>Why now</Mark></p>
-                    <ul className="mt-2 space-y-1 text-[0.8125rem] leading-snug text-muted">
+                    <p className="mt-4 text-[0.8125rem] font-semibold text-ink">Why now</p>
+                    <ul className="mt-2 space-y-1 text-[0.8125rem] leading-snug text-body">
                       {why.map((w, i) => (
-                        <motion.li key={w} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 + i * 0.18, duration: 0.35 }}>{w}</motion.li>
+                        <motion.li key={w} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.18, duration: 0.35 }}>{w}</motion.li>
                       ))}
                     </ul>
                     <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -135,16 +164,16 @@ export function HeroProduct() {
                   </div>
 
                   <ul className="mt-3 divide-y divide-line rounded-panel border border-line bg-surface px-5">
-                    <li className={cn("py-3.5 transition-colors", flash && "bg-eyebrow")}>
+                    <li className="py-3.5">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sunk text-ink"><Tray size={16} /></span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[0.8125rem] font-medium text-ink">Counter to {q.extraction.brand}</p>
-                          <p className="text-xs text-muted"><span className="tnum">{inr(q.evaluation.quote.lowInr)} to {inr(q.evaluation.quote.highInr)}</span>. Walk away below <span className="tnum">{inr(round500(q.evaluation.quote.walkAwayInr))}</span>.</p>
+                          <p className="text-[0.8125rem] font-medium text-ink">Counter to {ex.brand}</p>
+                          <p className="text-[0.8125rem] text-muted"><span className="tnum">{inr(quote.lowInr)} to {inr(quote.highInr)}</span>. Walk away below <span className="tnum">{inr(round500(quote.walkAwayInr))}</span>.</p>
                         </div>
                         <Button size="sm" variant={approved ? "ghost" : "dark"} aria-pressed={approved} onClick={() => setApproved((a) => !a)}>{approved ? "Approved" : "Approve"}</Button>
                       </div>
-                      <p className="mt-1.5 pl-11 text-xs text-muted">{approved ? "You send it. CREO never sends for you." : "Nothing is sent until you approve."}</p>
+                      <p className="mt-1.5 pl-11 text-[0.8125rem] text-muted">{approved ? "You send it. CREO never sends for you." : "Nothing is sent until you approve."}</p>
                     </li>
                   </ul>
                 </motion.div>
@@ -194,30 +223,7 @@ export function HeroProduct() {
                       </div>
                     </div>
                   </div>
-                  <p className="mt-3 text-xs text-muted">Nothing is posted until you approve. <Link href="/app/studio" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Studio</Link></p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <AnimatePresence>
-              {toast && view === "hq" && (
-                <motion.div
-                  role="status"
-                  initial={{ opacity: 0, y: -14, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ type: "spring", stiffness: 160, damping: 20 }}
-                  className="absolute right-4 top-4 z-10 w-[min(19rem,calc(100%-2rem))] rounded-panel border border-line bg-raised p-3.5 shadow-pop"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-mark text-on-mark"><Tray size={16} weight="fill" /></span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[0.8125rem] font-medium text-ink">New brand inquiry</p>
-                      <p className="mt-0.5 text-xs leading-snug text-muted">{q.extraction.brand} offers <span className="tnum">{inr(12000)}</span>. CREO priced it at <span className="tnum">{inr(q.evaluation.quote.lowInr)}</span> and up.</p>
-                      <button type="button" onClick={review} className="mt-2 text-xs font-medium text-ink underline underline-offset-4 hover:no-underline">Review counter</button>
-                    </div>
-                    <button type="button" aria-label="Dismiss" onClick={() => setToast(false)} className="grid size-6 place-items-center rounded-full text-muted hover:bg-sunk hover:text-ink"><X size={12} /></button>
-                  </div>
+                  <p className="mt-3 text-[0.8125rem] text-muted">Nothing is posted until you approve. <Link href="/app/studio" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Studio</Link></p>
                 </motion.div>
               )}
             </AnimatePresence>

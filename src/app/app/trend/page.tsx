@@ -27,7 +27,7 @@ export default function TrendPage() {
   const current = ranked.find((r) => r.pattern.id === sel) ?? list[0] ?? ranked[0];
   const ideas = useMemo(() => (current && ws && insights ? adaptations(current.pattern, ws.dna, insights) : []), [current, ws, insights]);
 
-  if (!ws || !insights) return <div className="grid gap-6 xl:grid-cols-[24rem_1fr]"><Skeleton className="h-[40rem]" /><Skeleton className="h-[40rem]" /></div>;
+  if (!ws || !insights) return <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[24rem_1fr]"><Skeleton className="h-[40rem]" /><Skeleton className="h-[40rem]" /></div>;
   const previewFit = preview ? scoreFit({ ...preview.pattern, id: "preview", addedAt: isoNow(), source: "creator" }, ws.dna, insights, ws.memory) : null;
 
   return (
@@ -41,7 +41,7 @@ export default function TrendPage() {
 
       {adding && (
         <Panel as="section" className="mb-6 p-6">
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
             <div className="flex flex-col gap-4">
               <h2 className="font-display text-lg font-semibold">Add a saved Reel</h2>
               <Field label="Reel link" hint="Optional. CREO does not open links, it reads what you tell it.">
@@ -80,7 +80,7 @@ export default function TrendPage() {
         </Panel>
       )}
 
-      <div className="grid items-start gap-6 xl:grid-cols-[25rem_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 xl:grid-cols-[25rem_minmax(0,1fr)]">
         <section aria-label="Trend library" className="flex flex-col gap-3">
           <Tabs<Filter> label="Filter by status" value={filter} onChange={setFilter} items={[{ id: "all", label: "All" }, { id: "emerging", label: "Emerging" }, { id: "rising", label: "Rising" }, { id: "stable", label: "Stable" }]} />
           {list.map(({ pattern, fit }) => <TrendRow key={pattern.id} pattern={pattern} fit={fit.score} selected={current?.pattern.id === pattern.id} onSelect={() => setSel(pattern.id)} />)}
@@ -107,7 +107,7 @@ export default function TrendPage() {
               </div>
             </Panel>
 
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
               <Panel as="section" className="p-6">
                 <div className="flex items-center gap-4">
                   <FitScore score={current.fit.score} size={64} label={false} />

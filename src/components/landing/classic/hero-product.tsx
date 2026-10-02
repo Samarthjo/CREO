@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { inr, round500 } from "@/lib/engine/format";
 import { Logo } from "../../product/logo";
-import { Button, Chip, FitScore, Mark, Slots, cn } from "../../ui/kit";
+import { Button, Chip, FitScore, Slots, cn } from "../../ui/kit";
 import { demoPackage, getDemo } from "../demo";
 
 type View = "hq" | "studio";
@@ -125,7 +125,7 @@ export function HeroProduct() {
                       </div>
                       {top.fit ? <FitScore score={top.fit} size={56} /> : null}
                     </div>
-                    <p className="mt-4 text-[0.8125rem] font-medium text-ink"><Mark sweep delay={500}>Why now</Mark></p>
+                    <p className="mt-4 text-[0.8125rem] font-semibold text-ink">Why now</p>
                     <ul className="mt-2 space-y-1 text-[0.8125rem] leading-snug text-muted">
                       {why.map((w, i) => (
                         <motion.li key={w} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 + i * 0.18, duration: 0.35 }}>{w}</motion.li>

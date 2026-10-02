@@ -50,7 +50,7 @@ export function PackageView({ pkg, onEdit, onChooseHook }: { pkg: StudioPackage;
   const secs = spokenSeconds(pkg.script);
 
   return (
-    <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_16rem]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 2xl:grid-cols-[minmax(0,1fr)_16rem]">
       <div className="min-w-0">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <Tabs<Tab> label="Package sections" items={TABS} value={tab} onChange={setTab} />
@@ -166,7 +166,7 @@ export function PackageView({ pkg, onEdit, onChooseHook }: { pkg: StudioPackage;
         )}
       </div>
 
-      <aside className="grid gap-4 self-start md:grid-cols-2 2xl:grid-cols-1" aria-label="How CREO built this">
+      <aside className="grid grid-cols-[minmax(0,1fr)] gap-4 self-start md:grid-cols-2 2xl:grid-cols-1" aria-label="How CREO built this">
         <Panel className="p-5">
           <h3 className="font-display text-base font-semibold">How CREO built this</h3>
           <ul className="mt-3 space-y-3 text-[0.8125rem] leading-snug text-muted">

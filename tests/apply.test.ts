@@ -22,7 +22,16 @@ test("apply: phone numbers and emails both work as contact", () => {
 test("apply: every required field is enforced with a plain message", () => {
   const r = validateApplication({});
   assert.equal(r.ok, false);
-  if (!r.ok) for (const k of ["name", "handle", "contact", "followers", "niche", "focus", "agreed"] as const) assert.ok(r.errors[k], `${k} should have an error`);
+  if (!r.ok) for (const k of ["name", "handle", "contact", "followers", "agreed"] as const) assert.ok(r.errors[k], `${k} should have an error`);
+});
+
+test("apply: niche and start-with are optional, but a niche that is given must be a real one", () => {
+  const { niche: _n, focus: _f, ...short } = ok;
+  const r = validateApplication(short);
+  assert.ok(r.ok);
+  if (r.ok) assert.deepEqual(r.value.focus, []);
+  assert.ok(validateApplication({ ...short, niche: "" }).ok);
+  assert.equal(validateApplication({ ...short, niche: "crypto" }).ok, false);
 });
 
 test("apply: unknown enum values and a missing consent are rejected", () => {

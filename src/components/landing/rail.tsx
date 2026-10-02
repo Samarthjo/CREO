@@ -39,7 +39,7 @@ export function Rail() {
             </li>
           ))}
         </ol>
-        <p className="mt-4 text-center text-xs text-muted">Sample data</p>
+        <p className="mt-4 text-center text-[0.8125rem] text-body">Sample data</p>
       </Reveal>
     </section>
   );
