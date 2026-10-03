@@ -16,7 +16,7 @@ export function TrendSection() {
   const ideas = useMemo(() => adaptations(cur.pattern, ws.dna, insights, 2), [cur, ws.dna, insights]);
 
   return (
-    <Section id="trend">
+    <Section id="trend" motif="wave" treeline={-420}>
       <SectionHead eyebrow="CREO Trend" title={<>Understand why it <Accent>works</Accent>.</>} sub="Don't just see what's trending. Understand why it works, whether it fits you, and what original version you should make next." />
       <Reveal>
         <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">

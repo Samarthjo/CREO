@@ -5,7 +5,7 @@ import { HeroProduct } from "./hero-product";
 
 export function Hero() {
   return (
-    <section id="top" className="relative isolate pb-14 pt-24 lg:pb-20">
+    <section id="top" className="relative isolate overflow-x-clip pb-14 pt-24 lg:pb-20">
       <Landscape time="dawn" fadeTop="long" sky={<WindClouds time="dawn" />} className="absolute inset-x-0 top-28 -z-10 h-[36rem] rounded-b-[2.5rem] sm:h-[40rem] lg:top-24 lg:h-[46rem] lg:rounded-b-[4rem]" />
 
       <div className="mx-auto flex w-full max-w-[72rem] flex-col items-center px-5 text-center sm:px-6">

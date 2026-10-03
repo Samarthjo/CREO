@@ -1,4 +1,5 @@
 import { deriveDna } from "@/lib/engine/dna";
+import { Treeline } from "../scene/backdrop";
 import { Accent, Button, Chip, FitScore } from "../ui/kit";
 import { getDemo } from "./demo";
 import { Reveal } from "./reveal";
@@ -28,7 +29,8 @@ export function Rail() {
   ];
 
   return (
-    <section id="story" className="px-5 pb-20 pt-10 sm:px-6 lg:pb-28">
+    <section id="story" className="relative isolate px-5 pb-20 pt-10 sm:px-6 lg:pb-28">
+      <Treeline shift={-180} />
       <Reveal>
         <div className="mx-auto mb-10 max-w-[76rem] text-center lg:mb-12">
           <h2 className="mx-auto max-w-[20ch] font-display text-[clamp(2rem,4vw,3.4rem)] font-normal leading-[1.04] tracking-[-0.04em]">CREO doesn't start from zero every <Accent>time</Accent>.</h2>

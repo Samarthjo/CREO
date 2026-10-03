@@ -5,5 +5,5 @@ import { SubPage } from "@/components/landing/subpage";
 export const metadata: Metadata = { title: "Cohort" };
 
 export default function CohortPage() {
-  return <SubPage title="Cohort"><Cohort /></SubPage>;
+  return <SubPage title="Cohort" flow="dusk"><Cohort /></SubPage>;
 }

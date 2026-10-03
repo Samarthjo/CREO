@@ -26,7 +26,7 @@ export function CollabSection() {
   const choose = (w: Which) => { const t = w === "offer" ? SAMPLE_INQUIRY : SAMPLE_SCAM; setWhich(w); setRaw(t); setDraftText(t); setEditing(false); setApproved(false); };
 
   return (
-    <Section id="collab">
+    <Section id="collab" treeline={150}>
       <SectionHead eyebrow="Collab Inbox" title={<>Know what the opportunity is <Accent>worth</Accent> before you reply.</>} sub="Paste the inquiry, or upload it as a text file. CREO pulls out the terms, flags risk signals, sets a quote range and a walk-away price, and drafts a counter you approve." />
       <Pipeline />
       <Reveal>

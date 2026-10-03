@@ -5,5 +5,5 @@ import { SubPage } from "@/components/landing/subpage";
 export const metadata: Metadata = { title: "Collab Inbox" };
 
 export default function CollabInboxPage() {
-  return <SubPage title="Collab Inbox"><CollabSection /></SubPage>;
+  return <SubPage title="Collab Inbox" flow="short"><CollabSection /></SubPage>;
 }

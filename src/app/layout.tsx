@@ -4,6 +4,7 @@ import "@fontsource-variable/instrument-sans/wght-italic.css";
 import { MotionProvider } from "@/components/motion-provider";
 import "./globals.css";
 import "./wind.css";
+import "./backdrop.css";
 
 // Social preview images need an absolute address. Vercel exposes the production host at build time.
 const site = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000";

@@ -76,7 +76,7 @@ export function HeroProduct() {
       initial={{ opacity: 0, y: 48 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 70, damping: 18, delay: 0.25 }}
-      className="relative mx-auto w-full max-w-[64rem]"
+      className="glow relative mx-auto w-full max-w-[64rem]"
     >
       <div className="overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop">
         <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">

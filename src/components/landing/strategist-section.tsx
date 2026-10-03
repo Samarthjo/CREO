@@ -12,7 +12,7 @@ const FLOW = [
 /** The human layer: CREO Intelligence does most of the work, CREO Strategist Support covers judgment calls. */
 export function StrategistSection() {
   return (
-    <Section id="strategist" band>
+    <Section id="strategist" band treeline={-640}>
       <SectionHead eyebrow="CREO Strategist Support" title={<>Intelligence first. <br className="hidden sm:block" />A strategist when it <Accent>matters</Accent>.</>} sub="CREO does most of the analysis and drafting. When judgment matters, a CREO strategist can review the recommendation, script or decision with you." />
       <Reveal>
         <Panel className="p-6 sm:p-8">

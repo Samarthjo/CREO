@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Learning loop" };
 
 export default function LearningLoopPage() {
   return (
-    <SubPage title="Learning loop">
+    <SubPage title="Learning loop" flow="mid">
       <LoopSection />
       <StrategistSection />
     </SubPage>

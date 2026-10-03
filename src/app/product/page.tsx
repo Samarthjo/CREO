@@ -12,8 +12,8 @@ export const metadata: Metadata = { title: "Product" };
 
 export default function ProductPage() {
   return (
-    <SubPage title="Product">
-      <section className="relative isolate pb-16 pt-6 lg:pb-24">
+    <SubPage title="Product" flow="long">
+      <section className="relative isolate overflow-x-clip pb-16 pt-6 lg:pb-24">
         <Landscape time="dawn" fadeTop="long" sky={<WindClouds time="dawn" />} className="absolute inset-x-0 top-0 -z-10 h-[40rem] rounded-b-[2.5rem] sm:h-[46rem] lg:h-[54rem] lg:rounded-b-[4rem]" />
         <div className="mx-auto flex w-full max-w-[72rem] flex-col items-center px-5 pt-10 text-center sm:px-6">
           <Eyebrow>CREO Intelligence</Eyebrow>

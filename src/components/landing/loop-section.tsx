@@ -3,6 +3,7 @@
 import { Brain, ChartLineUp, Compass, MagnifyingGlass, PaperPlaneTilt, PencilSimpleLine } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "motion/react";
 import { Accent, Chip, Eyebrow, FitScore, Mark, cn } from "../ui/kit";
+import { Ripples } from "../scene/backdrop";
 import { demoPackage, getDemo } from "./demo";
 import { usePinnedSteps } from "./use-pinned-steps";
 
@@ -33,7 +34,7 @@ export function LoopSection() {
 
   return (
     <section id="loop" ref={ref} className={cn("relative", pinned && "h-[460svh]")}>
-      <div className={cn("relative overflow-hidden bg-[linear-gradient(180deg,var(--bg)_0%,var(--sky-tint)_42%,var(--bg)_100%)]", pinned ? "sticky top-0 flex h-svh items-center" : "py-20")}>
+      <div className={cn("relative overflow-hidden", pinned ? "sticky top-0 flex h-svh items-center" : "py-20")}>
         <div className="relative mx-auto grid grid-cols-[minmax(0,1fr)] w-full max-w-[76rem] items-center gap-10 px-5 sm:px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
           <div>
             <Eyebrow>The learning loop</Eyebrow>
@@ -62,7 +63,8 @@ export function LoopSection() {
             </ol>
           </div>
 
-          <div className="relative mx-auto aspect-square w-full max-w-[36rem]">
+          <div className="relative isolate mx-auto aspect-square w-full max-w-[36rem]">
+            <Ripples />
             <svg viewBox="0 0 100 100" className="absolute inset-0 size-full" aria-hidden focusable="false">
               <circle cx="50" cy="50" r="40" fill="none" stroke="var(--line-strong)" strokeWidth="0.35" strokeDasharray="0.8 1.6" />
               <circle cx="50" cy="50" r="40" fill="none" stroke="var(--lime-400)" strokeWidth="1.1" strokeLinecap="round" pathLength={1} strokeDasharray="1" strokeDashoffset={1 - progress} transform="rotate(-90 50 50)" className="transition-[stroke-dashoffset] duration-700 ease-out motion-reduce:transition-none" />

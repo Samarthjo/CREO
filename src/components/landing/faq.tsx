@@ -18,7 +18,7 @@ export const FAQS = [
 export function Faq() {
   const ld = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) };
   return (
-    <Section id="faq" className="pt-10 lg:pt-16">
+    <Section id="faq" className="pt-10 lg:pt-16" treeline={-300}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
       <SectionHead eyebrow="FAQ" title={<>Questions, <Accent>answered</Accent>.</>} />
       <Reveal>

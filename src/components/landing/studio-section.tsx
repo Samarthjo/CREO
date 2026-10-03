@@ -22,7 +22,7 @@ export function StudioSection() {
   const pkg = useMemo(() => demoPackage({ topic, proof, lengthSec: Number(len) as 30 | 45 | 60, language: lang, trendId: trend }), [topic, proof, lang, len, trend]);
 
   return (
-    <Section id="studio" band>
+    <Section id="studio" band treeline={260}>
       <SectionHead eyebrow="CREO Studio" title={<>Turn intelligence into something worth <Accent>publishing</Accent>.</>} sub="Three hooks to open with, a script, a shot and B-roll plan, caption, CTA and title options. In your voice, in English or Hinglish. Gaps only you can fill stay highlighted." />
       <Reveal>
         <Panel className="overflow-hidden">

@@ -46,10 +46,10 @@ function Compounding() {
 /** Flagship: CREO remembers what actually works for you. Illustrative numbers. */
 export function MemorySection() {
   return (
-    <Section id="memory">
+    <Section id="memory" motif="contours" treeline={-90}>
       <SectionHead eyebrow="Creator Memory" title={<>CREO remembers what actually works for <Accent>you</Accent>.</>} sub="Every script, edit, Reel, result and decision is kept, so each recommendation starts from your history instead of from zero." />
       <Reveal>
-        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-3">
+        <div className="glow grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-3">
           <Panel className="flex flex-col p-6 sm:p-7">
             <h3 className="font-display text-xl font-semibold text-ink">Your Content DNA</h3>
             <ul className="mt-5 space-y-4">

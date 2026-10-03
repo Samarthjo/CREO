@@ -46,10 +46,10 @@ function List({ title, items, tick }: { title: string; items: string[]; tick?: b
 /** The 30-day Founding Cohort: what happens during it, what we ask, what you can keep after it, and the application. */
 export function Cohort() {
   return (
-    <Section id="cohort">
+    <Section id="cohort" treeline={520}>
       <SectionHead eyebrow="30-Day Founding Cohort" title={<>30 days to build the AI Creator Manager around <Accent>you</Accent>.</>} sub="Limited seats per cohort so the team can stay hands-on." />
 
-      <Reveal>
+      <Reveal className="glow">
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-surface shadow-pop">
           <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
             <div className="border-b border-line p-8 sm:p-10 lg:border-b-0 lg:border-r lg:p-12">
@@ -88,7 +88,7 @@ export function AfterCohort({ applyHref }: { applyHref: string }) {
   return (
     <>
       <SectionHead eyebrow="After 30 days" title={<>After 30 days, CREO already knows <Accent>you</Accent>.</>} sub="Your cohort isn't a disposable trial. CREO has spent 30 days learning your content history, style, performance patterns, decisions and goals." />
-      <Reveal>
+      <Reveal className="glow">
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-surface shadow-panel">
           <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <div className="border-b border-line bg-mark-wash/50 p-8 sm:p-10 lg:border-b-0 lg:border-r lg:p-12">

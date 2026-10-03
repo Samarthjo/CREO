@@ -37,6 +37,24 @@
   --shadow-pop: 0 2px 4px rgb(17 20 12 / 0.05), 0 32px 64px -24px rgb(17 20 12 / 0.28);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* One day, top to bottom: the page background walks dawn, morning, midday, afternoon and dusk (see .day below). */
+  --day-0: var(--bg);
+  --day-1: #f4f2e2;
+  --day-2: #eaf1dc;
+  --day-3: #e2eeea;
+  --day-4: #f5ecd7;
+  --day-5: #f1e2dd;
+  --band: rgb(227 236 197 / 0.55);
+  --band-line: rgb(75 106 14 / 0.1);
+  --hill-far: rgb(75 106 14 / 0.08);
+  --hill-near: rgb(55 84 12 / 0.15);
+  --motif: rgb(75 106 14 / 0.24);
+  --motif-soft: rgb(75 106 14 / 0.15);
+  --glow-a: rgb(200 224 110 / 0.55);
+  --glow-b: rgb(244 247 226 / 0.35);
+  --dusk-1: #d8a8a4;
+  --dusk-2: #6e5d9d;
+
   /* Fixed palette (not themed): used for numerals, tickets and the scene. */
   --olive-800: #3f5a0c;
   --olive-700: #4b6a0e;
@@ -46,6 +64,7 @@
   --lime-50: #f0f5df;
   --night-900: #1b2252;
   --night-700: #2f3d8f;
+  --night-top: #0c1030; /* what the night scene shows along its top edge, so the dusk strip meets it exactly */
 }
 
 /* Night: the same token names on a deep indigo ground. Used by the dark theme and by .night sections. */
@@ -76,6 +95,21 @@
     --ok-wash: rgb(127 220 149 / 0.13);
     --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 48px -28px rgb(0 0 0 / 0.7);
     --shadow-pop: 0 2px 4px rgb(0 0 0 / 0.3), 0 32px 64px -24px rgb(0 0 0 / 0.8);
+    --day-1: #0d1437;
+    --day-2: #0a1a3a;
+    --day-3: #0a2140;
+    --day-4: #14123f;
+    --day-5: #1d1548;
+    --band: rgb(181 207 79 / 0.06);
+    --band-line: rgb(181 207 79 / 0.1);
+    --hill-far: rgb(120 140 255 / 0.1);
+    --hill-near: rgb(160 190 90 / 0.1);
+    --motif: rgb(181 207 79 / 0.22);
+    --motif-soft: rgb(150 165 255 / 0.13);
+    --glow-a: rgb(181 207 79 / 0.2);
+    --glow-b: rgb(90 100 230 / 0.18);
+    --dusk-1: #6b4b8f;
+    --dusk-2: #2c2a73;
   }
 }
 
@@ -106,6 +140,21 @@
   --ok-wash: rgb(127 220 149 / 0.13);
   --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 48px -28px rgb(0 0 0 / 0.7);
   --shadow-pop: 0 2px 4px rgb(0 0 0 / 0.3), 0 32px 64px -24px rgb(0 0 0 / 0.8);
+  --day-1: #0d1437;
+  --day-2: #0a1a3a;
+  --day-3: #0a2140;
+  --day-4: #14123f;
+  --day-5: #1d1548;
+  --band: rgb(181 207 79 / 0.06);
+  --band-line: rgb(181 207 79 / 0.1);
+  --hill-far: rgb(120 140 255 / 0.1);
+  --hill-near: rgb(160 190 90 / 0.1);
+  --motif: rgb(181 207 79 / 0.22);
+  --motif-soft: rgb(150 165 255 / 0.13);
+  --glow-a: rgb(181 207 79 / 0.2);
+  --glow-b: rgb(90 100 230 / 0.18);
+  --dusk-1: #6b4b8f;
+  --dusk-2: #2c2a73;
 }
 
 @theme inline {
@@ -306,3 +355,109 @@
   background-image: linear-gradient(var(--mark), var(--mark));
   color: var(--on-mark);
 }
+
+/* ==========================================================================
+   Backgrounds
+   One day, top to bottom: .day wraps a whole page and paints a single gradient from dawn to dusk behind it, with a fine
+   paper grain on top. Sections stay transparent, so the light changes continuously instead of in blocks.
+   On top of that, each section may add one quiet decoration: a motif (contours, a rising line, ripples), a treeline
+   along its bottom edge, a soft glow behind the product, or, in the dark theme, a still star field and a faint aurora.
+   Everything is static. Nothing sits behind text except colour, and the pictures come from backdrop.css.
+   ========================================================================== */
+.day {
+  --flow: linear-gradient(to bottom, var(--day-0), var(--day-1) 45%, var(--day-2));
+  --paper: var(--paper-light);
+  background-color: var(--day-0);
+  background-image: var(--paper), var(--flow);
+  background-size: 240px 240px, 100% 100%;
+  background-repeat: repeat, no-repeat;
+}
+:root[data-theme="dark"] .day { --paper: var(--paper-dark); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .day { --paper: var(--paper-dark); } }
+.day[data-flow="home"] { --flow: linear-gradient(to bottom, var(--day-0) 0%, var(--day-1) 20%, var(--day-2) 40%, var(--day-4) 58%, var(--day-5) 70%, var(--day-5)); }
+.day[data-flow="long"] { --flow: linear-gradient(to bottom, var(--day-0) 0%, var(--day-1) 16%, var(--day-2) 38%, var(--day-3) 60%, var(--day-4) 82%, var(--day-5) 100%); }
+.day[data-flow="mid"] { --flow: linear-gradient(to bottom, var(--day-0) 0%, var(--day-1) 22%, var(--day-2) 50%, var(--day-3) 78%, var(--day-4) 100%); }
+.day[data-flow="dusk"] { --flow: linear-gradient(to bottom, var(--day-0) 0%, var(--day-1) 18%, var(--day-2) 38%, var(--day-4) 66%, var(--day-5) 100%); }
+.day[data-flow="short"] { --flow: linear-gradient(to bottom, var(--day-0) 0%, var(--day-1) 45%, var(--day-2) 100%); }
+
+/* A band is a rounded, tinted slab inside the day. (Outside .day, on /classic, it stays a plain tint.) */
+.day .band {
+  margin-inline: clamp(0.75rem, 2.4vw, 2rem);
+  border-radius: 2.5rem;
+  background: var(--band);
+  box-shadow: inset 0 0 0 1px var(--band-line);
+  overflow: clip;
+}
+
+/* A soft glow behind the product: a window, a row of panels, a price card. */
+.glow { position: relative; isolation: isolate; }
+.day .glow::before {
+  content: "";
+  position: absolute;
+  inset: -20% -12% -26%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, var(--glow-a) 0%, var(--glow-a) 56%, var(--glow-b) 80%, transparent 100%);
+}
+
+/* Decorations belong to the day. Outside it (on /classic) they are not drawn. */
+.treeline, .motif-layer, .ripples { display: none; }
+.day .treeline, .day .motif-layer, .day .ripples { display: block; }
+
+/* One quiet picture behind a section (contours, a rising line, ripples). It fades in and out so it never ends in a hard edge. */
+.motif-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  overflow: clip;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+}
+.motif-layer > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* A treeline along the bottom edge of a section: far hills and a nearer ridge of conifers, painted as masks in the theme's colours. */
+.treeline { --ground: linear-gradient(to bottom, #000 0%, #000 38%, transparent 100%); position: absolute; inset-inline: 0; bottom: 0; z-index: -10; pointer-events: none; height: clamp(4rem, 8.5vw, 8rem); }
+.treeline::before, .treeline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* The trees repeat along the edge; a second mask fades the ground out towards the bottom. */
+  -webkit-mask-repeat: repeat-x, no-repeat;
+  mask-repeat: repeat-x, no-repeat;
+  -webkit-mask-size: auto 100%, 100% 100%;
+  mask-size: auto 100%, 100% 100%;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+.treeline::before { background: var(--hill-far); -webkit-mask-image: var(--mask-far), var(--ground); mask-image: var(--mask-far), var(--ground); -webkit-mask-position: calc(var(--tl, 0px) + 700px) 100%, 0 0; mask-position: calc(var(--tl, 0px) + 700px) 100%, 0 0; }
+.treeline::after { background: var(--hill-near); -webkit-mask-image: var(--mask-near), var(--ground); mask-image: var(--mask-near), var(--ground); -webkit-mask-position: var(--tl, 0px) 100%, 0 0; mask-position: var(--tl, 0px) 100%, 0 0; }
+
+/* Dusk on the way into the night scene: the afternoon blush deepens to the night's own top colour, with a ridge of trees rising out of it. */
+.horizon { position: relative; height: clamp(9rem, 19vw, 16rem); pointer-events: none; background: linear-gradient(to bottom, transparent 0%, var(--dusk-1) 42%, var(--dusk-2) 76%, var(--night-top) 100%); }
+.horizon::before, .horizon::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: auto 100%;
+  mask-size: auto 100%;
+}
+.horizon::before { height: 62%; background: color-mix(in oklab, var(--night-top) 55%, var(--dusk-2)); -webkit-mask-image: var(--mask-far); mask-image: var(--mask-far); -webkit-mask-position: 300px 100%; mask-position: 300px 100%; }
+.horizon::after { height: 56%; background: var(--night-top); -webkit-mask-image: var(--mask-near); mask-image: var(--mask-near); -webkit-mask-position: 0 100%; mask-position: 0 100%; }
+
+/* Dark theme only: a still star field and a faint aurora along the top edge of every section. */
+.sky-deco { display: none; position: absolute; inset: 0 0 auto 0; height: min(100%, 28rem); z-index: -10; pointer-events: none; }
+.sky-deco::before, .sky-deco::after { content: ""; position: absolute; inset: 0; }
+.sky-deco::before {
+  background-image: var(--stars-a), var(--stars-b);
+  background-size: 360px 300px, 590px 470px;
+  background-position: 0 0, 150px 110px;
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 90%);
+  mask-image: linear-gradient(to bottom, #000, transparent 90%);
+}
+.sky-deco::after { background: radial-gradient(38% 80% at 10% 0%, rgb(181 207 79 / 0.1), transparent 72%), radial-gradient(46% 90% at 90% 0%, rgb(110 120 255 / 0.18), transparent 74%); }
+:root[data-theme="dark"] .day .sky-deco { display: block; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .day .sky-deco { display: block; } }

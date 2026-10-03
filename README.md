@@ -25,6 +25,12 @@ npm run build && npm start
 
 Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `CRON_SECRET` before deploying.
 
+## Backgrounds
+
+Every page is one `.day`: a single gradient from dawn to dusk behind the whole page, with a fine paper grain on top (`globals.css`, "Backgrounds"). Sections stay transparent and add one quiet decoration each: a motif (contours, a rising line, ripples), a treeline along the bottom edge, a soft glow behind the product, or, in the dark theme, a still star field and a faint aurora. Everything is static, and `/classic` does not use any of it.
+
+The treeline, star and grain images are baked into `src/app/backdrop.css` by `node scripts/backdrop.mjs` (like `scripts/wind.mjs` for the trees). Edit the script and run it again; do not edit the CSS file.
+
 ## Stack
 
 Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Motion, Phosphor icons, Instrument Sans (self-hosted via Fontsource). No UI kit, no state library, no test framework.

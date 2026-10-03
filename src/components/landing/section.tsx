@@ -1,10 +1,22 @@
 import type { ReactNode } from "react";
+import { Contours, Sky, Treeline, Wave } from "../scene/backdrop";
 import { Eyebrow, cn } from "../ui/kit";
 import { Reveal } from "./reveal";
 
-export function Section({ id, className, children, band }: { id?: string; className?: string; children: ReactNode; band?: boolean }) {
+/**
+ * A page section. Decorations are opt-in and sit behind the content:
+ *  - motif: one quiet picture ("contours" for memory, "wave" for trends)
+ *  - treeline: a treeline along the bottom edge; the number slides the pattern so neighbours differ
+ *  - band: a rounded, tinted slab (see .band in globals.css)
+ * In the dark theme every section also gets a still sky along its top edge.
+ */
+export function Section({ id, className, children, band, motif, treeline }: { id?: string; className?: string; children: ReactNode; band?: boolean; motif?: "contours" | "wave"; treeline?: number }) {
   return (
-    <section id={id} className={cn(band && "bg-sunk/60")}>
+    <section id={id} className={cn("relative isolate overflow-x-clip", band && "band bg-sunk/60")}>
+      <Sky />
+      {motif === "contours" && <Contours />}
+      {motif === "wave" && <Wave />}
+      {treeline !== undefined && <Treeline shift={treeline} />}
       <div className={cn("mx-auto w-full max-w-[76rem] px-5 py-20 sm:px-6 lg:py-32", className)}>{children}</div>
     </section>
   );
