@@ -12,7 +12,7 @@ import { Section, SectionHead } from "./section";
 
 type Tab = "hooks" | "formats";
 
-/** Section 2: CREO gets you. A Creator DNA read from the sample creator's posts, with the evidence behind it. */
+/** Section 2: CREO gets you. A Creator DNA read from the made-up creator's posts, with the evidence behind it. */
 export function DnaSection() {
   const { ws, insights } = getDemo();
   const reduce = useReducedMotion();
@@ -43,7 +43,7 @@ export function DnaSection() {
         <Panel className="p-6 sm:p-8">
           <div className="flex items-center justify-between gap-3">
             <h3 className="font-display text-xl font-medium tracking-tight">Creator DNA</h3>
-            <span className="text-xs text-muted">Sample creator</span>
+            <span className="text-xs text-muted">Creator · 27K followers</span>
           </div>
           <dl className="mt-5 divide-y divide-line">
             {rows.map(([k, v], i) => (
@@ -88,7 +88,7 @@ export function DnaSection() {
               </li>
             ))}
           </ul>
-          <p className="mt-5 text-[0.8125rem] text-body">The line marks 1.0x, your usual. Hooks and formats come from {dna.posts.length} sample posts, so CREO would say "not enough data" before it guessed.</p>
+          <p className="mt-5 text-[0.8125rem] text-body">The line marks 1.0x, your usual. Hooks and formats come from {dna.posts.length} posts, so CREO would say "not enough data" before it guessed.</p>
         </Panel>
       </div>
 
@@ -99,7 +99,7 @@ export function DnaSection() {
           <Ticket label="Best format lift" note={FORMATS[bestFormat.key as keyof typeof FORMATS]}><CountUp to={bestFormat.lift} decimals={1} suffix="x" /></Ticket>
           <Ticket label="Your sweet spot" note="Median of your top posts"><CountUp to={insights.typicalDurationSec} suffix=" sec" /></Ticket>
         </TicketStrip>
-        <p className="mt-4 text-center text-[0.8125rem] text-body">Sample creator, real CREO engine. These are not results from live creators.</p>
+        <p className="mt-4 text-center text-[0.8125rem] text-body">Example creator on the real CREO engine. These are not results from live creators.</p>
       </div>
     </Section>
   );

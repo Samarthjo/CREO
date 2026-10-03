@@ -35,10 +35,10 @@ export function CollabSection() {
             <Panel className="p-6">
               <div className="mb-4 flex items-center gap-3">
                 <span className="grid size-10 place-items-center rounded-full bg-sunk font-display text-sm font-semibold text-ink" aria-hidden>{which === "offer" ? "T" : "?"}</span>
-                <div className="min-w-0"><p className="text-sm font-medium text-ink">{which === "offer" ? "Meera Rao, Tessera" : "Unknown sender"}</p><p className="text-[0.8125rem] text-muted">Sample brand message</p></div>
+                <div className="min-w-0"><p className="text-sm font-medium text-ink">{which === "offer" ? "Meera Rao, Tessera" : "Unknown sender"}</p><p className="text-[0.8125rem] text-muted">Brand inquiry</p></div>
               </div>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <Tabs<Which> label="Sample message" value={which} onChange={choose} items={[{ id: "offer", label: "Brand offer" }, { id: "scam", label: "Pay-to-join message" }]} />
+                <Tabs<Which> label="Message" value={which} onChange={choose} items={[{ id: "offer", label: "Brand offer" }, { id: "scam", label: "Pay-to-join message" }]} />
                 <Button size="sm" variant="ghost" onClick={() => { setEditing((e) => !e); setDraftText(raw); }}>{editing ? "Cancel" : "Edit the message"}</Button>
               </div>
               {editing ? (

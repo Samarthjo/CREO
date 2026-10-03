@@ -21,7 +21,7 @@ const pos = (i: number, r = 40) => {
   return { left: `${50 + r * Math.cos(a)}%`, top: `${50 + r * Math.sin(a)}%` };
 };
 
-/** The learning loop, CREO's main idea: recommendations meet real outcomes. Illustrative sequence on the sample creator, labelled as such. */
+/** The learning loop, CREO's main idea: recommendations meet real outcomes. Illustrative sequence, labelled as such. */
 export function LoopSection() {
   const { ref, pinned, active, go } = usePinnedSteps(N);
   const { brief } = getDemo();
@@ -101,7 +101,7 @@ export function LoopSection() {
             </div>
           </div>
         </div>
-        <p className="relative mx-auto mt-10 max-w-[76rem] px-5 text-center text-[0.8125rem] text-body sm:px-6 lg:mt-0 lg:absolute lg:bottom-6 lg:left-0 lg:right-0">A sequence on the sample creator to show the mechanism. It is not a result from a live creator.</p>
+        <p className="relative mx-auto mt-10 max-w-[76rem] px-5 text-center text-[0.8125rem] text-body sm:px-6 lg:mt-0 lg:absolute lg:bottom-6 lg:left-0 lg:right-0">An example sequence to show the mechanism, not a result from a live creator.</p>
       </div>
     </section>
   );

@@ -7,7 +7,7 @@ const KNOWS = ["what you sound like", "what your audience responds to", "which h
 
 /**
  * The core story in six beats: CREO sees, understands, recommends; you create; real results come back; CREO learns.
- * Every number comes from the same engine as the app, on the sample creator. Beats 5 and 6 use an example post and say so.
+ * Every number comes from the same engine as the app, on a made-up creator. Beat 5 uses an example post and says so.
  */
 export function Rail() {
   const { ws, insights, brief } = getDemo();
@@ -45,7 +45,6 @@ export function Rail() {
             </li>
           ))}
         </ol>
-        <p className="mt-4 text-center text-[0.8125rem] text-body">Sample data. Beats 5 and 6 use an example post.</p>
         <div className="mx-auto mt-12 max-w-[56rem] text-center">
           <p className="text-[0.9375rem] font-medium text-ink">The longer you work with CREO, the more it understands</p>
           <ul className="mt-4 flex flex-wrap justify-center gap-2">

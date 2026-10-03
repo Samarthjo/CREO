@@ -33,7 +33,7 @@ const TABS: { id: View; label: string }[] = [
 ];
 
 /**
- * The hero is the product: a working CREO window on a sample creator.
+ * The hero is the product: a working CREO window on a made-up creator.
  * It opens on HQ, the creator's next best move with the reasons behind it. Trend, Studio, Collab Inbox and Memory
  * are one click away. Every number comes from the same engines the app uses.
  */
@@ -81,13 +81,12 @@ export function HeroProduct() {
       <div className="overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop">
         <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">
           <Logo word={false} />
-          <span className="hidden text-[0.8125rem] text-muted sm:inline">Sample creator, 27K followers</span>
-          <Chip tone="lime">Sample data</Chip>
+          <span className="hidden text-[0.8125rem] text-muted sm:inline">Creator · 27K followers</span>
         </div>
 
         <div className="grid md:grid-cols-[13rem_minmax(0,1fr)]">
-          <aside className="hidden border-r border-line bg-surface/60 p-4 md:block" aria-label="Sample workspace navigation">
-            <Link href="/app" title="Open the sample workspace" aria-label="Open the sample workspace as Creator" className="group -mx-1 mb-4 flex items-center gap-2.5 rounded-control px-2.5 py-1.5 transition hover:bg-sunk">
+          <aside className="hidden border-r border-line bg-surface/60 p-4 md:block" aria-label="Workspace navigation">
+            <Link href="/app" title="Open the workspace" aria-label="Open the workspace as Creator" className="group -mx-1 mb-4 flex items-center gap-2.5 rounded-control px-2.5 py-1.5 transition hover:bg-sunk">
               <span className="grid size-8 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg">C</span>
               <span className="text-sm font-medium text-ink">Creator</span>
               <ArrowUpRight size={16} className="ml-auto text-muted opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100" />
@@ -114,7 +113,7 @@ export function HeroProduct() {
           </aside>
 
           <div className="relative min-h-[22rem] min-w-0 p-5 sm:p-6 md:h-[27rem] md:overflow-y-auto scroll-thin">
-            <div className="scroll-thin -mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label="Sample workspace">
+            <div className="scroll-thin -mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label="Workspace">
               {TABS.map((t) => (
                 <button key={t.id} type="button" role="tab" aria-selected={view === t.id} onClick={() => setView(t.id)} className={cn("shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium leading-5 pointer-coarse:min-h-11", view === t.id ? "bg-eyebrow text-on-eyebrow" : "text-muted")}>{t.label}</button>
               ))}
@@ -203,7 +202,7 @@ export function HeroProduct() {
                       );
                     })}
                   </ul>
-                  <p className="mt-3 text-[0.8125rem] text-muted">Scored on the sample creator. <Link href="/app/trend" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Trend page</Link></p>
+                  <p className="mt-3 text-[0.8125rem] text-muted">Scored against this creator's history. <Link href="/app/trend" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Trend page</Link></p>
                 </motion.div>
               ) : view === "memory" ? (
                 <motion.div key="memory" {...fade}>
@@ -212,7 +211,7 @@ export function HeroProduct() {
                   <ul className="mt-3 rounded-panel border border-line bg-surface px-4">
                     {ws.memory.slice(0, 4).map((m) => <MemoryRow key={m.id} item={m} compact />)}
                   </ul>
-                  <p className="mt-3 text-[0.8125rem] text-muted">Sample memory. <Link href="/app/memory" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Memory page</Link></p>
+                  <p className="mt-3 text-[0.8125rem] text-muted"><Link href="/app/memory" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Memory page</Link></p>
                 </motion.div>
               ) : (
                 <motion.div key="studio" {...fade}>

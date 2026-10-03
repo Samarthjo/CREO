@@ -37,7 +37,7 @@ export function StudioSection() {
           <div className="flex gap-3.5 border-t border-line bg-soft/60 px-6 py-5">
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-mark-wash text-ink"><ChatsCircle size={18} /></span>
             <div>
-              <p className="text-xs font-medium text-muted">Strategist note · sample</p>
+              <p className="text-xs font-medium text-muted">Strategist note</p>
               <p className="mt-1 max-w-[62ch] text-[0.9375rem] leading-snug text-ink">Show the result on screen before you explain it. Your proof-first openings hold viewers longer than the ones that start with context.</p>
             </div>
           </div>

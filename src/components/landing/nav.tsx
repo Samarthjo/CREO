@@ -21,6 +21,14 @@ export function Nav() {
   const toggle = useRef<HTMLButtonElement>(null);
 
   useEffect(() => setOpen(false), [path]);
+
+  // On the home page the logo scrolls back to the top (and drops any #section from the address); elsewhere it opens home.
+  const toTop = (e: React.MouseEvent) => {
+    if (path !== "/" || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    if (location.hash) history.replaceState(history.state, "", "/");
+    window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -35,7 +43,7 @@ export function Nav() {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-3 z-50 flex justify-center px-3 sm:top-4">
       <div className="pointer-events-auto flex h-12 items-center gap-1 rounded-full border border-line bg-bg/80 py-1 pl-4 pr-1 shadow-panel backdrop-blur-xl pointer-coarse:h-[3.25rem] sm:gap-3">
-        <Link href="/" aria-label="CREO home" className="mr-1 flex h-11 items-center sm:mr-3"><Logo /></Link>
+        <Link href="/" aria-label="CREO home" onClick={toTop} className="mr-1 flex h-11 items-center sm:mr-3"><Logo /></Link>
         <nav aria-label="Pages" className="hidden items-center md:flex">
           {NAV_LINKS.map((l) => {
             const here = path === l.href;

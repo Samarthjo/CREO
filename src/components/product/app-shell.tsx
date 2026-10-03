@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const sampleCard = ws?.mode === "sample" && (
     <div className="rounded-control border border-line p-3">
-      <p className="text-xs font-medium text-ink">Sample workspace</p>
+      <p className="text-xs font-medium text-ink">Demo workspace</p>
       <p className="mt-0.5 text-xs text-muted">Explore with a made-up creator, or set up your own.</p>
       <Button size="sm" variant="primary" className="mt-2.5 w-full" onClick={() => router.push("/app/dna?setup=1")}>
         Use my profile
@@ -92,7 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   );
   const backToSample = ws?.mode === "own" && (
     <Button size="sm" variant="quiet" className="justify-start" onClick={() => { resetSample(); router.push("/app"); }}>
-      Back to sample workspace
+      Back to the demo workspace
     </Button>
   );
 
