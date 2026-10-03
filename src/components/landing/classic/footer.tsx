@@ -37,7 +37,6 @@ export function ClassicFooter() {
           <a href="#cohort" className="inline-flex items-center leading-5 hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center">Cohort</a>
           <a href="#faq" className="inline-flex items-center leading-5 hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center">FAQ</a>
         </nav>
-        <p className="w-full text-xs text-[#11140c]/70">The creator, brands and numbers on this page are examples running on the real CREO engine. No testimonials yet.</p>
       </div>
     </footer>
   );

@@ -43,7 +43,7 @@ function Compounding() {
   );
 }
 
-/** Flagship: CREO remembers what actually works for you. Illustrative numbers, labelled as such. */
+/** Flagship: CREO remembers what actually works for you. Illustrative numbers. */
 export function MemorySection() {
   return (
     <Section id="memory">
@@ -95,7 +95,6 @@ export function MemorySection() {
             <Compounding />
           </Panel>
         </div>
-        <p className="mt-4 text-center text-[0.8125rem] text-body">Illustrative numbers, not results from a live creator.</p>
       </Reveal>
     </Section>
   );

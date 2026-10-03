@@ -11,7 +11,6 @@ export function Footer() {
           <Link href="/app" className="inline-flex items-center leading-5 hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center">Workspace</Link>
           {NAV_LINKS.map((l) => <Link key={l.href} href={l.href} className="inline-flex items-center leading-5 hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center">{l.label}</Link>)}
         </nav>
-        <p className="w-full text-sm font-medium text-[#11140c]">Works from what you add. Instagram Reels only. No testimonials yet.</p>
       </div>
     </footer>
   );

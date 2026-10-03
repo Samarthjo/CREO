@@ -16,7 +16,7 @@ export function ProofSection() {
         <div className="night absolute inset-0 flex flex-col items-center px-5 pt-20 text-center sm:px-6 lg:pt-28">
           <Eyebrow>Founding creators</Eyebrow>
           <h2 className="mt-5 max-w-[14ch] font-display text-[clamp(2.4rem,5.4vw,4.75rem)] font-normal leading-[1.02] tracking-[-0.04em]">Be creator <Accent>#01</Accent>.</h2>
-          <p className="mt-5 max-w-[34rem] text-[1.0625rem] leading-relaxed text-ink [text-shadow:0_1px_14px_rgb(40_30_90/0.55)]">We have no testimonials yet, and we will not invent any. These seats are open, and the first creators shape what CREO becomes.</p>
+          <p className="mt-5 max-w-[34rem] text-[1.0625rem] leading-relaxed text-ink [text-shadow:0_1px_14px_rgb(40_30_90/0.55)]">These seats are open, and the first creators shape what CREO becomes.</p>
         </div>
         <div className="absolute inset-x-0 bottom-8 mx-auto w-full max-w-[76rem] px-5 sm:px-6 lg:bottom-12">
           <TicketStrip>

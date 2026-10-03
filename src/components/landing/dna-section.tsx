@@ -99,7 +99,6 @@ export function DnaSection() {
           <Ticket label="Best format lift" note={FORMATS[bestFormat.key as keyof typeof FORMATS]}><CountUp to={bestFormat.lift} decimals={1} suffix="x" /></Ticket>
           <Ticket label="Your sweet spot" note="Median of your top posts"><CountUp to={insights.typicalDurationSec} suffix=" sec" /></Ticket>
         </TicketStrip>
-        <p className="mt-4 text-center text-[0.8125rem] text-body">Example creator on the real CREO engine. These are not results from live creators.</p>
       </div>
     </Section>
   );

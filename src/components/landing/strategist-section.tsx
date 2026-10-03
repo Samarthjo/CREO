@@ -40,7 +40,6 @@ export function StrategistSection() {
             })}
           </ol>
         </Panel>
-        <p className="mx-auto mt-6 max-w-[40rem] text-center text-[0.9375rem] leading-relaxed text-muted">Those corrections feed back into your Creator Intelligence instead of disappearing into a support chat.</p>
       </Reveal>
     </Section>
   );
