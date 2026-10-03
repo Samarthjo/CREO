@@ -3,8 +3,15 @@ import { cn } from "../ui/kit";
 import { r1, rng } from "./noise";
 import { paletteFor, type Look, type Time } from "./palette";
 
-/** A soft painted cumulus with a flat base and long wisps, in the palette of the given time of day. */
+/** The calm look's clouds, baked as lit volumes (see scripts/scenery). Seeds not listed fall back to the painted cloud below. */
+const BAKED: Partial<Record<Time, readonly number[]>> = { dawn: [2, 5, 7, 9], night: [11] };
+
+/** A cumulus with a flat base and long wisps: a baked picture in the calm look, a soft painted shape in the classic one. */
 export function Cloud({ time, look = "calm", seed = 1, className, style }: { time: Time; look?: Look; seed?: number; className?: string; style?: CSSProperties }) {
+  if (look === "calm" && BAKED[time]?.includes(seed)) {
+    // Lazy: the side clouds are hidden below 1024px, and a hidden lazy image is never fetched.
+    return <img src={`/scene/cloud-${time}-${seed}.webp`} width={520} height={220} alt="" aria-hidden draggable={false} decoding="async" loading="lazy" className={cn("pointer-events-none select-none", className)} style={style} />;
+  }
   const p = paletteFor(time, look);
   const r = rng(seed * 101);
   const id = `cl-${look}-${time}-${seed}`;

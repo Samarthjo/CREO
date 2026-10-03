@@ -1,14 +1,15 @@
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "../ui/kit";
 import { fbm, noise1, polyPath, r1, ridge, rng, smoothstep } from "./noise";
+import { BANKS, NEAR_TREES, type Box, type TreePlacement } from "./geometry";
 import { paletteFor, type Look, type Palette, type Time } from "./palette";
 
 /*
-  The CREO scene: an original, procedurally drawn mountain-and-lake world in three layers.
-  Every layer is its own element so a painted PNG/WebP can replace it later without touching layout
-  (see docs/design-direction.md section 11). Server component: output is deterministic, no hydration drift.
-  Two looks. "classic" is the original pastel scene with scroll parallax, kept for /classic. "calm" is the site's scene: muted
-  slate, forest and cream, one light direction, varied trees, still mountains and water, no parallax.
+  The CREO scene: a mountain-and-lake world in layers. Every layer is its own element, so a picture can replace it
+  without touching layout (see docs/design-direction.md section 11). Server component: output is deterministic, no hydration drift.
+  Two looks. "classic" is the original pastel scene drawn in SVG with scroll parallax, kept for /classic.
+  "calm" is the site's scene, in two light settings (dawn, night): real terrain, water, grass, stones, trees and clouds, baked into
+  pictures by scripts/scenery and placed here. One light direction, still mountains and water, no parallax.
   Near trees move in one wind (see scripts/wind.mjs and windFor below). Distant trees are too far away to show it.
 */
 const W = 1600;
@@ -16,9 +17,6 @@ const H = 900;
 const SHORE = 620;
 
 const bump = (x: number, c: number, w: number) => Math.exp(-(((x - c) / w) ** 2));
-/** A tree's bounding box in scene units: x, y, width, height. */
-type Box = [number, number, number, number];
-
 function pine(x: number, y: number, h: number, r: () => number) {
   const tiers = 5;
   const trunk = h * 0.07;
@@ -53,56 +51,7 @@ function rock(cx: number, cy: number, rx: number, ry: number, r: () => number) {
   return { full: `M${pts.join("L")}Z`, lit: `M${lit.join("L")}Z` };
 }
 
-/** A conifer with its own tier count, slenderness and lean, so no two in a row repeat. Returns the whole tree and its two halves. */
-function conifer(x: number, y: number, h: number, r: () => number, o: { tiers?: number; slim?: number; lean?: number }) {
-  const tiers = o.tiers ?? 5;
-  const slim = o.slim ?? 0.2;
-  const ax = x + (o.lean ?? 0) * h;
-  const trunk = h * 0.07;
-  const body = h - trunk;
-  const right: string[] = [];
-  const left: string[] = [];
-  for (let i = 0; i < tiers; i++) {
-    const t = (i + 1) / tiers;
-    const yb = y - h + body * (0.3 + 0.7 * t);
-    const cx = ax + (x - ax) * t;
-    const wr = h * slim * (0.42 + 0.58 * t) * (0.88 + 0.24 * r());
-    const wl = h * slim * (0.42 + 0.58 * t) * (0.88 + 0.24 * r());
-    const notch = h * 0.026 * (0.6 + 0.8 * r());
-    right.push(`${r1(cx + wr)} ${r1(yb)}`, `${r1(cx + wr * 0.32)} ${r1(yb - notch)}`);
-    left.unshift(`${r1(cx - wl * 0.32)} ${r1(yb - notch)}`, `${r1(cx - wl)} ${r1(yb)}`);
-  }
-  const apex = `${r1(ax)} ${r1(y - h)}`;
-  const tw = Math.max(1, h * 0.022);
-  const full = `M${apex}L${right.join("L")}L${r1(x + tw)} ${r1(y - trunk)}L${r1(x + tw)} ${r1(y)}L${r1(x - tw)} ${r1(y)}L${r1(x - tw)} ${r1(y - trunk)}L${left.join("L")}Z`;
-  const reach = h * slim * 1.15;
-  const x0 = Math.min(x, ax) - reach - 2;
-  const box: Box = [r1(x0), r1(y - h - 3), r1(Math.max(x, ax) + reach + 2 - x0), r1(h + 5)];
-  return { full, left: `M${apex}L${[...left].reverse().join("L")}L${r1(x)} ${r1(y - trunk)}Z`, right: `M${apex}L${right.join("L")}L${r1(x)} ${r1(y - trunk)}Z`, box };
-}
-
-/** A rounded broadleaf crown: a cluster of overlapping circles on a thin trunk. Same return shape as conifer(). */
-function broadleaf(x: number, y: number, h: number, r: () => number) {
-  const cy = y - h * 0.62;
-  const blobs = Array.from({ length: 6 }, (_, i) => {
-    const a = (i / 5) * Math.PI * 2 + r() * 0.8;
-    const d = h * (0.1 + 0.12 * r());
-    return { cx: x + Math.cos(a) * d * 1.25, cy: cy + Math.sin(a) * d * 0.8, rr: h * (0.17 + 0.1 * r()) };
-  });
-  blobs.push({ cx: x, cy: cy - h * 0.04, rr: h * 0.27 });
-  const circle = (c: { cx: number; cy: number; rr: number }) => `M${r1(c.cx - c.rr)} ${r1(c.cy)}a${r1(c.rr)} ${r1(c.rr)} 0 1 0 ${r1(2 * c.rr)} 0a${r1(c.rr)} ${r1(c.rr)} 0 1 0 ${r1(-2 * c.rr)} 0Z`;
-  const tw = Math.max(0.8, h * 0.03);
-  const trunk = `M${r1(x - tw)} ${r1(y)}L${r1(x - tw)} ${r1(cy)}L${r1(x + tw)} ${r1(cy)}L${r1(x + tw)} ${r1(y)}Z`;
-  const crown = blobs.map(circle).join("");
-  const half = (side: number) => blobs.map((c) => circle({ cx: c.cx + side * c.rr * 0.3, cy: c.cy - c.rr * 0.22, rr: c.rr * 0.62 })).join("");
-  const x0 = Math.min(...blobs.map((c) => c.cx - c.rr)) - 2;
-  const y0 = Math.min(...blobs.map((c) => c.cy - c.rr)) - 2;
-  const box: Box = [r1(x0), r1(y0), r1(Math.max(...blobs.map((c) => c.cx + c.rr)) + 2 - x0), r1(y + 2 - y0)];
-  // The crown pivots where the trunk enters it, so leaves can move without the trunk sliding.
-  return { full: trunk + crown, trunk, crown, left: half(-1), right: half(1), pivot: [r1(x), r1(cy + h * 0.16)] as [number, number], box };
-}
-
-function Back({ id, p, calm, dir }: { id: string; p: Palette; calm: boolean; dir: number }) {
+function Back({ id, p, dir }: { id: string; p: Palette; dir: number }) {
   const far = ridge({ seed: 11, width: 1700, base: 622, amp: 360, freq: 0.0042, oct: 5, ridged: true, envelope: (x) => Math.min(1.12, 0.5 + 0.5 * (bump(x, 1250, 340) + 0.62 * bump(x, 300, 270))) });
   const mid = ridge({ seed: 29, width: 1700, base: 628, amp: 225, freq: 0.0058, oct: 4, envelope: (x) => 0.6 + 0.4 * bump(x, 760, 430) });
   const farPath = polyPath(far, 700);
@@ -184,39 +133,6 @@ function MidClassic({ p }: { p: Palette }) {
   );
 }
 
-function MidCalm({ id, p, dir }: { id: string; p: Palette; dir: number }) {
-  const r = rng(41);
-  const n = noise1(61);
-  const shore = ridge({ seed: 53, base: 634, amp: 52, freq: 0.006, oct: 3, envelope: (x) => smoothstep(480, 640, x) * (1 - smoothstep(1420, 1560, x)) });
-  const body: string[] = [];
-  const lit: string[] = [];
-  const shade: string[] = [];
-  // Irregular spacing: tight groves, then a gap. Height follows a slow noise, so groves rise and fall.
-  for (let x = 500; x < 1540; ) {
-    x += 6 + r() * 24 + (r() < 0.1 ? 36 + r() * 56 : 0);
-    const base = shore[Math.round(x / 10)]?.[1] ?? 634;
-    if (base > 631) continue;
-    const grove = fbm(n, x * 0.012, 2);
-    const h = 16 + 44 * grove * (0.7 + 0.5 * r());
-    const t = r() < 0.22 ? broadleaf(x, base + 6, h * 0.9, r) : conifer(x, base + 6, h, r, { tiers: 4 + Math.floor(r() * 3), slim: 0.13 + r() * 0.09, lean: (r() - 0.5) * 0.05 });
-    body.push(t.full);
-    lit.push(dir < 0 ? t.left : t.right);
-    shade.push(dir < 0 ? t.right : t.left);
-  }
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className="size-full" aria-hidden focusable="false">
-      <defs><filter id={`${id}-soft`} x="-2%" y="-10%" width="104%" height="120%"><feGaussianBlur stdDeviation="0.8" /></filter></defs>
-      <path d={polyPath(shore, 646)} fill={p.shore} />
-      <g filter={`url(#${id}-soft)`}>
-        <path d={body.join("")} fill={p.shore} />
-        <path d={lit.join("")} fill={p.shoreLit} opacity="0.7" />
-        <path d={shade.join("")} fill={p.treeShade ?? p.pine} opacity="0.3" />
-      </g>
-      <ellipse cx="1010" cy="640" rx="640" ry="16" fill={p.haze} opacity="0.32" />
-    </svg>
-  );
-}
-
 function NearClassic({ id, p }: { id: string; p: Palette }) {
   const r = rng(77);
   const n = noise1(97);
@@ -283,21 +199,6 @@ function NearClassic({ id, p }: { id: string; p: Palette }) {
   );
 }
 
-type Tree = { side: "l" | "r"; x: number; s: number; kind: "c" | "b"; tiers?: number; slim?: number; lean?: number };
-// Varied by hand: heights, species, slenderness and spacing differ.
-const TREES: Tree[] = [
-  { side: "l", x: 22, s: 1.0, kind: "c", tiers: 6, slim: 0.17, lean: 0.02 },
-  { side: "l", x: 104, s: 0.62, kind: "b" },
-  { side: "l", x: 166, s: 0.84, kind: "c", tiers: 5, slim: 0.21, lean: -0.015 },
-  { side: "l", x: 246, s: 0.46, kind: "c", tiers: 4, slim: 0.19 },
-  { side: "l", x: 306, s: 0.56, kind: "b" },
-  { side: "l", x: 378, s: 0.3, kind: "c", tiers: 4, slim: 0.2, lean: 0.03 },
-  { side: "r", x: 1496, s: 0.68, kind: "c", tiers: 6, slim: 0.16, lean: -0.02 },
-  { side: "r", x: 1420, s: 0.4, kind: "b" },
-  { side: "r", x: 1558, s: 0.48, kind: "c", tiers: 5, slim: 0.2, lean: 0.02 },
-  { side: "r", x: 1352, s: 0.26, kind: "c", tiers: 4, slim: 0.18 },
-];
-
 /**
  * How one near tree moves in the wind. The whole tree leans from its trunk base as gusts arrive (keyframes gust-* in
  * app/wind.css: tall trees answer slowly, small ones quickly) and its crown flutters on a faster loop of its own.
@@ -313,22 +214,29 @@ function windFor(kind: "c" | "b", x: number, s: number, i: number) {
 const pct = (v: number, start: number, len: number) => `${r1(((v - start) / len) * 100)}%`;
 
 /**
- * One near tree on its own layer, placed exactly where the scene's slice-scaled SVG would draw it (--u is one scene unit,
- * set by <Trees>). Each tree is a separate element so the browser animates it on the compositor: moving trees cost no
- * restyle or repaint of the page.
+ * Where one near tree sits and how it pivots, in scene units (--u is one scene unit, set by <Trees>). The tree leans around its
+ * root in a gust; its crown flutters around its own pivot.
  */
-function WindTree({ box, root, pivot, wind, trunk, children }: { box: Box; root: [number, number]; pivot: [number, number]; wind: ReturnType<typeof windFor>; trunk?: ReactNode; children: ReactNode }) {
+function treeFrame(box: Box, root: [number, number], pivot: [number, number], wind: ReturnType<typeof windFor>) {
   const [x0, y0, w, h] = box;
-  const vb = `${x0} ${y0} ${w} ${h}`;
+  return {
+    outer: { left: `calc(50cqw + ${r1(x0 - W / 2)} * var(--u))`, top: `calc(100cqh + ${r1(y0 - H)} * var(--u))`, width: `calc(${w} * var(--u))`, height: `calc(${h} * var(--u))`, transformOrigin: `${pct(root[0], x0, w)} ${pct(root[1], y0, h)}`, animationDelay: wind.lag } as CSSProperties,
+    crown: { transformOrigin: `${pct(pivot[0], x0, w)} ${pct(pivot[1], y0, h)}`, animationDuration: wind.fdur, animationDelay: wind.fdel } as CSSProperties,
+  };
+}
+
+/**
+ * One near tree on its own layer, placed exactly where the scene's slice-scaled SVG would draw it. Each tree is a separate
+ * element so the browser animates it on the compositor: moving trees cost no restyle or repaint of the page.
+ */
+function WindTree({ box, root, pivot, wind, children }: { box: Box; root: [number, number]; pivot: [number, number]; wind: ReturnType<typeof windFor>; children: ReactNode }) {
+  const [x0, y0, w, h] = box;
+  const f = treeFrame(box, root, pivot, wind);
   return (
-    <div
-      className={`tree ${wind.gust}`}
-      style={{ left: `calc(50cqw + ${r1(x0 - W / 2)} * var(--u))`, top: `calc(100cqh + ${r1(y0 - H)} * var(--u))`, width: `calc(${w} * var(--u))`, height: `calc(${h} * var(--u))`, transformOrigin: `${pct(root[0], x0, w)} ${pct(root[1], y0, h)}`, animationDelay: wind.lag }}
-    >
-      {trunk && <svg viewBox={vb} preserveAspectRatio="none" className="absolute inset-0 size-full" focusable="false">{trunk}</svg>}
+    <div className={`tree ${wind.gust}`} style={f.outer}>
       {/* A div, not the svg itself: Chrome only hands rotate animations on HTML boxes to the compositor. */}
-      <div className={`crown ${wind.flutter} absolute inset-0`} style={{ transformOrigin: `${pct(pivot[0], x0, w)} ${pct(pivot[1], y0, h)}`, animationDuration: wind.fdur, animationDelay: wind.fdel }}>
-        <svg viewBox={vb} preserveAspectRatio="none" className="size-full" focusable="false">{children}</svg>
+      <div className={`crown ${wind.flutter} absolute inset-0`} style={f.crown}>
+        <svg viewBox={`${x0} ${y0} ${w} ${h}`} preserveAspectRatio="none" className="size-full" focusable="false">{children}</svg>
       </div>
     </div>
   );
@@ -343,67 +251,73 @@ function Trees({ children }: { children: ReactNode }) {
   );
 }
 
-function NearCalm({ id, p, dir }: { id: string; p: Palette; dir: number }) {
-  const r = rng(77);
-  const n = noise1(97);
-  const leftTop = (x: number) => 505 + 365 * Math.pow(smoothstep(0, 780, x), 1.25) + (fbm(n, x * 0.012, 3) - 0.5) * 38;
-  const rightTop = (x: number) => 890 - 250 * Math.pow(smoothstep(1020, 1600, x), 1.1) + (fbm(n, x * 0.012 + 40, 3) - 0.5) * 38;
-  const leftPts: [number, number][] = [];
-  for (let x = 0; x <= 790; x += 10) leftPts.push([x, r1(leftTop(x))]);
-  const rightPts: [number, number][] = [];
-  for (let x = 1010; x <= 1610; x += 10) rightPts.push([x, r1(rightTop(x))]);
-  const leftPath = `M0 ${H + 20}L${leftPts.map(([x, y]) => `${x} ${y}`).join("L")}L790 ${H + 20}Z`;
-  const rightPath = `M1010 ${H + 20}L${rightPts.map(([x, y]) => `${x} ${y}`).join("L")}L1610 ${H + 20}Z`;
+/* ---- The calm scene, as baked pictures (public/scene, made by scripts/scenery) ------------------------------------------ */
 
-  const dabs = (pts: [number, number][], x0: number, x1: number, count: number) =>
-    Array.from({ length: count }, () => {
-      const x = x0 + r() * (x1 - x0);
-      const top = pts.find(([px]) => px >= x)?.[1] ?? H;
-      return { x: r1(x), y: r1(top + 14 + r() * Math.max(10, H - top - 30)), rx: r1(14 + r() * 56), ry: r1(3 + r() * 9), o: r1(0.14 + r() * 0.3) };
-    });
-  const lDabs = dabs(leftPts, 0, 780, 40);
-  const rDabs = dabs(rightPts, 1020, 1600, 30);
+type PhotoTime = "dawn" | "night";
 
-  const rocks = [
-    rock(430, leftTop(430) + 40, 74, 34, r), rock(230, leftTop(230) + 90, 54, 26, r), rock(610, leftTop(610) + 52, 46, 20, r),
-    rock(1210, rightTop(1210) + 34, 62, 26, r), rock(1460, rightTop(1460) + 70, 82, 34, r), rock(1330, 876, 90, 28, r),
-  ];
-  const trees = TREES.map((t) => {
-    const base = r1((t.side === "l" ? leftTop(t.x) : rightTop(t.x)) + 20);
-    const h = 330 * t.s;
-    if (t.kind === "c") return { ...t, base, ...conifer(t.x, base, h, r, { tiers: t.tiers, slim: t.slim, lean: t.lean }), trunk: undefined, pivot: [t.x, base] as [number, number] };
-    const b = broadleaf(t.x, base, h * 0.8, r);
-    return { ...t, base, ...b, full: b.crown };
-  });
-  const crown = (k: "c" | "b") => (k === "c" ? p.pine : p.crown ?? p.pine);
-  const crownLit = (k: "c" | "b") => (k === "c" ? p.pineLit : p.crownLit ?? p.pineLit);
-
+/** Sky, moon, stars, mountains, forest and lake in one picture, cropped like the SVG scenes were (xMidYMax slice). */
+function PhotoBack({ time }: { time: PhotoTime }) {
+  const src = (w: number) => `/scene/back-${time}-${w}.webp`;
+  const first = time === "dawn";
   return (
-    <>
-      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMax slice" className="size-full" aria-hidden focusable="false">
-        <defs>
-          <linearGradient id={`${id}-bank`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={p.bankLit} /><stop offset="1" stopColor={p.bankShade} /></linearGradient>
-          <clipPath id={`${id}-lbc`}><path d={leftPath} /></clipPath>
-          <clipPath id={`${id}-rbc`}><path d={rightPath} /></clipPath>
-        </defs>
-        <path d={leftPath} fill={`url(#${id}-bank)`} />
-        <path d={rightPath} fill={`url(#${id}-bank)`} />
-        <g clipPath={`url(#${id}-lbc)`}>{lDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
-        <g clipPath={`url(#${id}-rbc)`}>{rDabs.map((d, i) => <ellipse key={i} cx={d.x} cy={d.y} rx={d.rx} ry={d.ry} fill={p.bankDab} opacity={d.o} />)}</g>
-        {rocks.map((k, i) => (
-          <g key={i}><path d={k.full} fill={p.rock} /><path d={k.lit} fill={p.rockLit} opacity="0.8" /></g>
-        ))}
-      </svg>
-      <Trees>
-        {trees.map((t, i) => (
-          <WindTree key={i} box={t.box} root={[t.x, t.base]} pivot={t.pivot} wind={windFor(t.kind, t.x, t.s, i)} trunk={t.trunk && <path d={t.trunk} fill={crown(t.kind)} />}>
-            <path d={t.full} fill={crown(t.kind)} />
-            <path d={dir < 0 ? t.left : t.right} fill={crownLit(t.kind)} opacity="0.85" />
-            <path d={dir < 0 ? t.right : t.left} fill={p.treeShade ?? p.pine} opacity="0.32" />
-          </WindTree>
-        ))}
-      </Trees>
-    </>
+    <img
+      src={src(1600)}
+      srcSet={`${src(800)} 800w, ${src(1600)} 1600w, ${src(3200)} 3200w`}
+      sizes="max(100vw, 1536px)"
+      width={W}
+      height={H}
+      alt=""
+      aria-hidden
+      draggable={false}
+      decoding="async"
+      loading={first ? "eager" : "lazy"}
+      fetchPriority={first ? "high" : "auto"}
+      className="absolute inset-0 size-full select-none object-cover object-bottom"
+    />
+  );
+}
+
+const sprite = "absolute max-w-none select-none";
+
+function Bank({ side, time }: { side: "l" | "r"; time: PhotoTime }) {
+  const [x0, y0, w, h] = BANKS[side].box;
+  return (
+    <img
+      src={`/scene/bank-${time}-${side}.webp`}
+      alt=""
+      aria-hidden
+      draggable={false}
+      decoding="async"
+      loading={time === "dawn" ? "eager" : "lazy"}
+      className={sprite}
+      style={{ left: `calc(50cqw + ${r1(x0 - W / 2)} * var(--u))`, top: `calc(100cqh + ${r1(y0 - H)} * var(--u))`, width: `calc(${w} * var(--u))`, height: `calc(${h} * var(--u))` }}
+    />
+  );
+}
+
+function PhotoTree({ t, i, time }: { t: TreePlacement; i: number; time: PhotoTime }) {
+  const wind = windFor(t.kind, t.x, t.s, i);
+  const f = treeFrame(t.box, t.root, t.pivot, wind);
+  const src = `/scene/tree-${time}-${i}`;
+  const lazy = time === "night" ? "lazy" : "eager";
+  return (
+    <div className={`tree ${wind.gust}`} style={f.outer}>
+      {t.kind === "b" && <img src={`${src}-trunk.webp`} alt="" aria-hidden draggable={false} decoding="async" loading={lazy} className={`${sprite} inset-0 size-full`} />}
+      <div className={`crown ${wind.flutter} absolute inset-0`} style={f.crown}>
+        <img src={t.kind === "b" ? `${src}-crown.webp` : `${src}.webp`} alt="" aria-hidden draggable={false} decoding="async" loading={lazy} className={`${sprite} inset-0 size-full`} />
+      </div>
+    </div>
+  );
+}
+
+/** The grassy banks with their stones, and the near trees that stand on them and move in the wind. */
+function PhotoNear({ time }: { time: PhotoTime }) {
+  return (
+    <Trees>
+      <Bank side="l" time={time} />
+      <Bank side="r" time={time} />
+      {NEAR_TREES.map((t, i) => <PhotoTree key={i} t={t} i={i} time={time} />)}
+    </Trees>
   );
 }
 
@@ -422,16 +336,23 @@ function Layer({ px, children, still }: { px: number; children: ReactNode; still
  */
 export function Landscape({ time, look = "calm", className, children, sky, fadeTop = true, id }: { time: Time; look?: Look; className?: string; children?: ReactNode; sky?: ReactNode; fadeTop?: boolean | "long"; id?: string }) {
   const calm = look === "calm";
+  const photo: PhotoTime | null = calm && (time === "dawn" || time === "night") ? time : null;
   const p = paletteFor(time, look);
   const uid = id ?? `ls-${look}-${time}`;
   const dir = calm && p.sunX >= 0.5 ? 1 : -1;
   return (
     <div className={cn("isolate overflow-hidden", !/\b(absolute|fixed|relative|sticky)\b/.test(className ?? "") && "relative", fadeTop === "long" ? "scene-fade-long" : fadeTop && "scene-fade-top", className)} data-time={time} data-look={look}>
-      <Layer px={14} still={calm}><Back id={uid} p={p} calm={calm} dir={dir} /></Layer>
+      <Layer px={14} still={calm}>{photo ? <PhotoBack time={photo} /> : <Back id={uid} p={p} dir={dir} />}</Layer>
       {sky}
-      <Layer px={30} still={calm}>{calm ? <MidCalm id={uid} p={p} dir={dir} /> : <MidClassic p={p} />}</Layer>
-      <Layer px={58} still={calm}>{calm ? <NearCalm id={uid} p={p} dir={dir} /> : <NearClassic id={uid} p={p} />}</Layer>
-      <div aria-hidden className="grain pointer-events-none absolute inset-0" />
+      {photo ? (
+        <Layer px={58} still><PhotoNear time={photo} /></Layer>
+      ) : (
+        <>
+          <Layer px={30} still={calm}><MidClassic p={p} /></Layer>
+          <Layer px={58} still={calm}><NearClassic id={uid} p={p} /></Layer>
+        </>
+      )}
+      <div aria-hidden className="grain pointer-events-none absolute inset-0" style={photo ? { opacity: 0.06 } : undefined} />
       {children}
     </div>
   );

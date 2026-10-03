@@ -31,6 +31,12 @@ Every page is one `.day`: a single gradient from dawn to dusk behind the whole p
 
 The treeline, star and grain images are baked into `src/app/backdrop.css` by `node scripts/backdrop.mjs` (like `scripts/wind.mjs` for the trees). Edit the script and run it again; do not edit the CSS file.
 
+## The scenery
+
+The hero, the product page and the night section show one scene in two light settings, dawn and night: mountains, forest, lake, clouds, grassy banks with stones, and near trees that move in the wind. These are pictures in `public/scene`, baked by the scripts in `scripts/scenery` (see the README there). `src/components/scene/geometry.ts` says where the banks and trees stand, so the pictures and the page always agree, and `landscape.tsx` and `cloud.tsx` place them. `/classic` keeps its drawn SVG scene. To change the scene, edit a script and bake again; do not edit the `.webp` files.
+
+The mountains are real terrain: elevation data from the US Geological Survey (public domain), rendered in 3D by `scripts/scenery/back.frag`.
+
 ## Stack
 
 Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Motion, Phosphor icons, Instrument Sans (self-hosted via Fontsource). No UI kit, no state library, no test framework.
