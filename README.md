@@ -1,6 +1,10 @@
 # CREO
 
-The AI Creator Manager. CREO learns a creator's content, audience, performance and deals, then recommends what to do next.
+The Intelligence Layer for Creators: an AI creator manager that remembers everything, analyzes everything, and turns it into your next best move. CREO learns a creator's content, audience, performance and deals, then recommends what to do next.
+
+Live site: [trycreosi.vercel.app](https://trycreosi.vercel.app). The workspace behind it is invite-only for now (see [Workspace access](#workspace-access)).
+
+![The CREO landing page at dawn: photographic mountains and forest behind the headline and the live product window](docs/images/scene-dawn.jpg)
 
 This repo is the launch product from the *CREO 3-Day Launch + 30-Day Design Partner Plan*: a marketing site and a desktop-first web app with four systems.
 
@@ -23,7 +27,19 @@ npm run typecheck
 npm run build && npm start
 ```
 
-Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `CRON_SECRET` before deploying.
+Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `CRON_SECRET` and `WORKSPACE_ACCESS_CODE` before deploying. Without `WORKSPACE_ACCESS_CODE` nobody can open `/app`, so set it locally too.
+
+## Workspace access
+
+For now `/app` (the workspace) is gated with one shared access code; the landing site and every other page stay public.
+
+- `src/proxy.ts` (Next 16's renamed middleware) runs on `/app` and `/app/*`. A visitor without the access cookie is sent to `/access?next=<where they were going>`.
+- `/access` asks for the code and posts it to `POST /api/access`. A right code sets the `creo_access` cookie (httpOnly, SameSite=Lax, Secure in production, 30 days) and the page goes where the visitor was heading. `next` can only ever point inside `/app`.
+- The code lives in the server-only env var `WORKSPACE_ACCESS_CODE` (in Vercel: Project Settings, Environment Variables). The cookie holds an HMAC of the code, never the code. Codes are compared in constant time, and wrong guesses are rate limited per IP (8 per 15 minutes, best effort per server instance).
+- **Change the code to sign everyone out.** If the variable is empty the gate stays shut: `/access` says the workspace is not open yet.
+- "Clear what CREO saved in this browser" on `/cookies` also removes the access cookie, which locks the workspace again on that browser.
+
+`src/lib/access.ts` holds the logic and `tests/access.test.ts` covers it. This is a stopgap for the invite-only phase, not accounts: everyone with the code is the same user, and workspace data still lives in each browser.
 
 ## Backgrounds
 
@@ -36,6 +52,12 @@ The treeline, star and grain images are baked into `src/app/backdrop.css` by `no
 The hero, the product page and the night section show one scene in two light settings, dawn and night: mountains, forest, lake, clouds, grassy banks with stones, and near trees that move in the wind. These are pictures in `public/scene`, baked by the scripts in `scripts/scenery` (see the README there). `src/components/scene/geometry.ts` says where the banks and trees stand, so the pictures and the page always agree, and `landscape.tsx` and `cloud.tsx` place them. `/classic` keeps its drawn SVG scene. To change the scene, edit a script and bake again; do not edit the `.webp` files.
 
 The mountains are real terrain: elevation data from the US Geological Survey (public domain), rendered in 3D by `scripts/scenery/back.frag`.
+
+The same scene a few scrolls later, at night: moon, stars, a cloud and the lake's far shore behind the cohort application.
+
+![The CREO landing page at night: a full moon, stars and snow-capped mountains behind the founding cohort application](docs/images/scene-night.jpg)
+
+Both pictures are screenshots of the production build.
 
 ## Stack
 
@@ -54,13 +76,18 @@ src/lib/engine/   Pure TypeScript, no framework imports. This is the product log
   dna.ts          Creator DNA insights derived from past posts
   brief.ts        HQ brief and next-best-action ranking
 src/lib/store/    Workspace reducer, localStorage persistence, sample workspace seed
+src/lib/          access.ts (workspace gate), apply.ts and contact.ts (form validation), supabase.ts (REST insert), site.ts (contact details, social links)
+src/proxy.ts      The workspace gate: /app and /app/* need the access cookie
 src/components/
   product/        Shared product components, used by the app and the landing page
   landing/        Landing sections. They run the real engines on a sample creator.
   scene/          The painted landscape, clouds and glass tiles (server components, seeded, original art)
   ui/             Buttons, panels, the marker, fit ring, tickets, count-up, form fields
-src/app/          Routes: / (landing), /app/* (workspace), /api/apply
-tests/            Engine tests and application validation tests
+src/app/          Routes: / (landing), /product, /learning-loop, /collab-inbox, /cohort, /faq, /classic,
+                  /about, /media, /contact, /terms, /privacy, /cookies (public pages and the footer's pages),
+                  /access (the code page), /app/* (workspace, gated),
+                  /api/apply, /api/contact, /api/access, /api/keepalive
+tests/            Engine tests, form validation tests and access gate tests
 ```
 
 The landing page does not use screenshots. Each section renders the same components and engines as the app, on a made-up sample creator, so what visitors try is what the product does.
@@ -84,13 +111,15 @@ See `docs/design-research.md` and `docs/design-direction.md`. The landing page i
 - A daily Vercel cron (`vercel.json`) calls `/api/keepalive`, which runs one trivial query so a free-plan project is not paused for inactivity. It needs `CRON_SECRET`.
 - Without Supabase, `CREO_APPLICATIONS_WEBHOOK` is used if set. With neither, applications go to `.data/applications.jsonl` in development and the route returns 503 in production, so a misconfigured deployment never silently drops applications.
 
+The Contact Us page works the same way: `POST /api/contact` validates the message (`src/lib/contact.ts`), ignores a honeypot field, rate limits per IP and inserts a row into `contact_messages` (insert-only for the publishable key, like applications).
+
 ## What is not built yet
 
 Kept out on purpose, per the plan's "do not build in 72 hours" list: Gmail integration, invoices, auto-publishing, native mobile apps, contract workflows, affiliate tracking, multi-creator workspaces.
 
 Also not built yet:
 
-- **Accounts and a database.** Workspace data lives in the browser (`localStorage`, key `creo.workspace.v1`). `src/lib/store/workspace.tsx` is the single place to swap in Supabase auth and Postgres.
+- **Accounts and a database.** Workspace data lives in the browser (`localStorage`, key `creo.workspace.v1`), and access is one shared code (see Workspace access), not per-user sign-in. `src/lib/store/workspace.tsx` is the single place to swap in Supabase auth and Postgres.
 - **A language model.** Generation is deterministic and template-based (`copy.ts`), so it is fast, explainable and testable, but it will not match a model's range. A model route can sit behind `buildPackage` and fall back to the local engine.
 - **Screenshot reading.** Collab Inbox accepts pasted text and `.txt` or `.eml` files. Reading screenshots needs a vision model.
 - **A live trend feed.** The pattern library is curated by hand (`LIBRARY` in `trend.ts`) and creators add saved Reels by describing them. CREO does not scrape Instagram.

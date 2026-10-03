@@ -21,7 +21,7 @@ function Column({ title, links }: { title: string; links: readonly { href: strin
     <nav aria-label={title}>
       <h2 className="font-display text-lg font-semibold tracking-[-0.01em]">{title}</h2>
       <ul className="mt-4 flex flex-col gap-2.5 text-sm font-medium">
-        {links.map((l) => <li key={l.href}><Link href={l.href} className={link}>{l.label}</Link></li>)}
+        {links.map((l) => <li key={l.href}><Link href={l.href} prefetch={l.href.startsWith("/app") ? false : undefined} className={link}>{l.label}</Link></li>)}
       </ul>
     </nav>
   );

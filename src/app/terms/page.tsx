@@ -10,7 +10,7 @@ export default function TermsPage() {
     <SubPage title="Terms & Conditions" flow="short">
       <Doc eyebrow="Legal" title="Terms & Conditions." intro="Last updated October 2026. By using this website you agree to these terms.">
         <DocSection title="This website">
-          <p>This website describes CREO and lets you apply for the Founding Creator Cohort or send us a message. The workspace you can open on the site is a working preview of how CREO behaves. It is there so you can try the ideas, and it does not connect to your accounts.</p>
+          <p>This website describes CREO and lets you apply for the Founding Creator Cohort or send us a message. The workspace is a working preview of how CREO behaves. It is open to people with an access code for now, it is there so you can try the ideas, and it does not connect to your accounts.</p>
         </DocSection>
         <DocSection title="Applying to the cohort">
           <p>What you tell us in an application must be true and yours to share. Applying does not guarantee a place: seats are limited for each cohort, and a place is confirmed only when we tell you so.</p>
