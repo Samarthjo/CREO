@@ -1,9 +1,9 @@
 // The workspace is invite-only for now: a visitor types the access code, and gets a cookie that proves they did.
 // The code lives in the WORKSPACE_ACCESS_CODE environment variable (server only). While it is empty, nobody gets in.
+// Nothing is saved: the cookie has no expiry (a session cookie), so the browser drops it when it closes.
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 export const ACCESS_COOKIE = "creo_access";
-export const ACCESS_MAX_AGE = 60 * 60 * 24 * 30; // the cookie lasts 30 days
 
 const accessCode = (): string | null => process.env.WORKSPACE_ACCESS_CODE?.trim() || null;
 export const accessConfigured = (): boolean => accessCode() !== null;

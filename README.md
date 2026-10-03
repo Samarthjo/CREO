@@ -34,7 +34,7 @@ Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, 
 For now `/app` (the workspace) is gated with one shared access code; the landing site and every other page stay public.
 
 - `src/proxy.ts` (Next 16's renamed middleware) runs on `/app` and `/app/*`. A visitor without the access cookie is sent to `/access?next=<where they were going>`.
-- `/access` asks for the code and posts it to `POST /api/access`. A right code sets the `creo_access` cookie (httpOnly, SameSite=Lax, Secure in production, 30 days) and the page goes where the visitor was heading. `next` can only ever point inside `/app`.
+- `/access` asks for the code and posts it to `POST /api/access`. A right code sets the `creo_access` cookie (httpOnly, SameSite=Lax, Secure in production) and the page goes where the visitor was heading. The cookie has no expiry, so nothing is saved: the browser drops it when it closes and the code is asked for again. `next` can only ever point inside `/app`.
 - The code lives in the server-only env var `WORKSPACE_ACCESS_CODE` (in Vercel: Project Settings, Environment Variables). The cookie holds an HMAC of the code, never the code. Codes are compared in constant time, and wrong guesses are rate limited per IP (8 per 15 minutes, best effort per server instance).
 - **Change the code to sign everyone out.** If the variable is empty the gate stays shut: whatever is typed on `/access` gets "The workspace is not open yet."
 - "Clear what CREO saved in this browser" on `/cookies` also removes the access cookie, which locks the workspace again on that browser.

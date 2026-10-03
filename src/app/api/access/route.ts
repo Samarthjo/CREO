@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ACCESS_COOKIE, ACCESS_MAX_AGE, accessConfigured, accessToken, codeIsRight, safeNext } from "@/lib/access";
+import { ACCESS_COOKIE, accessConfigured, accessToken, codeIsRight, safeNext } from "@/lib/access";
 
 export const runtime = "nodejs";
 
@@ -30,7 +30,8 @@ export async function POST(req: Request) {
   if (!codeIsRight(body.code)) return NextResponse.json({ error: "That code is not right." }, { status: 401 });
 
   const res = NextResponse.json({ ok: true, next: safeNext(body.next) });
-  res.cookies.set(ACCESS_COOKIE, accessToken()!, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: ACCESS_MAX_AGE });
+  // No maxAge or expires: a session cookie, so nothing is saved once the browser closes.
+  res.cookies.set(ACCESS_COOKIE, accessToken()!, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
   return res;
 }
 
