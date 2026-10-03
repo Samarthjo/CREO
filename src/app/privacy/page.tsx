@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Doc, DocSection } from "@/components/landing/doc";
 import { SubPage } from "@/components/landing/subpage";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Privacy Policy" };
 
@@ -26,7 +27,7 @@ export default function PrivacyPage() {
           <p>This website has no advertising or analytics trackers and sets no cookies. See <Link href="/cookies" className={a}>Cookies Settings</Link> for the two small things it keeps on your own device.</p>
         </DocSection>
         <DocSection title="Your choices">
-          <p>You can ask us to show you what we hold about you, correct it, or delete it. <Link href="/contact" className={a}>Contact us</Link> from the same WhatsApp number or email you used, and we will take care of it. We keep applications and messages only as long as we need them for the reasons above.</p>
+          <p>You can ask us to show you what we hold about you, correct it, or delete it. <Link href="/contact" className={a}>Contact us</Link> or write to <a href={`mailto:${CONTACT_EMAIL}`} className={a}>{CONTACT_EMAIL}</a> from the same WhatsApp number or email you used, and we will take care of it. We keep applications and messages only as long as we need them for the reasons above.</p>
         </DocSection>
         <DocSection title="Changes">
           <p>If we change how we handle your information, we will update this page and its date.</p>
