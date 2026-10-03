@@ -93,7 +93,6 @@ export function LoopSection() {
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                     {/* Inside the ring on a phone the card is narrow, so the chip shows the step number; the list above names it. */}
                     <Chip tone="lime"><span className="sm:hidden">Step {active + 1}</span><span className="hidden sm:inline">{STEPS[active]!.title}</span></Chip>
-                    <span className="hidden text-[0.6875rem] text-faint sm:inline">Illustrative</span>
                   </div>
                   <StepCard i={active} top={top} next={next} hook={hook.text} />
                 </motion.div>

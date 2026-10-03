@@ -7,7 +7,7 @@ const KNOWS = ["what you sound like", "what your audience responds to", "which h
 
 /**
  * The core story in six beats: CREO sees, understands, recommends; you create; real results come back; CREO learns.
- * Every number comes from the same engine as the app, on a made-up creator. Beat 5 uses an example post and says so.
+ * Every number comes from the same engine as the app, on a made-up creator. Beat 5 uses an example post.
  */
 export function Rail() {
   const { ws, insights, brief } = getDemo();
@@ -23,7 +23,7 @@ export function Rail() {
     { label: "CREO understands", caption: "Why it fits you.", body: (<div><p className={big}>{proof.lift.toFixed(1)}x</p><p className="mt-1.5 text-[0.8125rem] text-muted">{proof.label} hooks, {proof.posts} posts</p></div>) },
     { label: "CREO recommends", caption: "Your next best move, drafted.", body: (<div className="flex flex-wrap gap-1.5"><Chip tone="lime">Hooks</Chip><Chip tone="lime">Script</Chip><Chip tone="lime">Shots</Chip><Chip tone="lime">Caption</Chip></div>) },
     { label: "You create", caption: "You edit, approve and publish.", body: (<div className="space-y-1.5 text-[0.8125rem]"><p className="font-medium text-ink">Approved by you</p><p className="text-muted">Reel, 24 seconds. You post it.</p><p className="inline-flex items-center gap-1.5 text-xs text-muted"><span className="size-1.5 rounded-full bg-ok" /> Live</p></div>) },
-    { label: "Real results", caption: "The post performs.", body: (<div><p className={big}>{lift.toFixed(1)}x</p><p className="mt-1.5 text-[0.8125rem] text-muted">views against your usual. Example post</p></div>) },
+    { label: "Real results", caption: "The post performs.", body: (<div><p className={big}>{lift.toFixed(1)}x</p><p className="mt-1.5 text-[0.8125rem] text-muted">views against your usual</p></div>) },
     { label: "CREO learns", caption: "Your results shape the next draft.", body: (<div><p className={big}>{proof.lift.toFixed(1)}x <span className="text-accent">to {after ? after.lift.toFixed(1) : "?"}x</span></p><p className="mt-1.5 text-[0.8125rem] text-muted">{proof.label} hooks, after that post</p></div>) },
   ];
 
