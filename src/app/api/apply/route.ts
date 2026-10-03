@@ -1,7 +1,8 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
-import { validateApplication } from "@/lib/apply";
+import { toApplicationRow, validateApplication } from "@/lib/apply";
+import { supabaseConfigured, supabaseInsert } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
@@ -34,10 +35,13 @@ export async function POST(req: Request) {
   const result = validateApplication(body);
   if (!result.ok) return NextResponse.json({ error: "Please fix the highlighted fields.", errors: result.errors }, { status: 422 });
 
+  // Where the application goes: Supabase when configured, else a webhook, else a local file in development.
   const record = { ...result.value, receivedAt: new Date().toISOString(), source: "landing" };
   const webhook = process.env.CREO_APPLICATIONS_WEBHOOK;
   try {
-    if (webhook) {
+    if (supabaseConfigured()) {
+      await supabaseInsert("cohort_applications", toApplicationRow(result.value));
+    } else if (webhook) {
       const res = await fetch(webhook, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(record) });
       if (!res.ok) throw new Error(`Webhook responded ${res.status}`);
     } else if (process.env.NODE_ENV !== "production") {
@@ -45,7 +49,7 @@ export async function POST(req: Request) {
       await mkdir(dir, { recursive: true });
       await appendFile(path.join(dir, "applications.jsonl"), JSON.stringify(record) + "\n", "utf8");
     } else {
-      console.error("CREO_APPLICATIONS_WEBHOOK is not set. Application not stored.");
+      console.error("Neither SUPABASE_URL with SUPABASE_PUBLISHABLE_KEY nor CREO_APPLICATIONS_WEBHOOK is set. Application not stored.");
       return NextResponse.json({ error: "Applications are not open on this deployment yet." }, { status: 503 });
     }
   } catch (e) {

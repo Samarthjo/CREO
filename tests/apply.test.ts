@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { validateApplication } from "../src/lib/apply.ts";
+import { toApplicationRow, validateApplication } from "../src/lib/apply.ts";
 
 const ok = {
   name: "Meher Shah",
@@ -67,4 +67,31 @@ test("apply: oversized input is clipped, not stored whole", () => {
   const r = validateApplication({ ...ok, name: "x".repeat(500), problem: "y".repeat(5000) });
   assert.ok(r.ok);
   if (r.ok) assert.ok(r.value.name.length <= 80 && r.value.problem.length <= 400);
+});
+
+test("apply: an accepted application maps to a cohort_applications row", () => {
+  const r = validateApplication({ ...ok, niche: "ai-tech", problem: "Brand deals feel random" });
+  assert.ok(r.ok);
+  if (!r.ok) return;
+  assert.deepEqual(toApplicationRow(r.value), {
+    name: "Meher Shah",
+    handle: "@meher.cooks",
+    contact: "meher@example.com",
+    followers: "2K to 10K",
+    niche: "AI and tech",
+    platform: "Instagram",
+    posts_per_week: "3 to 4",
+    goal: "Brand deals",
+    brand_inquiries: "Sometimes",
+    problem: "Brand deals feel random",
+    agreed: true,
+  });
+  const bare = validateApplication({ name: "Meher Shah", handle: "@meher", contact: "+91 98765 43210", followers: "Over 40K", agreed: true });
+  assert.ok(bare.ok);
+  if (bare.ok) {
+    const row = toApplicationRow(bare.value);
+    assert.equal(row.niche, null);
+    assert.equal(row.goal, null);
+    assert.equal(row.problem, null);
+  }
 });

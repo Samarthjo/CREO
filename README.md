@@ -23,7 +23,7 @@ npm run typecheck
 npm run build && npm start
 ```
 
-Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `CREO_APPLICATIONS_WEBHOOK` before deploying.
+Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `CRON_SECRET` before deploying.
 
 ## Stack
 
@@ -66,7 +66,11 @@ See `docs/design-research.md` and `docs/design-direction.md`. The landing page i
 
 ## Applications
 
-`POST /api/apply` validates a founding-cohort application (`src/lib/apply.ts`), ignores a honeypot field, rate limits per IP (best effort, per server instance) and forwards the record to `CREO_APPLICATIONS_WEBHOOK`. Without the variable it writes to `.data/applications.jsonl` in development and returns 503 in production, so a misconfigured deployment never silently drops applications.
+`POST /api/apply` validates a founding-cohort application (`src/lib/apply.ts`), ignores a honeypot field, rate limits per IP (best effort, per server instance) and inserts a row into the Supabase table `cohort_applications` (schema in `supabase/migrations`). Read applications in the Supabase dashboard under Table Editor.
+
+- The server talks to Supabase over REST with the publishable key, kept in server env vars. Row Level Security lets that key insert applications and nothing else: it cannot read, change or delete them.
+- A daily Vercel cron (`vercel.json`) calls `/api/keepalive`, which runs one trivial query so a free-plan project is not paused for inactivity. It needs `CRON_SECRET`.
+- Without Supabase, `CREO_APPLICATIONS_WEBHOOK` is used if set. With neither, applications go to `.data/applications.jsonl` in development and the route returns 503 in production, so a misconfigured deployment never silently drops applications.
 
 ## What is not built yet
 

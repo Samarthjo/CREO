@@ -79,3 +79,20 @@ export function validateApplication(input: unknown): { ok: true; value: Applicat
     },
   };
 }
+
+/** The application as a row in the Supabase table `cohort_applications` (see supabase/migrations). */
+export function toApplicationRow(a: Application) {
+  return {
+    name: a.name,
+    handle: a.handle,
+    contact: a.contact,
+    followers: a.followers,
+    niche: a.niche ? NICHES[a.niche].label : null,
+    platform: a.platform ?? null,
+    posts_per_week: a.postsPerWeek ?? null,
+    goal: a.goal ?? null,
+    brand_inquiries: a.brandInquiries ?? null,
+    problem: a.problem || null,
+    agreed: a.agreed,
+  };
+}
