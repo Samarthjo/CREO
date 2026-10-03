@@ -16,7 +16,7 @@ export default function CookiesPage() {
             <li>Your light or dark theme choice, so the site looks the way you left it.</li>
             <li>The workspace preview: what you change there, so it is still there when you come back.</li>
           </ul>
-          <p>One cookie is set only if you enter an access code to open the workspace. It proves you entered the right code and does not contain the code. It is not saved: your browser deletes it when you close it. Without a code, CREO sets no cookies.</p>
+          <p>One cookie is set only if you enter an access code to open the workspace. It lets the server serve the workspace to you, does not contain the code, and is deleted when you close your browser. The code itself is never saved: the workspace asks for it every time you open it. Without a code, CREO sets no cookies.</p>
         </DocSection>
         <DocSection title="Forget them">
           <CookieSettings />

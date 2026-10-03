@@ -13,7 +13,7 @@ export default async function AccessPage({ searchParams }: { searchParams: Promi
   const { next } = await searchParams;
   return (
     <SubPage title="Workspace access" flow="short">
-      <Doc eyebrow="Workspace" title="Invite only, for now." intro="The CREO workspace is open to people with an access code. Founding Cohort members get one when they join.">
+      <Doc eyebrow="Workspace" title="Invite only, for now." intro="The CREO workspace is open to people with an access code. Founding Cohort members get one when they join. It asks for the code every time you open it.">
         <div className="rounded-[1.75rem] border border-line bg-surface p-6 shadow-pop sm:p-8"><AccessForm next={safeNext(next)} /></div>
         <p className="text-[0.9375rem] leading-relaxed text-body">
           No code yet? <Link href="/cohort#apply" className={link}>Join the 30-Day Founding Cohort</Link>, or <Link href="/contact" className={link}>contact us</Link>.

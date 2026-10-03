@@ -4,16 +4,18 @@ import { ACCESS_COOKIE, accessConfigured, accessToken, codeIsRight, safeNext } f
 export const runtime = "nodejs";
 
 // Best-effort limiter (per server instance) so the code cannot be guessed by hammering the form.
-const hits = new Map<string, number[]>();
+// Only wrong guesses count: the workspace asks for the code every time it opens, and opening it must never lock someone out.
+const misses = new Map<string, number[]>();
 const WINDOW_MS = 15 * 60 * 1000;
-const MAX_PER_WINDOW = 8;
+const MAX_MISSES = 8;
 
-function limited(ip: string): boolean {
+/** The wrong guesses this connection made in the last few minutes. */
+function recentMisses(ip: string): number[] {
   const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  return recent.length > MAX_PER_WINDOW;
+  const recent = (misses.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+  if (recent.length) misses.set(ip, recent);
+  else misses.delete(ip);
+  return recent;
 }
 
 /** Check the access code and, if it is right, hand out the cookie that opens the workspace. */
@@ -26,8 +28,12 @@ export async function POST(req: Request) {
   }
   if (!accessConfigured()) return NextResponse.json({ error: "The workspace is not open yet." }, { status: 503 });
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  if (limited(ip)) return NextResponse.json({ error: "Too many tries. Wait a few minutes and try again." }, { status: 429 });
-  if (!codeIsRight(body.code)) return NextResponse.json({ error: "That code is not right." }, { status: 401 });
+  const missed = recentMisses(ip);
+  if (missed.length >= MAX_MISSES) return NextResponse.json({ error: "Too many tries. Wait a few minutes and try again." }, { status: 429 });
+  if (!codeIsRight(body.code)) {
+    misses.set(ip, [...missed, Date.now()]);
+    return NextResponse.json({ error: "That code is not right." }, { status: 401 });
+  }
 
   const res = NextResponse.json({ ok: true, next: safeNext(body.next) });
   // No maxAge or expires: a session cookie, so nothing is saved once the browser closes.

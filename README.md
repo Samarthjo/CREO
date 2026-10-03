@@ -31,15 +31,16 @@ Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, 
 
 ## Workspace access
 
-For now `/app` (the workspace) is gated with one shared access code; the landing site and every other page stay public.
+For now `/app` (the workspace) is gated with one shared access code, and **the workspace asks for it every time it is opened**: a first visit, a reload, a new tab, or coming back from the rest of the site. Moving between workspace pages does not ask again. The landing site and every other page stay public.
 
-- `src/proxy.ts` (Next 16's renamed middleware) runs on `/app` and `/app/*`. A visitor without the access cookie is sent to `/access?next=<where they were going>`.
-- `/access` asks for the code and posts it to `POST /api/access`. A right code sets the `creo_access` cookie (httpOnly, SameSite=Lax, Secure in production) and the page goes where the visitor was heading. The cookie has no expiry, so nothing is saved: the browser drops it when it closes and the code is asked for again. `next` can only ever point inside `/app`.
-- The code lives in the server-only env var `WORKSPACE_ACCESS_CODE` (in Vercel: Project Settings, Environment Variables). The cookie holds an HMAC of the code, never the code. Codes are compared in constant time, and wrong guesses are rate limited per IP (8 per 15 minutes, best effort per server instance).
-- **Change the code to sign everyone out.** If the variable is empty the gate stays shut: whatever is typed on `/access` gets "The workspace is not open yet."
-- "Clear what CREO saved in this browser" on `/cookies` also removes the access cookie, which locks the workspace again on that browser.
+- `src/proxy.ts` (Next 16's renamed middleware) is the server's check. It runs on `/app` and `/app/*`; a visitor without the access cookie is sent to `/access?next=<where they were going>`, so the public never gets a workspace page.
+- `/access` asks for the code and posts it to `POST /api/access`. A right code sets the `creo_access` cookie (httpOnly, SameSite=Lax, Secure in production, no expiry: the browser drops it when it closes) and the visitor goes where they were heading. `next` can only ever point inside `/app`.
+- `src/components/product/access-lock.tsx` is the ask-every-time part. The workspace layout starts locked on every fresh load and shows the code form. "Open" lives only in the page's memory, so a reload or a new tab starts locked again, and nothing about it is saved. The code page leaves a one-time note in the tab (`src/lib/access-marker.ts`: a timestamp in `sessionStorage`, never the code) so a visitor is not asked twice in a row.
+- The code lives in the server-only env var `WORKSPACE_ACCESS_CODE` (in Vercel: Project Settings, Environment Variables). The cookie holds an HMAC of the code, never the code. Codes are compared in constant time. Wrong guesses are rate limited per IP (8 per 15 minutes, best effort per server instance); a right code never counts, so opening the workspace cannot lock anyone out.
+- **Change the code to sign everyone out.** If the variable is empty the gate stays shut: whatever is typed gets "The workspace is not open yet."
+- "Clear what CREO saved in this browser" on `/cookies` also removes the access cookie, so the server sends that browser back to `/access`.
 
-`src/lib/access.ts` holds the logic and `tests/access.test.ts` covers it. This is a stopgap for the invite-only phase, not accounts: everyone with the code is the same user, and workspace data still lives in each browser.
+`src/lib/access.ts` holds the logic; `tests/access.test.ts` and `tests/access-marker.test.ts` cover it. The per-visit ask is a lock inside the page, on top of the server's cookie check. This is a stopgap for the invite-only phase, not accounts: everyone with the code is the same user, and workspace data still lives in each browser.
 
 ## Backgrounds
 
