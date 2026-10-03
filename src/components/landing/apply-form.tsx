@@ -1,7 +1,9 @@
 "use client";
 
 import { CheckCircle, Minus, Plus } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { track } from "@/lib/analytics";
+import { applyProps, fieldList } from "@/lib/analytics-events";
 import { BRAND_INQUIRIES, FOLLOWER_BANDS, GOALS, PLATFORMS, POSTS_PER_WEEK, validateApplication, type ApplicationErrors } from "@/lib/apply";
 import { NICHES, type NicheKey } from "@/lib/engine/types";
 import { Button, Field, Input, Select, Textarea, cn } from "../ui/kit";
@@ -20,6 +22,7 @@ export function ApplyForm({ variant = "short", submitLabel = "Apply for the next
   const [errors, setErrors] = useState<ApplicationErrors>({});
   const [state, setState] = useState<"idle" | "sending" | "done">("idle");
   const [serverError, setServerError] = useState("");
+  const started = useRef(false);
   const set = (k: keyof typeof v) => (e: { target: { value: string } }) => setV((x) => ({ ...x, [k]: e.target.value }));
 
   async function submit(e: React.FormEvent) {
@@ -28,6 +31,7 @@ export function ApplyForm({ variant = "short", submitLabel = "Apply for the next
     const payload = { ...v, agreed };
     const check = validateApplication(payload);
     if (!check.ok) {
+      track("cohort_apply_failed", { variant, reason: "invalid", fields: fieldList(check.errors) });
       setErrors(check.errors);
       if (["niche", "platform", "postsPerWeek", "goal", "brandInquiries"].some((k) => k in check.errors)) setMore(true);
       return;
@@ -37,10 +41,12 @@ export function ApplyForm({ variant = "short", submitLabel = "Apply for the next
     try {
       const res = await fetch("/api/apply", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
       const data = (await res.json().catch(() => ({}))) as { error?: string; errors?: ApplicationErrors };
-      if (res.ok) { setState("done"); return; }
+      if (res.ok) { track("cohort_apply_submitted", applyProps(variant, payload)); setState("done"); return; }
+      track("cohort_apply_failed", { variant, reason: "server", fields: data.errors ? fieldList(data.errors) : undefined });
       if (data.errors) setErrors(data.errors);
       setServerError(data.error ?? "Something went wrong. Please try again.");
     } catch {
+      track("cohort_apply_failed", { variant, reason: "network" });
       setServerError("We could not reach the server. Check your connection and try again.");
     }
     setState("idle");
@@ -48,7 +54,7 @@ export function ApplyForm({ variant = "short", submitLabel = "Apply for the next
 
   if (state === "done")
     return (
-      <div className="flex flex-col items-start gap-3 py-6" role="status">
+      <div className="ph-mask flex flex-col items-start gap-3 py-6" role="status">
         <CheckCircle size={36} weight="fill" className="text-ok" />
         <h4 className="font-display text-2xl font-semibold">Application received.</h4>
         <p className="max-w-[44ch] text-sm text-muted">Thank you, {v.name.split(" ")[0]}. We will reach you on {v.contact}.</p>
@@ -58,7 +64,7 @@ export function ApplyForm({ variant = "short", submitLabel = "Apply for the next
   const err = (k: keyof ApplicationErrors) => errors[k] && <span className="text-xs font-medium text-risk" role="alert">{errors[k]}</span>;
   const opt = <span className="font-normal text-muted"> (optional)</span>;
   return (
-    <form onSubmit={submit} noValidate className="grid grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-2">
+    <form onSubmit={submit} onFocusCapture={() => { if (!started.current) { started.current = true; track("cohort_apply_started", { variant }); } }} noValidate className="grid grid-cols-[minmax(0,1fr)] gap-5 md:grid-cols-2">
       <Field label="Your name"><Input value={v.name} onChange={set("name")} autoComplete="name" aria-invalid={!!errors.name} />{err("name")}</Field>
       <Field label="Instagram or main creator handle"><Input value={v.handle} onChange={set("handle")} placeholder="@yourhandle" aria-invalid={!!errors.handle} />{err("handle")}</Field>
       <Field label="WhatsApp number or email"><Input value={v.contact} onChange={set("contact")} autoComplete="email" aria-invalid={!!errors.contact} />{err("contact")}</Field>

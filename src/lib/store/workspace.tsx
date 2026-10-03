@@ -1,35 +1,17 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
 import { buildBrief, type Brief } from "../engine/brief.ts";
 import { deriveDna, type DnaInsights } from "../engine/dna.ts";
 import { isoNow, uid } from "../engine/format.ts";
 import { rankPatterns } from "../engine/trend.ts";
-import type { Approval, CreatorDNA, Draft, Inquiry, MemoryItem, PastDeal, PastPost, StudioPackage, TrendPattern, Workspace } from "../engine/types.ts";
+import type { Approval, CreatorDNA, Draft, Inquiry, MemoryItem, Workspace } from "../engine/types.ts";
+import { trackEvent, track } from "../analytics.ts";
+import { eventForAction } from "../analytics-events.ts";
+import type { Action } from "./actions.ts";
 import { blankWorkspace, makeInquiry, sampleDna, sampleWorkspace } from "./seed.ts";
 
 const KEY = "creo.workspace.v1";
-
-type Action =
-  | { type: "load"; ws: Workspace }
-  | { type: "dna"; patch: Partial<CreatorDNA> }
-  | { type: "post-add"; post: PastPost }
-  | { type: "post-remove"; id: string }
-  | { type: "deal-add"; deal: PastDeal }
-  | { type: "deal-remove"; id: string }
-  | { type: "pattern-add"; pattern: TrendPattern }
-  | { type: "pattern-remove"; id: string }
-  | { type: "pkg-add"; pkg: StudioPackage }
-  | { type: "pkg-patch"; id: string; patch: Partial<StudioPackage> }
-  | { type: "pkg-edit"; id: string; field: string; ai: string; human: string; reason: string; apply: Partial<StudioPackage> }
-  | { type: "pkg-remove"; id: string }
-  | { type: "inq-add"; inquiry: Inquiry }
-  | { type: "inq-patch"; id: string; patch: Partial<Inquiry> }
-  | { type: "inq-remove"; id: string }
-  | { type: "approval-request"; approval: Approval }
-  | { type: "approval-decide"; id: string; decision: "approved" | "rejected"; reason?: string }
-  | { type: "memory-add"; item: MemoryItem }
-  | { type: "memory-remove"; id: string };
 
 const mem = (kind: MemoryItem["kind"], text: string, source: MemoryItem["source"], detail?: MemoryItem["detail"]): MemoryItem => ({ id: uid(), kind, text, source, at: isoNow(), detail });
 
@@ -141,18 +123,31 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const insights = useMemo(() => (ws ? deriveDna(ws.dna) : null), [ws]);
   const brief = useMemo(() => (ws && insights ? buildBrief(ws, insights) : null), [ws, insights]);
   const ranked = useMemo(() => (ws && insights ? rankPatterns(ws.patterns, ws.dna, insights, ws.memory) : []), [ws, insights]);
-  const dispatch = useCallback((a: Action) => dispatchRaw(a), []);
-  const resetSample = useCallback(() => dispatchRaw({ type: "load", ws: sampleWorkspace() }), []);
-  const startOwn = useCallback((dna: CreatorDNA) => dispatchRaw({ type: "load", ws: blankWorkspace(dna) }), []);
+  // Every change goes through here, so analytics hears about each one, described by the kind of change and never by its text.
+  const approvals = useRef<Workspace["approvals"]>([]);
+  useEffect(() => { approvals.current = ws?.approvals ?? []; }, [ws]);
+  const dispatch = useCallback((a: Action) => {
+    const event = eventForAction(a, approvals.current);
+    if (event) trackEvent(event);
+    dispatchRaw(a);
+  }, []);
+  const resetSample = useCallback(() => {
+    track("sample_workspace_reset", {});
+    dispatchRaw({ type: "load", ws: sampleWorkspace() });
+  }, []);
+  const startOwn = useCallback((dna: CreatorDNA) => {
+    track("profile_created", { niche: dna.niche, past_posts: dna.posts.length, past_deals: dna.deals.length });
+    dispatchRaw({ type: "load", ws: blankWorkspace(dna) });
+  }, []);
   const addInquiry = useCallback(
     (raw: string, source: Inquiry["source"] = "paste") => {
       const q = makeInquiry(raw, ws!.dna, source, uid());
-      dispatchRaw({ type: "inq-add", inquiry: q });
+      dispatch({ type: "inq-add", inquiry: q });
       return q;
     },
-    [ws],
+    [ws, dispatch],
   );
-  const requestApproval = useCallback((a: Omit<Approval, "id" | "requestedAt" | "status">) => dispatchRaw({ type: "approval-request", approval: { ...a, id: uid(), requestedAt: isoNow(), status: "pending" } }), []);
+  const requestApproval = useCallback((a: Omit<Approval, "id" | "requestedAt" | "status">) => dispatch({ type: "approval-request", approval: { ...a, id: uid(), requestedAt: isoNow(), status: "pending" } }), [dispatch]);
 
   const value = useMemo<Ctx>(
     () => ({ ws: ready ? ws : null, insights, brief, ranked, pendingCount: ws?.approvals.filter((a) => a.status === "pending").length ?? 0, dispatch, resetSample, startOwn, addInquiry, requestApproval }),

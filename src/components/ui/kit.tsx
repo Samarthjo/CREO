@@ -17,8 +17,10 @@ export function Button({ variant = "dark", size = "md", href, className, childre
   const cls = cn("inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition active:translate-y-px disabled:pointer-events-none disabled:opacity-45", BTN[variant], SIZE[size], className);
   if (href) {
     const ext = /^https?:/.test(href);
+    // data-* attributes (data-track, for analytics) ride along to the link.
+    const data = Object.fromEntries(Object.entries(rest).filter(([k]) => k.startsWith("data-")));
     return (
-      <Link href={href} className={cls} {...(ext ? { target: "_blank", rel: "noreferrer" } : {})}>
+      <Link href={href} className={cls} {...data} {...(ext ? { target: "_blank", rel: "noreferrer" } : {})}>
         {children}
       </Link>
     );

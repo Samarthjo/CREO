@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "@fontsource-variable/instrument-sans";
 import "@fontsource-variable/instrument-sans/wght-italic.css";
+import { AnalyticsConsent } from "@/components/analytics-consent";
 import { MotionProvider } from "@/components/motion-provider";
 import "./globals.css";
 import "./wind.css";
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
-      <body><MotionProvider>{children}</MotionProvider></body>
+      <body><MotionProvider>{children}</MotionProvider><AnalyticsConsent /></body>
     </html>
   );
 }

@@ -18,7 +18,7 @@ export default function AboutPage() {
         </DocSection>
         <DocSection title="How we are starting">
           <p>We are opening CREO through the 30-Day Founding Cohort: ₹499 for 30 days. CREO builds your Creator Intelligence while a CREO strategist works alongside you. Seats are limited for each cohort, so every creator gets real attention.</p>
-          <div className="pt-2"><Button variant="primary" size="lg" href="/cohort#apply">Join the 30-Day Founding Cohort</Button></div>
+          <div className="pt-2"><Button variant="primary" size="lg" href="/cohort#apply" data-track="join_cohort" data-track-where="about">Join the 30-Day Founding Cohort</Button></div>
         </DocSection>
       </Doc>
     </SubPage>
