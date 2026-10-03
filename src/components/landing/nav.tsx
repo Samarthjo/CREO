@@ -10,12 +10,13 @@ import { ThemeToggle } from "../ui/interactive";
 import { NAV_LINKS } from "./nav-links";
 
 /**
- * A small floating pill. Each link opens its own page. The button goes to the form on whichever page has one.
+ * A small floating pill. Each link opens its own page. The button opens the full application on /cohort
+ * (on /cohort and /classic it scrolls to the form already on the page).
  * Below the md breakpoint the five links live in a menu, so they are reachable on a phone.
  */
 export function Nav() {
   const path = usePathname();
-  const cta = path === "/" ? { href: "#cohort", label: "Join the cohort", short: "Join" } : path === "/cohort" ? { href: "#apply", label: "Join the cohort", short: "Join" } : path === "/classic" ? { href: "#cohort", label: "Join the cohort", short: "Join" } : { href: "/cohort", label: "Join the cohort", short: "Join" };
+  const cta = { href: path === "/cohort" ? "#apply" : path === "/classic" ? "#cohort" : "/cohort#apply", label: "Join the cohort", short: "Join" };
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
 

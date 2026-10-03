@@ -16,7 +16,7 @@ export function Hero() {
           Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Button variant="primary" size="lg" href="#cohort">Join the 30-Day Founding Cohort</Button>
+          <Button variant="primary" size="lg" href="/cohort#apply">Join the 30-Day Founding Cohort</Button>
           <Button variant="ghost" size="lg" href="/learning-loop" className="bg-bg/60 backdrop-blur">See how CREO learns</Button>
         </div>
         <p className="mt-3.5 text-[0.8125rem] font-medium text-body">₹499 <span aria-hidden className="mx-1 text-faint">·</span> 30 days <span aria-hidden className="mx-1 text-faint">·</span> Limited seats per cohort</p>
