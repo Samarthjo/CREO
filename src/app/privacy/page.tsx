@@ -15,16 +15,17 @@ export default function PrivacyPage() {
         <DocSection title="What we collect">
           <p><strong className="font-semibold text-ink">When you apply to the cohort:</strong> your name, creator handle, WhatsApp number or email, follower range, and your answers to the optional questions (platform, niche, how often you post, main goal, whether brands contact you, and your biggest creator problem). We also record that you agreed to share weekly feedback.</p>
           <p><strong className="font-semibold text-ink">When you contact us:</strong> your name, WhatsApp number or email, and your message.</p>
+          <p><strong className="font-semibold text-ink">When you browse:</strong> which pages you view, where you came from, your device and country, how long you stay, and any errors you hit. If you allow analytics, also how you click and scroll, and anonymous recordings of how the site is used with everything you type hidden. None of it includes your name, contact details or what you write in the forms or the workspace.</p>
           <p>That is all. We do not ask for passwords, payment details or access to your accounts on this website.</p>
         </DocSection>
         <DocSection title="Why we use it">
-          <p>To read your application, decide who can join the cohort, and reach you about it. To answer your message. We do not use it for advertising, and we do not sell it.</p>
+          <p>To read your application, decide who can join the cohort, and reach you about it. To answer your message. To understand which pages and steps help creators, and fix what does not work. We do not use any of it for advertising, and we do not sell it.</p>
         </DocSection>
         <DocSection title="Where it is kept and who sees it">
-          <p>Applications and messages are stored in a database run by our service provider Supabase. The website is hosted by Vercel. People at CREO who review applications and messages can see them. Other than these providers and where the law requires it, we do not share your information.</p>
+          <p>Applications and messages are stored in a database run by our service provider Supabase. The website is hosted by Vercel. Website usage is processed by PostHog, whose servers are in the United States. People at CREO who review applications and messages can see them. Other than these providers and where the law requires it, we do not share your information.</p>
         </DocSection>
         <DocSection title="Tracking and cookies">
-          <p>This website has no advertising or analytics trackers. If you enter an access code to open the workspace, one cookie lets the server serve it to you until you close your browser, and the workspace asks for the code every time it opens; otherwise it sets none. See <Link href="/cookies" className={a}>Cookies Settings</Link> for that cookie and the two small things the site keeps on your own device.</p>
+          <p>This website has no advertising trackers. It uses PostHog analytics, and stores nothing on your device for it unless you allow it: until you choose, visits are only counted, without cookies, and a browser that sends Do Not Track or Global Privacy Control is not counted at all. If you enter an access code to open the workspace, one cookie lets the server serve it to you until you close your browser, and the workspace asks for the code every time it opens. See <Link href="/cookies" className={a}>Cookies Settings</Link> for everything the site keeps on your device, and to change your analytics choice at any time.</p>
         </DocSection>
         <DocSection title="Your choices">
           <p>You can ask us to show you what we hold about you, correct it, or delete it. <Link href="/contact" className={a}>Contact us</Link> or write to <a href={`mailto:${CONTACT_EMAIL}`} className={a}>{CONTACT_EMAIL}</a> from the same WhatsApp number or email you used, and we will take care of it. We keep applications and messages only as long as we need them for the reasons above.</p>

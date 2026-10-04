@@ -53,7 +53,7 @@ export function Nav() {
           })}
         </nav>
         <span className="hidden lg:block"><ThemeToggle /></span>
-        <Button variant="primary" size="md" href={cta.href} className="ml-1">
+        <Button variant="primary" size="md" href={cta.href} className="ml-1" data-track="join_cohort" data-track-where="nav">
           {/* On the narrowest phones the pill would be wider than the screen, so the label shortens. Screen readers still get the full one. */}
           <span className="max-[363px]:sr-only">{cta.label}</span>
           <span aria-hidden className="min-[364px]:hidden">{cta.short}</span>

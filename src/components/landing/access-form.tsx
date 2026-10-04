@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { markJustUnlocked } from "@/lib/access-marker";
+import { track } from "@/lib/analytics";
+import { unlockFailure } from "@/lib/analytics-events";
 import { Button, Field, Input } from "../ui/kit";
 
 /**
@@ -15,28 +17,31 @@ export function AccessForm({ next = "/app", onUnlocked, autoFocus }: { next?: st
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!code.trim()) { setError("Enter your access code."); return; }
+    if (!code.trim()) { track("workspace_unlock_failed", { reason: "empty" }); setError("Enter your access code."); return; }
     setError("");
     setSending(true);
     try {
       const res = await fetch("/api/access", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code, next }) });
       const data = (await res.json().catch(() => ({}))) as { error?: string; next?: string };
       if (res.ok) {
+        track("workspace_unlocked", { via: onUnlocked ? "lock" : "code_page" });
         if (onUnlocked) { onUnlocked(); return; }
         markJustUnlocked();
         // A full page load, not a client-side navigation: the router may have kept a redirect to this page from before the cookie existed.
         window.location.assign(data.next ?? "/app");
         return;
       }
+      track("workspace_unlock_failed", { reason: unlockFailure(res.status) });
       setError(data.error ?? "Something went wrong. Please try again.");
     } catch {
+      track("workspace_unlock_failed", { reason: "network" });
       setError("We could not reach the server. Check your connection and try again.");
     }
     setSending(false);
   }
 
   return (
-    <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+    <form onSubmit={submit} noValidate className="ph-no-capture flex flex-col gap-4">
       <Field label="Access code">
         <Input
           value={code}

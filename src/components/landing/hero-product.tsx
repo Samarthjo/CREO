@@ -86,7 +86,7 @@ export function HeroProduct() {
 
         <div className="grid md:grid-cols-[13rem_minmax(0,1fr)]">
           <aside className="hidden border-r border-line bg-surface/60 p-4 md:block" aria-label="Workspace navigation">
-            <Link href="/app" title="Open the workspace" aria-label="Open the workspace as Creator" className="group -mx-1 mb-4 flex items-center gap-2.5 rounded-control px-2.5 py-1.5 transition hover:bg-sunk">
+            <Link href="/app" title="Open the workspace" aria-label="Open the workspace as Creator" data-track="open_workspace" data-track-where="demo" className="group -mx-1 mb-4 flex items-center gap-2.5 rounded-control px-2.5 py-1.5 transition hover:bg-sunk">
               <span className="grid size-8 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg">C</span>
               <span className="text-sm font-medium text-ink">Creator</span>
               <ArrowUpRight size={16} className="ml-auto text-muted opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100" />

@@ -2,6 +2,8 @@
 
 import { CheckCircle } from "@phosphor-icons/react";
 import { useState } from "react";
+import { track } from "@/lib/analytics";
+import { fieldList } from "@/lib/analytics-events";
 import { validateContact, type ContactErrors } from "@/lib/contact";
 import { Button, Field, Input, Textarea } from "../ui/kit";
 
@@ -19,16 +21,18 @@ export function ContactForm() {
     e.preventDefault();
     setServerError("");
     const check = validateContact(v);
-    if (!check.ok) { setErrors(check.errors); return; }
+    if (!check.ok) { track("contact_failed", { reason: "invalid", fields: fieldList(check.errors) }); setErrors(check.errors); return; }
     setErrors({});
     setState("sending");
     try {
       const res = await fetch("/api/contact", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(v) });
       const data = (await res.json().catch(() => ({}))) as { error?: string; errors?: ContactErrors };
-      if (res.ok) { setState("done"); return; }
+      if (res.ok) { track("contact_submitted", {}); setState("done"); return; }
+      track("contact_failed", { reason: "server", fields: data.errors ? fieldList(data.errors) : undefined });
       if (data.errors) setErrors(data.errors);
       setServerError(data.error ?? "Something went wrong. Please try again.");
     } catch {
+      track("contact_failed", { reason: "network" });
       setServerError("We could not reach the server. Check your connection and try again.");
     }
     setState("idle");
@@ -36,7 +40,7 @@ export function ContactForm() {
 
   if (state === "done")
     return (
-      <div className="flex flex-col items-start gap-3 py-6" role="status">
+      <div className="ph-mask flex flex-col items-start gap-3 py-6" role="status">
         <CheckCircle size={36} weight="fill" className="text-ok" />
         <h3 className="font-display text-2xl font-semibold">Message received.</h3>
         <p className="max-w-[44ch] text-sm text-muted">Thank you, {v.name.split(" ")[0]}. We will reply on {v.contact}.</p>

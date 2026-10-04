@@ -42,6 +42,28 @@ For now `/app` (the workspace) is gated with one shared access code, and **the w
 
 `src/lib/access.ts` holds the logic; `tests/access.test.ts` and `tests/access-marker.test.ts` cover it. The per-visit ask is a lock inside the page, on top of the server's cookie check. This is a stopgap for the invite-only phase, not accounts: everyone with the code is the same user, and workspace data still lives in each browser.
 
+## Analytics (PostHog)
+
+The site and the workspace are measured with PostHog (US cloud, project 643469). Three dashboards hold the saved charts: [Web traffic](https://us.posthog.com/project/643469/dashboard/2166066), [Cohort funnel](https://us.posthog.com/project/643469/dashboard/2166067) and [Workspace usage](https://us.posthog.com/project/643469/dashboard/2166068). PostHog's own Web analytics, Session replay, Heatmaps and Error tracking pages are switched on too.
+
+- `src/instrumentation-client.ts` starts it before the page is interactive. `src/lib/analytics.ts` holds the SDK settings and the consent logic, `src/lib/analytics-events.ts` the event vocabulary (no browser code, so it is tested), `src/components/analytics-consent.tsx` the one-time question and the control on `/cookies`.
+- `next.config.ts` forwards `/ingest` to PostHog, so the browser only talks to our own address and ad blockers that list posthog.com do not drop the counts.
+- `NEXT_PUBLIC_POSTHOG_KEY` is the project token (public). In Vercel it is set for **Production only**, so previews and local runs send nothing. It is inlined at build time: change it, redeploy.
+
+**Consent.** Until a visitor answers the banner, nothing is stored on their device: visits are counted cookielessly (PostHog's server hash, which changes every day) and clicks, scrolling and recordings are not collected. "Allow analytics" turns on the visitor ID, autocapture, heatmaps and session replay; "No thanks" keeps the cookieless count. A browser sending Do Not Track or Global Privacy Control is not counted at all. The choice can be changed on `/cookies`, and "Clear what CREO saved" asks again. The project's cookieless server hash mode must stay on in PostHog (Project settings, Web analytics), or the pre-consent counts are dropped.
+
+**What is sent.** Events carry choices, counts and yes/no answers, never what someone typed: no names, handles, contact details, access codes, topics, message text or reasons. `EventMap` in `analytics-events.ts` is the whole list, and `track()` only accepts those events with those properties:
+
+| Where | Events |
+|---|---|
+| Website | `cta_clicked` (any link marked `data-track="id"`, with `data-track-where`), `cohort_apply_started`, `cohort_apply_submitted` (the options picked and how many optional answers), `cohort_apply_failed`, `contact_submitted`, `contact_failed` |
+| Workspace door | `workspace_unlocked`, `workspace_unlock_failed` (why, never the code) |
+| Workspace | `package_generated`, `package_updated`, `hook_edit_saved`, `package_deleted`, `inquiry_added`, `inquiry_updated`, `inquiry_deleted`, `approval_requested`, `approval_decided`, `memory_added`, `memory_removed`, `profile_created`, `profile_updated`, `library_item_changed`, `sample_workspace_reset` |
+
+The workspace events come from one place, the workspace store's `dispatch` (`src/lib/store/workspace.tsx`), through `eventForAction`. In session replay every input is hidden, the thank-you screens and the whole workspace carry `ph-mask` (all text hidden), and the access form carries `ph-no-capture`. Clicks inside `/app` are not autocaptured. `tests/analytics.test.ts` fails if any workspace action leaks a typed word.
+
+To add an event: add it to `EventMap`, call `track("name", { ... })`, and keep the properties to choices and counts.
+
 ## Backgrounds
 
 Every page is one `.day`: a single gradient from dawn to dusk behind the whole page, with a fine paper grain on top (`globals.css`, "Backgrounds"). Sections stay transparent and add one quiet decoration each: a motif (contours, a rising line, ripples), a treeline along the bottom edge, a soft glow behind the product, or, in the dark theme, a still star field and a faint aurora. Everything is static, and `/classic` does not use any of it.
