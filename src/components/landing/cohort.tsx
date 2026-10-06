@@ -47,7 +47,7 @@ function List({ title, items, tick }: { title: string; items: string[]; tick?: b
 export function Cohort() {
   return (
     <Section id="cohort" treeline={520}>
-      <SectionHead eyebrow="30-Day Founding Cohort" title={<>30 days to build the AI Creator Manager around <Accent>you</Accent>.</>} sub="Limited seats per cohort so the team can stay hands-on." />
+      <SectionHead eyebrow="30-Day Founding Cohort" title={<>30 days to build your Creator Intelligence around <Accent>you</Accent>.</>} sub="CREO learns your content, audience response and decisions while a strategist works alongside you. Limited seats keep the cohort hands-on." />
 
       <Reveal className="glow">
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-surface shadow-pop">

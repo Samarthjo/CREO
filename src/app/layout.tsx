@@ -12,12 +12,12 @@ const site = process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.
 
 export const metadata: Metadata = {
   metadataBase: new URL(site),
-  title: { default: "CREO | The Intelligence Layer for Creators", template: "%s | CREO" },
+  title: { default: "CREO | Stop guessing what to post next", template: "%s | CREO" },
   description:
-    "Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.",
+    "CREO is a 30-day creator cohort that learns which hooks and formats work for your audience, then drafts your next post. You approve it.",
   openGraph: {
-    title: "CREO | The Intelligence Layer for Creators",
-    description: "Your AI creator manager that remembers everything, analyzes everything, and turns it into your next best move.",
+    title: "CREO | Stop guessing what to post next",
+    description: "A 30-day creator cohort that learns what works for your audience and drafts what to make next. You approve it.",
     type: "website",
     siteName: "CREO",
   },

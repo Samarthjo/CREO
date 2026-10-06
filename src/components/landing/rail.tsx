@@ -33,8 +33,8 @@ export function Rail() {
       <Treeline shift={-180} />
       <Reveal>
         <div className="mx-auto mb-10 max-w-[76rem] text-center lg:mb-12">
-          <h2 className="mx-auto max-w-[20ch] font-display text-[clamp(2rem,4vw,3.4rem)] font-normal leading-[1.04] tracking-[-0.04em]">CREO doesn't start from zero every <Accent>time</Accent>.</h2>
-          <p className="mx-auto mt-4 max-w-[38rem] text-[1.0625rem] leading-relaxed text-muted">Every script, edit, Reel, result and decision adds to your Creator Memory.</p>
+          <h2 className="mx-auto max-w-[20ch] font-display text-[clamp(2rem,4vw,3.4rem)] font-normal leading-[1.04] tracking-[-0.04em]">Stop rebuilding your content strategy from <Accent>zero</Accent>.</h2>
+          <p className="mx-auto mt-4 max-w-[42rem] text-[1.0625rem] leading-relaxed text-muted">Every script, edit, Reel, result and decision adds to your Creator Memory, so the next recommendation starts with what already worked — and what did not.</p>
         </div>
         <ol className="mx-auto grid max-w-[76rem] gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {beats.map((b, i) => (
