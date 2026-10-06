@@ -34,7 +34,7 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
           <div className="flex flex-col items-start gap-4">
             <Logo inverse />
-            <p className="max-w-[22ch] text-sm font-medium leading-relaxed">The Intelligence Layer for Creators.</p>
+            <p className="max-w-[28ch] text-sm font-medium leading-relaxed">A 30-day creator cohort that builds your Creator Intelligence.</p>
           </div>
           <Column title="Explore" links={EXPLORE} />
           <Column title="About Us" links={ABOUT} />
