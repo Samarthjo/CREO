@@ -15,7 +15,7 @@ const EMPTY = { name: "", handle: "", contact: "", followers: "", niche: "", pla
  * Four answers are required. The rest help us pick the creators we can help most: on the home page they sit behind
  * "Add more about you" so the form stays short; on /cohort they are open.
  */
-export function ApplyForm({ variant = "short", submitLabel = "Apply for the next cohort" }: { variant?: "short" | "full"; submitLabel?: string }) {
+export function ApplyForm({ variant = "short", submitLabel = "Apply for the 30-day programme" }: { variant?: "short" | "full"; submitLabel?: string }) {
   const [v, setV] = useState(EMPTY);
   const [more, setMore] = useState(variant === "full");
   const [agreed, setAgreed] = useState(false);
@@ -126,7 +126,7 @@ export function ApplyForm({ variant = "short", submitLabel = "Apply for the next
         {err("agreed")}
       </div>
       {serverError && <p className="rounded-control bg-risk-wash p-3 text-sm font-medium text-risk md:col-span-2" role="alert">{serverError}</p>}
-      <div className="md:col-span-2"><Button type="submit" variant="primary" size="lg" disabled={state === "sending"}>{state === "sending" ? "Sending" : submitLabel}</Button></div>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 md:col-span-2"><Button type="submit" variant="primary" size="lg" disabled={state === "sending"}>{state === "sending" ? "Sending" : submitLabel}</Button><p className="text-[0.9375rem] font-medium text-ink">₹499 <span aria-hidden className="mx-1 text-faint">·</span> 30 days</p></div>
     </form>
   );
 }

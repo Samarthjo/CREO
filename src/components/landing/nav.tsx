@@ -16,7 +16,7 @@ import { NAV_LINKS } from "./nav-links";
  */
 export function Nav() {
   const path = usePathname();
-  const cta = { href: path === "/cohort" ? "#apply" : path === "/classic" ? "#cohort" : "/cohort#apply", label: "Join the cohort", short: "Join" };
+  const cta = { href: path === "/cohort" ? "#apply" : path === "/classic" ? "#cohort" : "/cohort#apply", label: "Apply for the 30-day programme", short: "Apply" };
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
 
@@ -54,9 +54,9 @@ export function Nav() {
         </nav>
         <span className="hidden lg:block"><ThemeToggle /></span>
         <Button variant="primary" size="md" href={cta.href} className="ml-1" data-track="join_cohort" data-track-where="nav">
-          {/* On the narrowest phones the pill would be wider than the screen, so the label shortens. Screen readers still get the full one. */}
-          <span className="max-[363px]:sr-only">{cta.label}</span>
-          <span aria-hidden className="min-[364px]:hidden">{cta.short}</span>
+          {/* Below the lg breakpoint the pill would be too wide, so the label shortens to "Apply". Screen readers always get the full one. */}
+          <span className="sr-only lg:not-sr-only">{cta.label}</span>
+          <span aria-hidden className="lg:hidden">{cta.short}</span>
         </Button>
         <button
           ref={toggle}

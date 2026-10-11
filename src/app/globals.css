@@ -246,6 +246,11 @@
   @keyframes sweep { from { background-size: 0% 64%; } to { background-size: 100% 64%; } }
 }
 
+/* The home headline split test: both versions are in the page, the one that is not picked is hidden. Without a pick (no script), the control shows. */
+.hook-b { display: none; }
+html[data-hook="b"] .hook-a { display: none; }
+html[data-hook="b"] .hook-b { display: inline; }
+
 /* One italic accent word per headline, in olive (lime at night). */
 .accent { font-style: italic; color: var(--accent); font-weight: inherit; }
 

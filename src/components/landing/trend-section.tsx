@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { adaptations } from "@/lib/engine/trend";
 import { AdaptationList, FitBreakdown, MechanismGrid, TrendRow } from "../product/trend";
-import { Accent, Button, FitScore, Panel } from "../ui/kit";
+import { Accent, Button, ExampleNote, FitScore, Panel } from "../ui/kit";
 import { getDemo } from "./demo";
 import { Reveal } from "./reveal";
 import { Section, SectionHead } from "./section";
@@ -18,6 +18,7 @@ export function TrendSection() {
   return (
     <Section id="trend" motif="wave" treeline={-420}>
       <SectionHead eyebrow="CREO Trend" title={<>Understand why it <Accent>works</Accent>.</>} sub="Don't just see what's trending. Understand why it works, whether it fits you, and what original version you should make next." />
+      <ExampleNote className="-mt-6 mb-10 lg:-mt-10 lg:mb-12" />
       <Reveal>
         <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
           <ul className="flex flex-col gap-2.5" aria-label="Trends ranked by creator fit">

@@ -11,7 +11,7 @@ const STEPS = [
   { id: "recommend", title: "CREO recommends", body: "A pattern, scored against your own history, with the reasons shown.", icon: Compass },
   { id: "edit", title: "You edit or approve", body: "You change what is off, or approve it as it is. CREO keeps the before, the after and your reason.", icon: PencilSimpleLine },
   { id: "publish", title: "You publish", body: "Nothing goes out without your approval, and you post it your way.", icon: PaperPlaneTilt },
-  { id: "perform", title: "The content performs", body: "Views, saves, shares and comments come back from the post.", icon: ChartLineUp },
+  { id: "perform", title: "The content performs", body: "You bring back the numbers: views, saves, shares and comments.", icon: ChartLineUp },
   { id: "analyze", title: "CREO analyzes the result", body: "It compares the post with what it expected and with your usual numbers, and works out why.", icon: MagnifyingGlass },
   { id: "improve", title: "Your Creator Intelligence improves", body: "The result and your reason join your Creator Memory, so the next recommendation starts from evidence.", icon: Brain },
 ] as const;
@@ -39,9 +39,9 @@ export function LoopSection() {
           <div>
             <Eyebrow>The learning loop</Eyebrow>
             <h2 className="mt-5 max-w-[17ch] font-display text-[clamp(2.1rem,4vw,3.4rem)] font-normal leading-[1.02] tracking-[-0.04em]">
-              CREO gets sharper because it sees what happens <Accent>next</Accent>.
+              CREO gets sharper because it learns what happens <Accent>next</Accent>.
             </h2>
-            <p className="mt-5 max-w-[31rem] text-[1.0625rem] leading-relaxed text-muted">CREO doesn't just generate content and forget it. It connects recommendations to real outcomes so future decisions start with evidence from your own content history.</p>
+            <p className="mt-5 max-w-[31rem] text-[1.0625rem] leading-relaxed text-muted">CREO doesn't just generate content and forget it. It connects each recommendation to the result you bring back, so future decisions start with evidence from your own content history. The creator and numbers shown here are an example.</p>
 
             <ol className="mt-8 space-y-1" aria-label="The learning loop, step by step">
               {STEPS.map((s, i) => {

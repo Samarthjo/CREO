@@ -11,7 +11,7 @@ import { HOOK_TYPES, FORMATS } from "@/lib/engine/types";
 import { HEALTH_LABEL, healthTone } from "../product/brief";
 import { MemoryRow } from "../product/memory";
 import { Logo } from "../product/logo";
-import { Button, Chip, FitScore, Slots, cn } from "../ui/kit";
+import { Button, Chip, ExampleTag, FitScore, Slots, cn } from "../ui/kit";
 import { demoPackage, getDemo } from "./demo";
 
 type View = "collab" | "hq" | "studio" | "trend" | "memory";
@@ -81,7 +81,7 @@ export function HeroProduct() {
       <div className="overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop">
         <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">
           <Logo word={false} />
-          <span className="hidden text-[0.8125rem] text-muted sm:inline">Creator · 27K followers</span>
+          <span className="flex items-center gap-2 text-[0.8125rem] text-muted"><ExampleTag /><span className="hidden sm:inline">Made-up creator · 27K followers</span></span>
         </div>
 
         <div className="grid md:grid-cols-[13rem_minmax(0,1fr)]">

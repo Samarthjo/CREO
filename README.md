@@ -1,8 +1,8 @@
 # CREO
 
-The Intelligence Layer for Creators: an AI creator manager that remembers everything, analyzes everything, and turns it into your next best move. CREO learns a creator's content, audience, performance and deals, then recommends what to do next.
+The Intelligence Layer for Creators: a 30-day creator programme. You bring an idea and your post history; CREO finds the angle that fits you, shapes the draft, and learns from what you publish. You keep the final say.
 
-Live site: [trycreosi.vercel.app](https://trycreosi.vercel.app). The workspace behind it is invite-only for now (see [Workspace access](#workspace-access)).
+Live site: [trycreosi.com](https://trycreosi.com). The workspace behind it is invite-only for now (see [Workspace access](#workspace-access)).
 
 ![The CREO landing page at dawn: photographic mountains and forest behind the headline and the live product window](docs/images/scene-dawn.jpg)
 

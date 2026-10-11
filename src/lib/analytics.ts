@@ -134,6 +134,9 @@ export function initAnalytics(): void {
       loaded: (ph) => {
         const release = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7);
         if (release) ph.register({ release });
+        // Which home headline this visit was shown ("a" is the control). It is picked per page load and never stored on the device.
+        const hook = document.documentElement.dataset.hook;
+        if (hook === "a" || hook === "b") ph.register({ hook_variant: hook });
       },
     });
     running = true;
