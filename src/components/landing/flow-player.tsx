@@ -81,7 +81,7 @@ export function FlowPlayer({ scene, c }: { scene: SceneDef; c: FlowCase }) {
 
   const playing = !paused && !ended;
   return (
-    <div ref={frame} role="group" aria-label="Example: CREO at work" className="overflow-hidden rounded-[1.25rem] border border-line bg-bg shadow-pop">
+    <div ref={frame} role="group" aria-label="Example: CREO at work" className="overflow-hidden border-y border-line bg-bg shadow-pop sm:rounded-[1.25rem] sm:border">
       <div className="flex h-11 items-center justify-between gap-3 border-b border-line bg-surface px-4">
         <span className="flex items-center gap-2.5">
           <Logo word={false} className="[&_img]:size-6" />
@@ -97,7 +97,7 @@ export function FlowPlayer({ scene, c }: { scene: SceneDef; c: FlowCase }) {
       </motion.div>
       <p className="sr-only">{scene.summary(c)}</p>
 
-      <div className="flex min-h-[4.9rem] items-center gap-2.5 border-t border-line bg-surface px-4 py-2.5 lg:min-h-[3.75rem]">
+      <div className="flex min-h-[3.75rem] items-center gap-2.5 border-t border-line bg-surface px-4 py-2.5 sm:min-h-[4.9rem] lg:min-h-[3.75rem]">
         <Chip tone="lime" className="shrink-0">CREO</Chip>
         <span className="text-[0.875rem] leading-snug text-body">{scene.answer}</span>
       </div>

@@ -260,20 +260,24 @@ function PhotoBack({ time }: { time: PhotoTime }) {
   const src = (w: number) => `/scene/back-${time}-${w}.webp`;
   const first = time === "dawn";
   return (
-    <img
-      src={src(1600)}
-      srcSet={`${src(800)} 800w, ${src(1600)} 1600w, ${src(3200)} 3200w`}
-      sizes="max(100vw, 1536px)"
-      width={W}
-      height={H}
-      alt=""
-      aria-hidden
-      draggable={false}
-      decoding="async"
-      loading={first ? "eager" : "lazy"}
-      fetchPriority={first ? "high" : "auto"}
-      className="absolute inset-0 size-full select-none object-cover object-bottom"
-    />
+    <picture>
+      {/* A phone only ever shows the middle of the picture (it is cropped to the screen, not squeezed), so it gets just that middle at full sharpness: half the bytes, the same pixels. */}
+      <source media="(max-width: 480px)" srcSet={`/scene/back-${time}-m.webp`} />
+      <img
+        src={src(1600)}
+        srcSet={`${src(800)} 800w, ${src(1600)} 1600w, ${src(3200)} 3200w`}
+        sizes="max(100vw, 1536px)"
+        width={W}
+        height={H}
+        alt=""
+        aria-hidden
+        draggable={false}
+        decoding="async"
+        loading={first ? "eager" : "lazy"}
+        fetchPriority={first ? "high" : "auto"}
+        className="absolute inset-0 size-full select-none object-cover object-bottom"
+      />
+    </picture>
   );
 }
 
@@ -289,6 +293,7 @@ function Bank({ side, time }: { side: "l" | "r"; time: PhotoTime }) {
       draggable={false}
       decoding="async"
       loading={time === "dawn" ? "eager" : "lazy"}
+      fetchPriority="low"
       className={sprite}
       style={{ left: `calc(50cqw + ${r1(x0 - W / 2)} * var(--u))`, top: `calc(100cqh + ${r1(y0 - H)} * var(--u))`, width: `calc(${w} * var(--u))`, height: `calc(${h} * var(--u))` }}
     />

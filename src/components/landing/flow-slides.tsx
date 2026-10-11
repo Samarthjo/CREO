@@ -25,6 +25,7 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
   const [i, setI] = useState(0);
   const [who, setWho] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const dots = useRef<(HTMLButtonElement | null)[]>([]);
   const picks = useRef<(HTMLButtonElement | null)[]>([]);
   const strip = useRef<HTMLDivElement>(null);
   const last = STEPS.length - 1;
@@ -48,7 +49,9 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
     if (to === null || to < 0 || to > last) return;
     e.preventDefault();
     go(to, "key");
-    tabs.current[to]?.focus();
+    // The step tabs show from the tablet up and the progress bar on a phone: focus whichever one is on screen.
+    const tab = tabs.current[to];
+    (tab && tab.offsetParent !== null ? tab : dots.current[to])?.focus();
   };
   const onPickKey = (e: React.KeyboardEvent) => {
     const d = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
@@ -64,7 +67,7 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
     else if (info.offset.x > 0 && i > 0) go(i - 1, "swipe");
   };
 
-  // On a phone the step tabs scroll sideways: keep the current one centred without moving the page.
+  // When the step tabs are too wide for the screen they scroll sideways: keep the current one centred without moving the page.
   useEffect(() => {
     const s = strip.current;
     const t = tabs.current[i];
@@ -73,9 +76,34 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
   }, [i, reduce]);
 
   return (
-    <div className="mx-auto w-full max-w-[64rem]" data-flow-slides="">
-      <div className="overflow-hidden rounded-[1.75rem] border border-line bg-surface shadow-panel">
-        <div ref={strip} role="tablist" aria-label="The six steps" onKeyDown={onKey} className="scroll-thin flex gap-1 overflow-x-auto border-b border-line bg-surface/60 px-3 py-2 sm:px-5">
+    // On a phone the card runs edge to edge (the section's 20px side padding is cancelled), so the video gets the whole screen width.
+    <div className="-mx-5 sm:mx-auto sm:w-full sm:max-w-[64rem]" data-flow-slides="">
+      {/* overflow-clip, not hidden: it rounds the corners the same way but keeps the phone's Back and Next bar sticky to the screen. */}
+      <div className="overflow-clip rounded-none border-y border-line bg-surface sm:rounded-[1.75rem] sm:border sm:shadow-panel">
+        <div className="border-b border-line bg-surface/60 px-4 pb-2.5 pt-1 sm:hidden">
+          <div role="tablist" aria-label="The six steps" onKeyDown={onKey} className="grid grid-cols-6 gap-1.5">
+            {STEPS.map((label, n) => (
+              <button
+                key={label}
+                ref={(el) => { dots.current[n] = el; }}
+                type="button"
+                role="tab"
+                id={`flow-dot-${n}`}
+                aria-selected={n === i}
+                aria-label={label}
+                aria-controls="flow-panel"
+                tabIndex={n === i ? 0 : -1}
+                onClick={() => go(n, "tab")}
+                className="grid h-11 place-items-center"
+              >
+                <span className={cn("block h-1.5 w-full rounded-full transition-colors duration-300", n === i ? "bg-accent" : n < i ? "bg-accent/45" : "bg-line-strong")} />
+              </button>
+            ))}
+          </div>
+          <p aria-hidden className="flex items-baseline gap-2 text-[0.9375rem] font-medium text-ink"><span className="tnum text-xs font-normal text-muted">{i + 1} of {STEPS.length}</span>{STEPS[i]}</p>
+        </div>
+
+        <div ref={strip} role="tablist" aria-label="The six steps" onKeyDown={onKey} className="scroll-thin hidden gap-1 overflow-x-auto border-b border-line bg-surface/60 px-3 py-2 sm:flex sm:px-5">
           {STEPS.map((label, n) => {
             const on = n === i;
             return (
@@ -101,7 +129,7 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
         <motion.div id="flow-panel" role="tabpanel" aria-labelledby={`flow-tab-${i}`} onPanEnd={onPanEnd} style={{ touchAction: "pan-y" }} className="flow-grid grid gap-6 p-4 sm:gap-7 sm:p-8 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-x-10 md:p-10">
           <div className="flow-problem relative">
             <p className="text-[0.8125rem] font-medium text-accent">The problem</p>
-            <div className="relative mt-3 min-h-[8.5rem] md:min-h-[10.5rem]">
+            <div className="relative mt-3 min-h-[5.9rem] sm:min-h-[8.5rem] md:min-h-[10.5rem]">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.h3
                   key={`${c.id}-${i}`}
@@ -117,7 +145,7 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
             </div>
           </div>
 
-          <div className="flow-player rounded-[1.5rem] sm:bg-soft sm:p-4 sm:[background-image:radial-gradient(75%_60%_at_85%_0%,var(--glow-a),transparent_70%)]">
+          <div className="flow-player -mx-4 sm:mx-0 sm:rounded-[1.5rem] sm:bg-soft sm:p-4 sm:[background-image:radial-gradient(75%_60%_at_85%_0%,var(--glow-a),transparent_70%)]">
             <FlowPlayer key={`${c.id}-${i}`} scene={SCENES[i]!} c={c} />
           </div>
 
@@ -148,10 +176,11 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
           </div>
         </motion.div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-line bg-surface px-4 py-3 sm:px-6">
-          <Button size="md" variant="ghost" onClick={() => go(i - 1, "back")} disabled={i === 0} aria-label="Previous step"><ArrowLeft size={16} /> <span className="max-[400px]:sr-only">Back</span></Button>
+        {/* On a phone this bar stays at the bottom of the screen while the card is in view, so changing step never needs a scroll. */}
+        <div className="sticky bottom-0 z-20 flex items-center justify-between gap-3 border-t border-line bg-surface px-4 py-3 shadow-[0_-14px_24px_-18px_rgb(17_20_12/0.4)] sm:px-6 md:static md:z-auto md:shadow-none">
+          <Button size="md" variant="ghost" onClick={() => go(i - 1, "back")} disabled={i === 0} aria-label="Previous step"><ArrowLeft size={16} /> Back</Button>
           <span className="sr-only" aria-live="polite">Step {i + 1} of {STEPS.length}: {STEPS[i]}</span>
-          <Button size="md" variant="dark" onClick={() => go(i === last ? 0 : i + 1, "next")} aria-label={i === last ? "Start over" : "Next step"}><span className="max-[400px]:sr-only">{i === last ? "Start over" : "Next"}</span> {i === last ? <ArrowLeft size={16} className="rotate-180" /> : <ArrowRight size={16} />}</Button>
+          <Button size="md" variant="dark" onClick={() => go(i === last ? 0 : i + 1, "next")} aria-label={i === last ? "Start over" : "Next step"} className="max-sm:flex-1">{i === last ? "Start over" : "Next"} {i === last ? <ArrowLeft size={16} className="rotate-180" /> : <ArrowRight size={16} />}</Button>
         </div>
       </div>
     </div>
