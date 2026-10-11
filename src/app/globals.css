@@ -262,6 +262,24 @@
 }
 @keyframes tour-caption { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
+/* The how-it-works slideshow: problem, video and creator picker stack on a phone (problem, then video, then picker) and sit in two columns from the tablet up. */
+@media (min-width: 768px) {
+  .flow-grid { grid-template-areas: "problem player" "picker player"; grid-template-rows: 1fr auto; }
+  .flow-problem { grid-area: problem; }
+  .flow-player { grid-area: player; }
+  .flow-persona { grid-area: picker; }
+}
+
+/* The thin scrubber under the example video: a line that fills as it plays, and a small round handle. */
+.scrub { -webkit-appearance: none; appearance: none; height: 1.5rem; background: transparent; cursor: pointer; touch-action: none; --p: 0%; }
+.scrub::-webkit-slider-runnable-track { height: 3px; border-radius: 999px; background: linear-gradient(to right, var(--ink) var(--p), var(--line-strong) var(--p)); }
+.scrub::-moz-range-track { height: 3px; border-radius: 999px; background: var(--line-strong); }
+.scrub::-moz-range-progress { height: 3px; border-radius: 999px; background: var(--ink); }
+.scrub::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; margin-top: -4.5px; border-radius: 999px; border: 2px solid var(--bg); background: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); }
+.scrub::-moz-range-thumb { width: 10px; height: 10px; border-radius: 999px; border: 2px solid var(--bg); background: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); }
+.scrub:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+@media (pointer: coarse) { .scrub { height: 2.75rem; } }
+
 /* One italic accent word per headline, in olive (lime at night). */
 .accent { font-style: italic; color: var(--accent); font-weight: inherit; }
 

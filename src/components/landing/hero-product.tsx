@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUpRight, Brain, CaretLeft, Check, FilmSlate, SquaresFour, Tray, TrendUp } from "@phosphor-icons/react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { scopeText } from "@/lib/engine/evaluate";
@@ -12,6 +12,7 @@ import { HEALTH_LABEL, healthTone } from "../product/brief";
 import { MemoryRow } from "../product/memory";
 import { Logo } from "../product/logo";
 import { Button, Chip, FitScore, Slots, cn } from "../ui/kit";
+import { useReduce } from "../ui/use-reduce";
 import { demoPackage, getDemo } from "./demo";
 import { TourBar, TourOverlay, tourBeats, useProductTour } from "./product-tour";
 
@@ -41,7 +42,7 @@ const TABS: { id: View; label: string }[] = [
  */
 export function HeroProduct({ guided = false }: { guided?: boolean }) {
   const { brief, ranked, ws } = getDemo();
-  const reduce = useReducedMotion();
+  const reduce = useReduce();
   const top = brief.actions.find((a) => a.kind === "create")!;
   const trendId = top.id.replace("create-", "");
   const why = ranked.find((r) => r.pattern.id === trendId)?.fit.parts.slice(0, 2).map((p) => p.note) ?? [];
