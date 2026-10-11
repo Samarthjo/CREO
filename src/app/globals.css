@@ -246,6 +246,22 @@
   @keyframes sweep { from { background-size: 0% 64%; } to { background-size: 100% 64%; } }
 }
 
+/* The guided tour on the hero window: a soft ring marks what the pointer is about to press or explain. */
+[data-tour-on] {
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 8px color-mix(in oklab, var(--accent) 20%, transparent);
+  transition: box-shadow 0.35s var(--ease-out);
+}
+/* The phone tab strip scrolls sideways and would clip an outer ring, so the ring goes inside there. */
+[role="tablist"] [data-tour-on] { box-shadow: inset 0 0 0 2px var(--accent); }
+@media (prefers-reduced-motion: no-preference) {
+  [data-tour-on]:not([role="tab"]) { animation: tour-ring 1.8s ease-in-out infinite; }
+}
+@keyframes tour-ring {
+  0%, 100% { box-shadow: 0 0 0 2px var(--accent), 0 0 0 7px color-mix(in oklab, var(--accent) 22%, transparent); }
+  50% { box-shadow: 0 0 0 2px var(--accent), 0 0 0 12px color-mix(in oklab, var(--accent) 6%, transparent); }
+}
+@keyframes tour-caption { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
 /* One italic accent word per headline, in olive (lime at night). */
 .accent { font-style: italic; color: var(--accent); font-weight: inherit; }
 
