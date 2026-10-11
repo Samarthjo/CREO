@@ -2,7 +2,7 @@
   "name": "creo",
   "version": "0.1.0",
   "private": true,
-  "description": "CREO: a 30-day creator programme. Bring an idea and your post history; CREO finds the angle, shapes the draft and learns from what you publish.",
+  "description": "CREO, the AI Creator Manager: Trend, Studio, Collab Inbox Lite and HQ.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -44,14 +44,6 @@ export function Chip({ tone = "neutral", className, children }: { tone?: keyof t
   return <span className={cn("inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium", CHIP[tone], className)}>{children}</span>;
 }
 
-/** Marks a number or screen that comes from the made-up sample creator, not from a real result. */
-export const ExampleTag = ({ className }: { className?: string }) => <Chip tone="outline" className={cn("py-0 text-[0.6875rem] uppercase tracking-[0.08em]", className)}>Example</Chip>;
-
-/** One line under a demo: says plainly that the creator and the numbers are made up. */
-export const ExampleNote = ({ className }: { className?: string }) => (
-  <p className={cn("flex items-center justify-center gap-2 text-center text-[0.8125rem] text-muted", className)}><ExampleTag /> Made-up creator and sample numbers, shown to explain how CREO works.</p>
-);
-
 /** Small pill label above a headline. */
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
   return <span className={cn("inline-flex items-center rounded-full bg-eyebrow px-3 py-1 text-[0.8125rem] font-medium text-on-eyebrow", className)}>{children}</span>;

@@ -10,7 +10,6 @@ type Failure = "invalid" | "server" | "network";
 export interface EventMap {
   // the website
   cta_clicked: { id: string; where: string };
-  demo_step: { step: "problem" | "fit" | "draft" | "learning"; via: "next" | "back" | "tab" | "key" };
   cohort_apply_started: { variant: "short" | "full" };
   cohort_apply_submitted: { variant: "short" | "full"; followers: string; niche?: string; platform?: string; posts_per_week?: string; goal?: string; brand_inquiries?: string; extra_answers: number; has_problem: boolean };
   cohort_apply_failed: { variant: "short" | "full"; reason: Failure; fields?: string };

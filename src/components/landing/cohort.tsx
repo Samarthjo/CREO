@@ -5,7 +5,7 @@ import { Reveal } from "./reveal";
 import { Section, SectionHead } from "./section";
 
 const DURING = [
-  "CREO studies the post history and results you bring: pasted or described, with no account connections yet",
+  "CREO analyzes your existing content and performance",
   "Builds your Creator DNA",
   "Finds and explains the creative patterns that fit you",
   "Turns opportunities into scripts and content packages",
@@ -74,7 +74,7 @@ export function Cohort() {
 
       <div id="apply" className="mt-20 grid scroll-mt-24 grid-cols-[minmax(0,1fr)] items-start gap-10 lg:mt-28 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
         <Reveal>
-          <h3 className="max-w-[14ch] font-display text-[clamp(1.9rem,3vw,2.6rem)] font-normal leading-tight tracking-[-0.03em]">Apply for the 30-day <Accent>programme</Accent>.</h3>
+          <h3 className="max-w-[14ch] font-display text-[clamp(1.9rem,3vw,2.6rem)] font-normal leading-tight tracking-[-0.03em]">Apply for the next <Accent>cohort</Accent>.</h3>
           <p className="mt-4 max-w-[36ch] text-[0.9375rem] leading-relaxed text-muted">Limited seats per cohort so the team can stay hands-on. We read every application and reach out to the creators we can help most.</p>
         </Reveal>
         <Reveal delay={0.08}><Panel className="p-7 lg:p-8"><ApplyForm variant="full" /></Panel></Reveal>
@@ -96,7 +96,7 @@ export function AfterCohort({ applyHref }: { applyHref: string }) {
               <p className="mt-3 font-display text-[clamp(3.5rem,6.5vw,5.5rem)] font-semibold leading-none tracking-[-0.04em] text-ink">₹5,999</p>
               <p className="mt-2 text-lg text-ink">one-time founding plan</p>
               <p className="mt-6 max-w-[38ch] text-[0.9375rem] leading-relaxed text-muted">Your personalized CREO Intelligence — built around 30 days of your content, decisions and performance.</p>
-              <div className="mt-7"><Button variant="primary" size="lg" href={applyHref} className="max-sm:h-auto max-sm:min-h-11 max-sm:whitespace-normal max-sm:py-2.5 max-sm:text-center">Apply for the 30-day programme</Button></div>
+              <div className="mt-7"><Button variant="primary" size="lg" href={applyHref} className="max-sm:h-auto max-sm:min-h-11 max-sm:whitespace-normal max-sm:py-2.5 max-sm:text-center">Build my CREO first — ₹499 cohort</Button></div>
             </div>
             <div className="p-8 sm:p-10 lg:p-12">
               <List title="Included" items={KEEP} tick />

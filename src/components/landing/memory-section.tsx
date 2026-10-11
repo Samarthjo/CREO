@@ -1,4 +1,4 @@
-import { Accent, Chip, ExampleNote, Panel } from "../ui/kit";
+import { Accent, Chip, Panel } from "../ui/kit";
 import { Reveal } from "./reveal";
 import { Section, SectionHead } from "./section";
 
@@ -48,7 +48,6 @@ export function MemorySection() {
   return (
     <Section id="memory" motif="contours" treeline={-90}>
       <SectionHead eyebrow="Creator Memory" title={<>CREO remembers what actually works for <Accent>you</Accent>.</>} sub="Every script, edit, Reel, result and decision is kept, so each recommendation starts from your history instead of from zero." />
-      <ExampleNote className="-mt-6 mb-10 lg:-mt-10 lg:mb-12" />
       <Reveal>
         <div className="glow grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-3">
           <Panel className="flex flex-col p-6 sm:p-7">

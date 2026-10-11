@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { SAMPLE_INQUIRY, SAMPLE_SCAM, makeInquiry } from "@/lib/store/seed";
 import { HEALTH_LABEL, healthTone } from "../product/brief";
 import { MessageHighlight, QuotePanel, SignalList, TermsList } from "../product/collab";
-import { Accent, Button, Chip, ExampleNote, Panel, Textarea } from "../ui/kit";
+import { Accent, Button, Chip, Panel, Textarea } from "../ui/kit";
 import { Tabs } from "../ui/interactive";
 import { getDemo } from "./demo";
 import { Reveal } from "./reveal";
@@ -28,7 +28,6 @@ export function CollabSection() {
   return (
     <Section id="collab" treeline={150}>
       <SectionHead eyebrow="Collab Inbox" title={<>Know what the opportunity is <Accent>worth</Accent> before you reply.</>} sub="Paste the inquiry, or upload it as a text file. CREO pulls out the terms, flags risk signals, sets a quote range and a walk-away price, and drafts a counter you approve." />
-      <ExampleNote className="-mt-6 mb-10 lg:-mt-10 lg:mb-12" />
       <Pipeline />
       <Reveal>
         <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">

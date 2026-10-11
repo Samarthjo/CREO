@@ -14,10 +14,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(site),
   title: { default: "CREO | Stop guessing what to post next", template: "%s | CREO" },
   description:
-    "Bring an idea and your post history. CREO finds the angle, shapes the draft and learns from what you publish. You keep the final say.",
+    "CREO is a 30-day creator cohort that learns which hooks and formats work for your audience, then drafts your next post. You approve it.",
   openGraph: {
     title: "CREO | Stop guessing what to post next",
-    description: "Bring an idea and your post history. CREO finds the angle, shapes the draft and learns from what you publish. You keep the final say.",
+    description: "A 30-day creator cohort that learns what works for your audience and drafts what to make next. You approve it.",
     type: "website",
     siteName: "CREO",
   },
@@ -34,16 +34,11 @@ export const viewport: Viewport = {
 // Runs before paint so a saved theme never flashes the other one.
 const themeInit = `try{var t=localStorage.getItem("creo.theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
-// The home page headline is a split test. This picks "a" (the control) or "b" at random before first paint, from the address (?hook=a|b) when it is there,
-// and stores nothing on the device. globals.css shows the matching version; analytics.ts adds it to the visit as hook_variant.
-const hookInit = `try{var h=new URLSearchParams(location.search).get("hook");document.documentElement.dataset.hook=h==="a"||h==="b"?h:Math.random()<0.5?"a":"b"}catch(e){}`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
-        <script dangerouslySetInnerHTML={{ __html: hookInit }} />
       </head>
       <body><MotionProvider>{children}</MotionProvider><AnalyticsConsent /></body>
     </html>
