@@ -14,6 +14,7 @@ export interface EventMap {
   flow_step: { step: number; via: "next" | "back" | "tab" | "key" | "swipe" };
   flow_case: { creator: "tech" | "fitness" | "food" };
   flow_player: { action: "play" | "pause" | "replay" };
+  feature_open: { feature: "trend" | "studio" | "collab" | "memory" };
   cohort_apply_started: { variant: "short" | "full" };
   cohort_apply_submitted: { variant: "short" | "full"; followers: string; niche?: string; platform?: string; posts_per_week?: string; goal?: string; brand_inquiries?: string; extra_answers: number; has_problem: boolean };
   cohort_apply_failed: { variant: "short" | "full"; reason: Failure; fields?: string };

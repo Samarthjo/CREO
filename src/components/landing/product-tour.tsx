@@ -5,6 +5,7 @@ import { animate, AnimatePresence, motion, useInView, useMotionValue } from "mot
 import { useCallback, useEffect, useRef, useState, type RefObject, type SyntheticEvent } from "react";
 import { track } from "@/lib/analytics";
 import { Button, cn } from "../ui/kit";
+import { usePhone } from "../ui/use-phone";
 
 /**
  * A slow guided tour of the hero window. A pointer glides to each tab, a ring marks the thing it is about to press, a short note says
@@ -34,16 +35,18 @@ export type TourBeat = {
   aim?: [number, number];
 };
 
-export const TOUR_STEPS = [
-  { lead: "HQ", rest: "shows your next best move and why it fits you." },
+type TourStep = { lead: string; rest: string; /** What a phone says instead: there, the start screen is "Today", not a tab called HQ. */ phone?: { lead: string; rest: string } };
+
+export const TOUR_STEPS: readonly TourStep[] = [
+  { lead: "HQ", rest: "shows your next best move and why it fits you.", phone: { lead: "Today", rest: "CREO picks your next move and shows why." } },
   { lead: "Trend", rest: "scores your saved ideas against your history, best fit first." },
   { lead: "Studio", rest: "drafts hooks and a script. You pick the hook that sounds like you." },
   { lead: "Collab Inbox", rest: "prices a brand offer. Nothing is sent until you approve." },
   { lead: "Memory", rest: "keeps every approval and edit, so the next draft starts from it." },
-] as const;
+];
 
 /** The whole tour, beat by beat. About 45 seconds, about nine per tab. */
-export function tourBeats(a: { go: (v: TourView) => void; pick: (hookId: string) => void; approve: (on: boolean) => void; altHook: string; reset: () => void }): TourBeat[] {
+export function tourBeats(a: { go: (v: TourView) => void; pick: (hookId: string) => void; approve: (on: boolean) => void; altHook: string; reset: () => void; phone?: boolean }): TourBeat[] {
   const tab = (id: TourView, step: number, travel = 1.5, hold = 0.9): TourBeat => ({ target: `tab-${id}`, say: TOUR_STEPS[step]!.lead, click: true, act: () => a.go(id), step, travel, hold, aim: [0.3, 0.5] });
   return [
     { target: "hq-fit", say: "CREO scores each idea against your history", step: 0, travel: 2, hold: 2.6 },
@@ -63,7 +66,7 @@ export function tourBeats(a: { go: (v: TourView) => void; pick: (hookId: string)
     tab("memory", 4),
     { target: "memory-list", say: "Every approval and edit is kept for your next draft", step: 4, travel: 1.3, hold: 3.4, aim: [0.3, 0.18] },
 
-    { target: "tab-hq", say: "HQ", click: true, act: a.reset, step: 0, travel: 1.5, hold: 1.4, aim: [0.3, 0.5] },
+    { target: "tab-hq", say: a.phone ? "Back to today" : "HQ", click: true, act: a.reset, step: 0, travel: 1.5, hold: 1.4, aim: a.phone ? [0.5, 0.5] : [0.3, 0.5] },
   ];
 }
 
@@ -257,16 +260,21 @@ export function useProductTour({ enabled, frame, beats, reset, reduce }: { enabl
     else { track("tour_control", { action: status === "idle" ? "play" : "replay" }); begin(); }
   };
 
+  /** Hands the window to the visitor: the pointer, the note and the ring go away. */
+  const stop = () => {
+    if (status === "playing" || status === "paused") { setStatus("stopped"); track("tour_control", { action: "takeover" }); }
+    else if (status === "idle") { auto.current = true; setStatus("stopped"); }
+  };
+
   /** Any press inside the window (other than the tour's own controls) hands it to the visitor. */
   const takeover = (e: SyntheticEvent) => {
     if (!enabled || (e.target as Element).closest?.("[data-tour-ui]")) return;
     // A finger that starts a page scroll on the window is not a visit to the window: only a tap (the click that follows) counts.
     if (e.type === "pointerdown" && (e.nativeEvent as PointerEvent).pointerType === "touch") return;
-    if (status === "playing" || status === "paused") { setStatus("stopped"); track("tour_control", { action: "takeover" }); }
-    else if (status === "idle") { auto.current = true; setStatus("stopped"); }
+    stop();
   };
 
-  return { enabled, status, step, on, note, clicks, x, y, seen, press, reduce, toggle, replay: begin, takeover };
+  return { enabled, status, step, on, note, clicks, x, y, seen, press, reduce, toggle, replay: begin, takeover, stop };
 }
 
 export type Tour = ReturnType<typeof useProductTour>;
@@ -312,17 +320,21 @@ export function TourOverlay({ tour }: { tour: Tour }) {
 /** The strip along the bottom of the window: play or pause, five dots (one per tab), and one line saying what the current tab is for. */
 export function TourBar({ tour }: { tour: Tour }) {
   const live = tour.status === "playing" || tour.status === "paused";
+  const phone = usePhone();
   const s = TOUR_STEPS[tour.step]!;
+  const say = phone && s.phone ? s.phone : s;
   const over = tour.status === "done" || tour.status === "stopped";
+  const word = tour.status === "playing" ? "Pause" : over ? "Replay" : "Play";
   return (
-    <div data-tour-ui className="flex min-h-14 items-center gap-3 border-t border-line bg-surface px-4 py-2.5 sm:px-5">
+    <div data-tour-ui className="flex min-h-14 items-center gap-3 border-t border-line bg-surface px-4 py-2.5 max-sm:shrink-0 max-sm:gap-3.5 max-sm:py-2.5 sm:px-5">
       <button
         type="button"
         onClick={tour.toggle}
         aria-label={tour.status === "playing" ? "Pause the tour" : over ? "Replay the tour" : "Play the tour"}
-        className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-bg transition hover:opacity-90 active:translate-y-px pointer-coarse:size-11"
+        className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-bg transition hover:opacity-90 active:translate-y-px pointer-coarse:size-11 max-sm:flex max-sm:h-11 max-sm:w-auto! max-sm:items-center max-sm:gap-2 max-sm:px-4"
       >
-        {tour.status === "playing" ? <Pause size={14} weight="fill" /> : <Play size={14} weight="fill" className="ml-0.5" />}
+        {tour.status === "playing" ? <Pause size={14} weight="fill" /> : <Play size={14} weight="fill" className="ml-0.5 max-sm:ml-0" />}
+        <span className="text-[0.8125rem] font-semibold leading-none sm:hidden">{word}</span>
       </button>
       <ol aria-hidden className="hidden items-center gap-1.5 sm:flex">
         {TOUR_STEPS.map((t, i) => (
@@ -331,7 +343,7 @@ export function TourBar({ tour }: { tour: Tour }) {
       </ol>
       <p className="min-w-0 flex-1 text-[0.8125rem] leading-snug text-body">
         {live ? (
-          <span key={tour.step} className="animate-[tour-caption_0.5s_ease-out_both]"><span className="font-semibold text-ink">{s.lead}</span> {s.rest}</span>
+          <span key={tour.step} className="animate-[tour-caption_0.5s_ease-out_both]"><span className="font-semibold text-ink">{say.lead}</span> {say.rest}</span>
         ) : over ? (
           <><span className="font-semibold text-ink">Your turn.</span> Click any tab to try it yourself.</>
         ) : tour.reduce ? (

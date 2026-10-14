@@ -12,6 +12,7 @@ import { HEALTH_LABEL, healthTone } from "../product/brief";
 import { MemoryRow } from "../product/memory";
 import { Logo } from "../product/logo";
 import { Button, Chip, FitScore, Slots, cn } from "../ui/kit";
+import { usePhone } from "../ui/use-phone";
 import { useReduce } from "../ui/use-reduce";
 import { demoPackage, getDemo } from "./demo";
 import { TourBar, TourOverlay, tourBeats, useProductTour } from "./product-tour";
@@ -34,6 +35,13 @@ const TABS: { id: View; label: string }[] = [
   { id: "memory", label: "Memory" },
 ];
 
+/** On a phone HQ is not a tab: it is the start screen ("Today"), and the four tools are the tabs. */
+const PHONE_TABS = TABS.filter((t) => t.id !== "hq");
+const PHONE_TITLE: Record<View, string> = { hq: "Today", trend: "Trend", studio: "Studio", collab: "Collab Inbox", memory: "Memory" };
+
+/** The features screen on a phone (phone-features.tsx) asks the window to open one of the four tools. */
+export const OPEN_FEATURE = "creo:open-feature";
+
 /**
  * The hero is the product: a working CREO window on a made-up creator.
  * It opens on HQ, the creator's next best move with the reasons behind it. Trend, Studio, Collab Inbox and Memory
@@ -43,6 +51,7 @@ const TABS: { id: View; label: string }[] = [
 export function HeroProduct({ guided = false }: { guided?: boolean }) {
   const { brief, ranked, ws } = getDemo();
   const reduce = useReduce();
+  const phone = usePhone();
   const top = brief.actions.find((a) => a.kind === "create")!;
   const trendId = top.id.replace("create-", "");
   const why = ranked.find((r) => r.pattern.id === trendId)?.fit.parts.slice(0, 2).map((p) => p.note) ?? [];
@@ -59,8 +68,22 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
   const frame = useRef<HTMLDivElement>(null);
   const altHook = (pkg.hooks.find((h) => h.id !== pkg.chosenHook) ?? pkg.hooks[0]!).id;
   const resetDemo = useCallback(() => { setView("hq"); setApproved(false); setHookId(pkg.chosenHook); }, [pkg.chosenHook]);
-  const steps = useMemo(() => tourBeats({ go: setView, pick: setHookId, approve: setApproved, altHook, reset: resetDemo }), [altHook, resetDemo]);
+  const steps = useMemo(() => tourBeats({ go: setView, pick: setHookId, approve: setApproved, altHook, reset: resetDemo, phone }), [altHook, resetDemo, phone]);
   const tour = useProductTour({ enabled: guided, frame, beats: steps, reset: resetDemo, reduce: !!reduce });
+  // The features screen on a phone can open one of the tools here. The visitor has chosen, so the tour steps aside.
+  const stopTour = useRef(tour.stop);
+  stopTour.current = tour.stop;
+  useEffect(() => {
+    if (!guided) return;
+    const open = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      if (!TABS.some((t) => t.id === id)) return;
+      stopTour.current();
+      setView(id as View);
+    };
+    window.addEventListener(OPEN_FEATURE, open);
+    return () => window.removeEventListener(OPEN_FEATURE, open);
+  }, [guided]);
   /** Marks an element for the tour: the pointer can find it and the ring can light it. */
   const T = (id: string) => (guided ? { "data-tour": id, "data-tour-on": tour.on === id ? "" : undefined } : {});
 
@@ -89,13 +112,18 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
       transition={{ type: "spring", stiffness: 70, damping: 18, delay: 0.25 }}
       className="glow relative mx-auto w-full max-w-[64rem]"
     >
-      <div ref={frame} onPointerDownCapture={tour.takeover} onClickCapture={tour.takeover} className="relative overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop">
-        <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">
-          <Logo word={false} />
+      <div ref={frame} onPointerDownCapture={tour.takeover} onClickCapture={tour.takeover} className="relative overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop max-sm:flex max-sm:h-[max(27rem,calc(100svh-14.5rem))] max-sm:flex-col">
+        <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3 max-sm:shrink-0 max-sm:py-2">
+          <Logo word={false} className="max-sm:hidden" />
+          {/* Phone: the mark is the way back to the start screen, and the title says where you are. */}
+          <button type="button" onClick={() => setView("hq")} aria-label={view === "hq" ? "Today" : `${PHONE_TITLE[view]}, back to today`} {...T("tab-hq")} className="-ml-1 flex items-center gap-3 rounded-full py-0.5 pl-1 pr-3 sm:hidden pointer-coarse:min-h-11">
+            <Logo word={false} />
+            <span className="text-[0.9375rem] font-medium text-ink">{PHONE_TITLE[view]}</span>
+          </button>
           <span className="hidden text-[0.8125rem] text-muted sm:inline">Creator · 27K followers</span>
         </div>
 
-        <div className="grid md:grid-cols-[13rem_minmax(0,1fr)]">
+        <div className="grid md:grid-cols-[13rem_minmax(0,1fr)] max-sm:min-h-0 max-sm:flex-1 max-sm:grid-rows-[minmax(0,1fr)]">
           <aside className="hidden border-r border-line bg-surface/60 p-4 md:block" aria-label="Workspace navigation">
             <Link href="/app" title="Open the workspace" aria-label="Open the workspace as Creator" data-track="open_workspace" data-track-where="demo" className="group -mx-1 mb-4 flex items-center gap-2.5 rounded-control px-2.5 py-1.5 transition hover:bg-sunk">
               <span className="grid size-8 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg">C</span>
@@ -123,8 +151,14 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
             </ul>
           </aside>
 
-          <div data-tour-scroll="" className="relative min-h-[22rem] min-w-0 p-5 sm:p-6 md:h-[27rem] md:overflow-y-auto scroll-thin">
-            <div className="scroll-thin -mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label="Workspace">
+          <div data-tour-scroll="" className="relative min-h-[22rem] min-w-0 p-5 sm:p-6 md:h-[27rem] md:overflow-y-auto scroll-thin max-sm:min-h-0 max-sm:overflow-y-auto max-sm:pb-8 max-sm:pt-5">
+            {/* Phone: the four tools, none selected on the start screen. */}
+            <div className="scroll-thin -mx-5 mb-6 flex gap-2 overflow-x-auto px-5 pb-1 sm:hidden" role="tablist" aria-label="Tools">
+              {PHONE_TABS.map((t) => (
+                <button key={t.id} type="button" role="tab" aria-selected={view === t.id} onClick={() => setView(t.id)} className={cn("shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[0.875rem] font-medium leading-5 pointer-coarse:min-h-11", view === t.id ? "border-transparent bg-eyebrow text-on-eyebrow" : "border-line-strong text-body")} {...T(`tab-${t.id}`)}>{t.label}</button>
+              ))}
+            </div>
+            <div className="scroll-thin -mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1 max-sm:hidden md:hidden" role="tablist" aria-label="Workspace">
               {TABS.map((t) => (
                 <button key={t.id} type="button" role="tab" aria-selected={view === t.id} onClick={() => setView(t.id)} className={cn("shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium leading-5 pointer-coarse:min-h-11", view === t.id ? "bg-eyebrow text-on-eyebrow" : "text-muted")} {...T(`tab-${t.id}`)}>{t.label}</button>
               ))}
@@ -156,9 +190,9 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                 </motion.div>
               ) : view === "hq" ? (
                 <motion.div key="hq" {...fade}>
-                  <h2 className="mb-4 font-display text-[1.75rem] font-medium tracking-tight sm:text-[2rem]">Good morning, Creator.</h2>
+                  <h2 className="mb-4 font-display text-[1.75rem] font-medium tracking-tight max-sm:mb-4 max-sm:text-[1.75rem] max-[380px]:text-[1.5rem] sm:text-[2rem]">Good morning, Creator.</h2>
 
-                  <div className="mt-4 rounded-panel border border-line bg-soft p-5">
+                  <div className="mt-4 rounded-panel border border-line bg-soft p-5 max-sm:mt-0 max-sm:p-6">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <p className="text-[0.8125rem] font-medium text-accent">{top.title}</p>
@@ -166,19 +200,19 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                       </div>
                       {top.fit ? <div className="shrink-0 rounded-2xl" {...T("hq-fit")}><FitScore score={top.fit} size={56} /></div> : null}
                     </div>
-                    <p className="mt-4 text-[0.8125rem] font-semibold text-ink">Why now</p>
-                    <ul className="-mx-2 -mb-1 mt-1 space-y-1 rounded-lg px-2 py-1 text-[0.8125rem] leading-snug text-body" {...T("hq-why")}>
+                    <p className="mt-4 text-[0.8125rem] font-semibold text-ink max-sm:mt-6">Why now</p>
+                    <ul className="-mx-2 -mb-1 mt-1 space-y-1 rounded-lg px-2 py-1 text-[0.8125rem] leading-snug text-body max-sm:mt-2 max-sm:space-y-1.5 max-sm:text-[0.875rem] max-sm:leading-normal" {...T("hq-why")}>
                       {why.map((w, i) => (
                         <motion.li key={w} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.18, duration: 0.35 }}>{w}</motion.li>
                       ))}
                     </ul>
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <div className="mt-4 flex flex-wrap items-center gap-3 max-sm:mt-5">
                       <Button variant="primary" size="md" onClick={() => setView("studio")}>Open in Studio</Button>
                     </div>
                   </div>
 
-                  <ul className="mt-3 divide-y divide-line rounded-panel border border-line bg-surface px-5">
-                    <li className="py-3.5">
+                  <ul className="mt-3 divide-y divide-line rounded-panel border border-line bg-surface px-5 max-sm:mt-5 max-sm:px-6">
+                    <li className="py-3.5 max-sm:py-5">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sunk text-ink"><Tray size={16} /></span>
                         <div className="min-w-0 flex-1">
@@ -226,7 +260,7 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                 </motion.div>
               ) : (
                 <motion.div key="studio" {...fade}>
-                  <button type="button" onClick={() => setView("hq")} className="mb-3 inline-flex items-center gap-1 text-[0.8125rem] font-medium leading-5 text-muted transition hover:text-ink pointer-coarse:min-h-11"><CaretLeft size={16} /> HQ</button>
+                  <button type="button" onClick={() => setView("hq")} className="mb-3 inline-flex items-center gap-1 text-[0.8125rem] font-medium leading-5 text-muted transition hover:text-ink pointer-coarse:min-h-11"><CaretLeft size={16} /> <span className="sm:hidden">Today</span><span className="hidden sm:inline">HQ</span></button>
                   <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight sm:text-[1.75rem]">{top.subject}</h2>
                   <p className="mt-1 text-[0.8125rem] text-muted">Your package, built from your Creator DNA.</p>
 

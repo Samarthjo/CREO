@@ -15,7 +15,7 @@ export function Hero() {
         </h1>
       </div>
 
-      <div id="product" className="mt-9 px-4 sm:px-6 lg:mt-12">
+      <div id="product" className="mt-9 px-4 max-sm:mt-6 sm:px-6 lg:mt-12">
         <HeroProduct guided />
       </div>
     </section>
