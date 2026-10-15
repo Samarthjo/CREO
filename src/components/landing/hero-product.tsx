@@ -12,9 +12,10 @@ import { HEALTH_LABEL, healthTone } from "../product/brief";
 import { MemoryRow } from "../product/memory";
 import { Logo } from "../product/logo";
 import { Button, Chip, FitScore, Slots, cn } from "../ui/kit";
+import { usePhone } from "../ui/use-phone";
 import { useReduce } from "../ui/use-reduce";
 import { demoPackage, getDemo } from "./demo";
-import { TourBar, TourOverlay, tourBeats, useProductTour } from "./product-tour";
+import { TourBar, TourOverlay, TourToggle, tourBeats, useProductTour } from "./product-tour";
 
 type View = "collab" | "hq" | "studio" | "trend" | "memory";
 
@@ -34,6 +35,12 @@ const TABS: { id: View; label: string }[] = [
   { id: "memory", label: "Memory" },
 ];
 
+/** On a phone HQ is not a tab: it is the start screen, and the four tools are the tabs. */
+const PHONE_TABS = TABS.filter((t) => t.id !== "hq");
+
+/** The features screen on a phone (phone-features.tsx) asks the window to open one of the four tools. */
+export const OPEN_FEATURE = "creo:open-feature";
+
 /**
  * The hero is the product: a working CREO window on a made-up creator.
  * It opens on HQ, the creator's next best move with the reasons behind it. Trend, Studio, Collab Inbox and Memory
@@ -43,6 +50,7 @@ const TABS: { id: View; label: string }[] = [
 export function HeroProduct({ guided = false }: { guided?: boolean }) {
   const { brief, ranked, ws } = getDemo();
   const reduce = useReduce();
+  const phone = usePhone();
   const top = brief.actions.find((a) => a.kind === "create")!;
   const trendId = top.id.replace("create-", "");
   const why = ranked.find((r) => r.pattern.id === trendId)?.fit.parts.slice(0, 2).map((p) => p.note) ?? [];
@@ -59,8 +67,22 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
   const frame = useRef<HTMLDivElement>(null);
   const altHook = (pkg.hooks.find((h) => h.id !== pkg.chosenHook) ?? pkg.hooks[0]!).id;
   const resetDemo = useCallback(() => { setView("hq"); setApproved(false); setHookId(pkg.chosenHook); }, [pkg.chosenHook]);
-  const steps = useMemo(() => tourBeats({ go: setView, pick: setHookId, approve: setApproved, altHook, reset: resetDemo }), [altHook, resetDemo]);
+  const steps = useMemo(() => tourBeats({ go: setView, pick: setHookId, approve: setApproved, altHook, reset: resetDemo, phone }), [altHook, resetDemo, phone]);
   const tour = useProductTour({ enabled: guided, frame, beats: steps, reset: resetDemo, reduce: !!reduce });
+  // The features screen on a phone can open one of the tools here. The visitor has chosen, so the tour steps aside.
+  const stopTour = useRef(tour.stop);
+  stopTour.current = tour.stop;
+  useEffect(() => {
+    if (!guided) return;
+    const open = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      if (!TABS.some((t) => t.id === id)) return;
+      stopTour.current();
+      setView(id as View);
+    };
+    window.addEventListener(OPEN_FEATURE, open);
+    return () => window.removeEventListener(OPEN_FEATURE, open);
+  }, [guided]);
   /** Marks an element for the tour: the pointer can find it and the ring can light it. */
   const T = (id: string) => (guided ? { "data-tour": id, "data-tour-on": tour.on === id ? "" : undefined } : {});
 
@@ -89,13 +111,19 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
       transition={{ type: "spring", stiffness: 70, damping: 18, delay: 0.25 }}
       className="glow relative mx-auto w-full max-w-[64rem]"
     >
-      <div ref={frame} onPointerDownCapture={tour.takeover} onClickCapture={tour.takeover} className="relative overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop">
-        <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">
-          <Logo word={false} />
+      <div ref={frame} onPointerDownCapture={tour.takeover} onClickCapture={tour.takeover} className="relative overflow-hidden rounded-[1.75rem] border border-line bg-bg shadow-pop max-sm:flex max-sm:h-[max(27rem,calc(100svh-14.5rem))] max-sm:flex-col">
+        <div className="flex items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3 max-sm:shrink-0 max-sm:px-4 max-sm:py-1.5">
+          <Logo word={false} className="max-sm:hidden" />
+          {/* Phone, one line: the mark and "Creator Dashboard" (a tap on them goes back to the start screen), then play or pause on the right. */}
+          <button type="button" onClick={() => setView("hq")} aria-label={view === "hq" ? "Creator Dashboard" : "Creator Dashboard, back to the start"} {...T("tab-hq")} className="-ml-1 flex min-w-0 items-center gap-2.5 rounded-full py-0.5 pl-1 pr-2 sm:hidden pointer-coarse:min-h-11">
+            <Logo word={false} />
+            <span className="truncate text-[0.9375rem] font-medium text-ink">Creator Dashboard</span>
+          </button>
+          {guided && <TourToggle tour={tour} className="px-3.5 sm:hidden" />}
           <span className="hidden text-[0.8125rem] text-muted sm:inline">Creator · 27K followers</span>
         </div>
 
-        <div className="grid md:grid-cols-[13rem_minmax(0,1fr)]">
+        <div className="grid md:grid-cols-[13rem_minmax(0,1fr)] max-sm:min-h-0 max-sm:flex-1 max-sm:grid-rows-[minmax(0,1fr)]">
           <aside className="hidden border-r border-line bg-surface/60 p-4 md:block" aria-label="Workspace navigation">
             <Link href="/app" title="Open the workspace" aria-label="Open the workspace as Creator" data-track="open_workspace" data-track-where="demo" className="group -mx-1 mb-4 flex items-center gap-2.5 rounded-control px-2.5 py-1.5 transition hover:bg-sunk">
               <span className="grid size-8 place-items-center rounded-full bg-ink text-[0.6875rem] font-semibold text-bg">C</span>
@@ -123,8 +151,14 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
             </ul>
           </aside>
 
-          <div data-tour-scroll="" className="relative min-h-[22rem] min-w-0 p-5 sm:p-6 md:h-[27rem] md:overflow-y-auto scroll-thin">
-            <div className="scroll-thin -mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1 md:hidden" role="tablist" aria-label="Workspace">
+          <div data-tour-scroll="" className="relative min-h-[22rem] min-w-0 p-5 sm:p-6 md:h-[27rem] md:overflow-y-auto scroll-thin max-sm:min-h-0 max-sm:overflow-y-auto max-sm:pb-3 max-sm:pt-3 max-sm:short:pb-2.5 max-sm:short:pt-2.5">
+            {/* Phone: the four tools, none selected on the start screen. */}
+            <div className="scroll-thin -mx-5 mb-3 flex gap-2 overflow-x-auto px-5 max-sm:short:mb-2.5 sm:hidden" role="tablist" aria-label="Tools">
+              {PHONE_TABS.map((t) => (
+                <button key={t.id} type="button" role="tab" aria-selected={view === t.id} onClick={() => setView(t.id)} className={cn("shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[0.875rem] font-medium leading-5 pointer-coarse:min-h-11", view === t.id ? "border-transparent bg-eyebrow text-on-eyebrow" : "border-line-strong text-body")} {...T(`tab-${t.id}`)}>{t.label}</button>
+              ))}
+            </div>
+            <div className="scroll-thin -mx-1 mb-4 flex gap-1 overflow-x-auto px-1 pb-1 max-sm:hidden md:hidden" role="tablist" aria-label="Workspace">
               {TABS.map((t) => (
                 <button key={t.id} type="button" role="tab" aria-selected={view === t.id} onClick={() => setView(t.id)} className={cn("shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[0.8125rem] font-medium leading-5 pointer-coarse:min-h-11", view === t.id ? "bg-eyebrow text-on-eyebrow" : "text-muted")} {...T(`tab-${t.id}`)}>{t.label}</button>
               ))}
@@ -135,12 +169,12 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                 <motion.div key="collab" {...fade}>
                   <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                     <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight sm:text-[1.75rem]">{ex.brand} offers <span className="tnum">{inr(ex.budgetInr ?? 0)}</span></h2>
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5 max-sm:hidden">
                       <Chip tone="mark">New brand inquiry</Chip>
                       <Chip tone={healthTone(q.evaluation.health)}>{HEALTH_LABEL[q.evaluation.health]}, {q.evaluation.score} of 100</Chip>
                     </div>
                   </div>
-                  <p className="mt-1 text-[0.8125rem] text-muted">{terms}</p>
+                  <p className="mt-1 text-[0.8125rem] text-muted max-sm:hidden">{terms}</p>
 
                   <div className="mt-4 rounded-panel border border-line bg-soft p-4 sm:p-5">
                     <p className="text-[0.8125rem] font-medium text-accent">CREO prices it at</p>
@@ -156,9 +190,9 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                 </motion.div>
               ) : view === "hq" ? (
                 <motion.div key="hq" {...fade}>
-                  <h2 className="mb-4 font-display text-[1.75rem] font-medium tracking-tight sm:text-[2rem]">Good morning, Creator.</h2>
+                  <h2 className="mb-4 font-display text-[1.75rem] font-medium tracking-tight max-sm:mb-4 max-sm:text-[1.75rem] max-sm:short:hidden max-[380px]:text-[1.5rem] sm:text-[2rem]">Good morning, Creator.</h2>
 
-                  <div className="mt-4 rounded-panel border border-line bg-soft p-5">
+                  <div className="mt-4 rounded-panel border border-line bg-soft p-5 max-sm:mt-0 max-sm:p-5 max-sm:short:p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="min-w-0">
                         <p className="text-[0.8125rem] font-medium text-accent">{top.title}</p>
@@ -166,19 +200,19 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                       </div>
                       {top.fit ? <div className="shrink-0 rounded-2xl" {...T("hq-fit")}><FitScore score={top.fit} size={56} /></div> : null}
                     </div>
-                    <p className="mt-4 text-[0.8125rem] font-semibold text-ink">Why now</p>
-                    <ul className="-mx-2 -mb-1 mt-1 space-y-1 rounded-lg px-2 py-1 text-[0.8125rem] leading-snug text-body" {...T("hq-why")}>
+                    <p className="mt-4 text-[0.8125rem] font-semibold text-ink max-sm:mt-5 max-sm:short:mt-4">Why now</p>
+                    <ul className="-mx-2 -mb-1 mt-1 space-y-1 rounded-lg px-2 py-1 text-[0.8125rem] leading-snug text-body max-sm:mt-2 max-sm:space-y-1.5 max-sm:text-[0.875rem] max-sm:leading-normal" {...T("hq-why")}>
                       {why.map((w, i) => (
                         <motion.li key={w} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + i * 0.18, duration: 0.35 }}>{w}</motion.li>
                       ))}
                     </ul>
-                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                    <div className="mt-4 flex flex-wrap items-center gap-3 max-sm:mt-5 max-sm:short:mt-4">
                       <Button variant="primary" size="md" onClick={() => setView("studio")}>Open in Studio</Button>
                     </div>
                   </div>
 
-                  <ul className="mt-3 divide-y divide-line rounded-panel border border-line bg-surface px-5">
-                    <li className="py-3.5">
+                  <ul className="mt-3 divide-y divide-line rounded-panel border border-line bg-surface px-5 max-sm:hidden">
+                    <li className="py-3.5 max-sm:py-5">
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sunk text-ink"><Tray size={16} /></span>
                         <div className="min-w-0 flex-1">
@@ -193,44 +227,44 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                 </motion.div>
               ) : view === "trend" ? (
                 <motion.div key="trend" {...fade}>
-                  <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight sm:text-[1.75rem]">Trend</h2>
-                  <p className="mt-1 text-[0.8125rem] text-muted">Patterns worth your time, scored against your Creator DNA.</p>
-                  <ul className="mt-4 space-y-2">
+                  <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight max-sm:hidden sm:text-[1.75rem]">Trend</h2>
+                  <p className="mt-1 text-[0.8125rem] text-muted max-sm:hidden">Patterns worth your time, scored against your Creator DNA.</p>
+                  <ul className="mt-4 space-y-2 max-sm:mt-0">
                     {ranked.slice(0, 4).map((r, i) => {
                       const m = r.pattern.mechanism;
                       return (
-                        <li key={r.pattern.id} className={cn("flex items-center gap-3.5 rounded-panel border p-3.5", i === 0 ? "border-line-strong bg-soft" : "border-line bg-surface")} {...(i === 0 ? T("trend-first") : {})}>
+                        <li key={r.pattern.id} className={cn("flex items-center gap-3.5 rounded-panel border p-3.5 max-sm:p-3", i === 0 ? "border-line-strong bg-soft" : "border-line bg-surface", i > 2 && "max-sm:hidden", i > 1 && "max-sm:tiny:hidden")} {...(i === 0 ? T("trend-first") : {})}>
                           <FitScore score={r.fit.score} size={44} label={false} />
                           <div className="min-w-0 flex-1">
                             <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
                               <span className="text-[0.9375rem] font-medium text-ink">{r.pattern.title}</span>
                               <Chip tone={r.pattern.status === "emerging" ? "mark" : r.pattern.status === "rising" ? "neutral" : "outline"}>{r.pattern.status}</Chip>
                             </p>
-                            <p className="mt-0.5 text-[0.8125rem] text-muted">{HOOK_TYPES[m.hook]} hook, {m.formats.map((f) => FORMATS[f].toLowerCase()).join(" and ")}, {m.durationSec[0]} to {m.durationSec[1]} seconds</p>
+                            <p className={cn("mt-0.5 text-[0.8125rem] text-muted", i > 0 && "max-sm:hidden")}>{HOOK_TYPES[m.hook]} hook, {m.formats.map((f) => FORMATS[f].toLowerCase()).join(" and ")}, {m.durationSec[0]} to {m.durationSec[1]} seconds</p>
                           </div>
-                          {i === 0 && <Button size="sm" variant="primary" className="shrink-0" onClick={() => setView("studio")}>Open in Studio</Button>}
+                          {i === 0 && <Button size="sm" variant="primary" className="shrink-0 max-sm:hidden" onClick={() => setView("studio")}>Open in Studio</Button>}
                         </li>
                       );
                     })}
                   </ul>
-                  <p className="mt-3 text-[0.8125rem] text-muted">Scored against this creator's history. <Link href="/app/trend" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Trend page</Link></p>
+                  <p className="mt-3 text-[0.8125rem] text-muted max-sm:hidden">Scored against this creator's history. <Link href="/app/trend" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Trend page</Link></p>
                 </motion.div>
               ) : view === "memory" ? (
                 <motion.div key="memory" {...fade}>
-                  <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight sm:text-[1.75rem]">Memory</h2>
-                  <p className="mt-1 text-[0.8125rem] text-muted">What CREO keeps from your approvals and edits. The next draft starts from it.</p>
-                  <ul className="mt-3 rounded-panel border border-line bg-surface px-4" {...T("memory-list")}>
-                    {ws.memory.slice(0, 4).map((m) => <MemoryRow key={m.id} item={m} compact />)}
+                  <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight max-sm:hidden sm:text-[1.75rem]">Memory</h2>
+                  <p className="mt-1 text-[0.8125rem] text-muted max-sm:hidden">What CREO keeps from your approvals and edits. The next draft starts from it.</p>
+                  <ul className="mt-3 rounded-panel border border-line bg-surface px-4 max-sm:mt-0 max-sm:short:[&>li:nth-child(n+3)]:hidden" {...T("memory-list")}>
+                    {ws.memory.slice(0, phone ? 3 : 4).map((m) => <MemoryRow key={m.id} item={m} compact />)}
                   </ul>
-                  <p className="mt-3 text-[0.8125rem] text-muted"><Link href="/app/memory" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Memory page</Link></p>
+                  <p className="mt-3 text-[0.8125rem] text-muted max-sm:hidden"><Link href="/app/memory" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Memory page</Link></p>
                 </motion.div>
               ) : (
                 <motion.div key="studio" {...fade}>
-                  <button type="button" onClick={() => setView("hq")} className="mb-3 inline-flex items-center gap-1 text-[0.8125rem] font-medium leading-5 text-muted transition hover:text-ink pointer-coarse:min-h-11"><CaretLeft size={16} /> HQ</button>
-                  <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight sm:text-[1.75rem]">{top.subject}</h2>
-                  <p className="mt-1 text-[0.8125rem] text-muted">Your package, built from your Creator DNA.</p>
+                  <button type="button" onClick={() => setView("hq")} className="mb-3 inline-flex items-center gap-1 text-[0.8125rem] font-medium leading-5 text-muted transition hover:text-ink max-sm:hidden pointer-coarse:min-h-11"><CaretLeft size={16} /> HQ</button>
+                  <h2 className="font-display text-[1.5rem] font-medium leading-tight tracking-tight max-sm:text-[1.25rem] max-sm:short:hidden sm:text-[1.75rem]">{top.subject}</h2>
+                  <p className="mt-1 text-[0.8125rem] text-muted max-sm:hidden">Your package, built from your Creator DNA.</p>
 
-                  <ol className="mt-4 flex flex-wrap gap-2" aria-label="Progress">
+                  <ol className="mt-4 flex flex-wrap gap-2 max-sm:hidden" aria-label="Progress">
                     {["Hooks", "Script", "Shot list"].map((l, i) => (
                       <li key={l} className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors", stage > i ? "bg-eyebrow text-on-eyebrow" : "bg-sunk text-faint")}>
                         {stage > i ? <Check size={12} weight="bold" /> : <span className="size-1.5 rounded-full bg-current opacity-60" />} {l}
@@ -238,13 +272,13 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                     ))}
                   </ol>
 
-                  <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-                    <div className={cn("rounded-panel border border-line bg-surface p-4 transition-opacity duration-500", stage < 1 && "opacity-30")}>
-                      <p className="text-[0.8125rem] font-medium text-ink">3 hooks</p>
-                      <ul className="mt-2 space-y-1.5" role="radiogroup" aria-label="Choose the opening hook">
+                  <div className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 max-sm:mt-3 max-sm:short:mt-0 max-sm:gap-2 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+                    <div className={cn("rounded-panel border border-line bg-surface p-4 transition-opacity duration-500 max-sm:p-3", stage < 1 && "opacity-30")}>
+                      <p className="text-[0.8125rem] font-medium text-ink max-sm:tiny:hidden"><span className="sm:hidden">Pick a hook</span><span className="max-sm:hidden">3 hooks</span></p>
+                      <ul className="mt-2 space-y-1.5 max-sm:mt-1.5" role="radiogroup" aria-label="Choose the opening hook">
                         {pkg.hooks.map((h) => (
-                          <li key={h.id}>
-                            <button type="button" role="radio" aria-checked={h.id === hook.id} onClick={() => setHookId(h.id)} {...T(`hook-${h.id}`)} className={cn("w-full rounded-control border px-3 py-2 text-left text-[0.8125rem] leading-snug transition", h.id === hook.id ? "border-accent bg-soft text-ink" : "border-line text-muted hover:text-ink")}>
+                          <li key={h.id} className={cn(h.id !== pkg.chosenHook && h.id !== altHook && "max-sm:hidden")}>
+                            <button type="button" role="radio" aria-checked={h.id === hook.id} onClick={() => setHookId(h.id)} {...T(`hook-${h.id}`)} className={cn("w-full rounded-control border px-3 py-2 text-left text-[0.8125rem] leading-snug transition max-sm:py-1.5", h.id === hook.id ? "border-accent bg-soft text-ink" : "border-line text-muted hover:text-ink")}>
                               <span className="mb-0.5 flex items-center gap-1.5 text-[0.6875rem] font-medium text-muted">{h.style}{h.recommended && <Chip tone="lime" className="py-0 text-[0.625rem]">best for you</Chip>}</span>
                               {h.text}
                             </button>
@@ -252,25 +286,25 @@ export function HeroProduct({ guided = false }: { guided?: boolean }) {
                         ))}
                       </ul>
                     </div>
-                    <div className="flex flex-col gap-3">
-                      <div className={cn("rounded-panel border border-line bg-surface p-4 transition-opacity duration-500", stage < 2 && "opacity-30")}>
+                    <div className="flex flex-col gap-3 max-sm:gap-2">
+                      <div className={cn("rounded-panel border border-line bg-surface p-4 transition-opacity duration-500 max-sm:p-3", stage < 2 && "opacity-30")}>
                         <p className="text-[0.8125rem] font-medium text-ink">Script, {pkg.lengthSec} seconds</p>
                         <ol className="mt-2 space-y-2">
-                          {beats.map((b) => (
-                            <li key={b.id} className="-mx-1.5 -my-0.5 grid grid-cols-[3.25rem_minmax(0,1fr)] gap-2 rounded-lg px-1.5 py-0.5 text-[0.8125rem] leading-snug" {...(b.id === "hook" ? T("script-hook") : {})}>
+                          {beats.map((b, i) => (
+                            <li key={b.id} className={cn("-mx-1.5 -my-0.5 grid grid-cols-[3.25rem_minmax(0,1fr)] gap-2 rounded-lg px-1.5 py-0.5 text-[0.8125rem] leading-snug", i > 1 && "max-sm:hidden", i > 0 && "max-sm:short:hidden")} {...(b.id === "hook" ? T("script-hook") : {})}>
                               <span className="tnum text-xs text-faint">{b.at}</span>
                               <span className="text-body"><Slots text={b.line} /></span>
                             </li>
                           ))}
                         </ol>
                       </div>
-                      <div className={cn("rounded-panel border border-line bg-surface p-4 transition-opacity duration-500", stage < 3 && "opacity-30")}>
+                      <div className={cn("rounded-panel border border-line bg-surface p-4 transition-opacity duration-500 max-sm:hidden", stage < 3 && "opacity-30")}>
                         <p className="text-[0.8125rem] font-medium text-ink">{pkg.shots.length} shots planned</p>
                         <p className="mt-1 line-clamp-2 text-xs text-muted">{pkg.shots.slice(0, 3).map((s) => s.kind).join(", ")}. Caption and CTA ready.</p>
                       </div>
                     </div>
                   </div>
-                  <p className="mt-3 text-[0.8125rem] text-muted">Nothing is posted until you approve. <Link href="/app/studio" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Studio</Link></p>
+                  <p className="mt-3 text-[0.8125rem] text-muted max-sm:hidden">Nothing is posted until you approve. <Link href="/app/studio" className="font-medium text-ink underline underline-offset-4 hover:no-underline">Open the full Studio</Link></p>
                 </motion.div>
               )}
             </AnimatePresence>
