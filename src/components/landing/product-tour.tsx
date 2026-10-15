@@ -5,7 +5,6 @@ import { animate, AnimatePresence, motion, useInView, useMotionValue } from "mot
 import { useCallback, useEffect, useRef, useState, type RefObject, type SyntheticEvent } from "react";
 import { track } from "@/lib/analytics";
 import { Button, cn } from "../ui/kit";
-import { usePhone } from "../ui/use-phone";
 
 /**
  * A slow guided tour of the hero window. A pointer glides to each tab, a ring marks the thing it is about to press, a short note says
@@ -35,15 +34,13 @@ export type TourBeat = {
   aim?: [number, number];
 };
 
-type TourStep = { lead: string; rest: string; /** What a phone says instead: there, the start screen is "Today", not a tab called HQ. */ phone?: { lead: string; rest: string } };
-
-export const TOUR_STEPS: readonly TourStep[] = [
-  { lead: "HQ", rest: "shows your next best move and why it fits you.", phone: { lead: "Today", rest: "CREO picks your next move and shows why." } },
+export const TOUR_STEPS = [
+  { lead: "HQ", rest: "shows your next best move and why it fits you." },
   { lead: "Trend", rest: "scores your saved ideas against your history, best fit first." },
   { lead: "Studio", rest: "drafts hooks and a script. You pick the hook that sounds like you." },
   { lead: "Collab Inbox", rest: "prices a brand offer. Nothing is sent until you approve." },
   { lead: "Memory", rest: "keeps every approval and edit, so the next draft starts from it." },
-];
+] as const;
 
 /** The whole tour, beat by beat. About 45 seconds, about nine per tab. */
 export function tourBeats(a: { go: (v: TourView) => void; pick: (hookId: string) => void; approve: (on: boolean) => void; altHook: string; reset: () => void; phone?: boolean }): TourBeat[] {
@@ -317,24 +314,38 @@ export function TourOverlay({ tour }: { tour: Tour }) {
   );
 }
 
-/** The strip along the bottom of the window: play or pause, five dots (one per tab), and one line saying what the current tab is for. */
-export function TourBar({ tour }: { tour: Tour }) {
-  const live = tour.status === "playing" || tour.status === "paused";
-  const phone = usePhone();
-  const s = TOUR_STEPS[tour.step]!;
-  const say = phone && s.phone ? s.phone : s;
+/** The play or pause button for a phone, which sits in the window's header (the strip along the bottom is not shown there). */
+export function TourToggle({ tour, className }: { tour: Tour; className?: string }) {
   const over = tour.status === "done" || tour.status === "stopped";
   const word = tour.status === "playing" ? "Pause" : over ? "Replay" : "Play";
   return (
-    <div data-tour-ui className="flex min-h-14 items-center gap-3 border-t border-line bg-surface px-4 py-2.5 max-sm:shrink-0 max-sm:gap-3.5 max-sm:py-2.5 sm:px-5">
+    <button
+      data-tour-ui
+      type="button"
+      onClick={tour.toggle}
+      aria-label={tour.status === "playing" ? "Pause the tour" : over ? "Replay the tour" : "Play the tour"}
+      className={cn("flex h-10 shrink-0 items-center gap-2 rounded-full bg-ink px-4 text-bg transition hover:opacity-90 active:translate-y-px", className)}
+    >
+      {tour.status === "playing" ? <Pause size={14} weight="fill" /> : <Play size={14} weight="fill" />}
+      <span className="text-[0.8125rem] font-semibold leading-none">{word}</span>
+    </button>
+  );
+}
+
+/** The strip along the bottom of the window: play or pause, five dots (one per tab), and one line saying what the current tab is for. Not shown on a phone. */
+export function TourBar({ tour }: { tour: Tour }) {
+  const live = tour.status === "playing" || tour.status === "paused";
+  const s = TOUR_STEPS[tour.step]!;
+  const over = tour.status === "done" || tour.status === "stopped";
+  return (
+    <div data-tour-ui className="flex min-h-14 items-center gap-3 border-t border-line bg-surface px-4 py-2.5 max-sm:hidden sm:px-5">
       <button
         type="button"
         onClick={tour.toggle}
         aria-label={tour.status === "playing" ? "Pause the tour" : over ? "Replay the tour" : "Play the tour"}
-        className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-bg transition hover:opacity-90 active:translate-y-px pointer-coarse:size-11 max-sm:flex max-sm:h-11 max-sm:w-auto! max-sm:items-center max-sm:gap-2 max-sm:px-4"
+        className="grid size-9 shrink-0 place-items-center rounded-full bg-ink text-bg transition hover:opacity-90 active:translate-y-px pointer-coarse:size-11"
       >
-        {tour.status === "playing" ? <Pause size={14} weight="fill" /> : <Play size={14} weight="fill" className="ml-0.5 max-sm:ml-0" />}
-        <span className="text-[0.8125rem] font-semibold leading-none sm:hidden">{word}</span>
+        {tour.status === "playing" ? <Pause size={14} weight="fill" /> : <Play size={14} weight="fill" className="ml-0.5" />}
       </button>
       <ol aria-hidden className="hidden items-center gap-1.5 sm:flex">
         {TOUR_STEPS.map((t, i) => (
@@ -343,7 +354,7 @@ export function TourBar({ tour }: { tour: Tour }) {
       </ol>
       <p className="min-w-0 flex-1 text-[0.8125rem] leading-snug text-body">
         {live ? (
-          <span key={tour.step} className="animate-[tour-caption_0.5s_ease-out_both]"><span className="font-semibold text-ink">{say.lead}</span> {say.rest}</span>
+          <span key={tour.step} className="animate-[tour-caption_0.5s_ease-out_both]"><span className="font-semibold text-ink">{s.lead}</span> {s.rest}</span>
         ) : over ? (
           <><span className="font-semibold text-ink">Your turn.</span> Click any tab to try it yourself.</>
         ) : tour.reduce ? (

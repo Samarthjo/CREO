@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* A phone held upright with the browser bars showing, or a small one (an iPhone SE): the dashboard window trims what it shows so every tab fits without scrolling. Use as max-sm:short:. */
+@custom-variant short (@media (max-height: 780px));
+@custom-variant tiny (@media (max-height: 650px));
+
 /*
   CREO design tokens (see docs/design-direction.md).
   Warm paper, olive and lime. The marker (a soft lime wash behind text) is CREO's own device:
