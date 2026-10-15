@@ -80,7 +80,7 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
     <div className="-mx-5 sm:mx-auto sm:w-full sm:max-w-[64rem]" data-flow-slides="">
       {/* overflow-clip, not hidden: it rounds the corners the same way but keeps the phone's Back and Next bar sticky to the screen. */}
       <div className="overflow-clip rounded-none border-y border-line bg-surface sm:rounded-[1.75rem] sm:border sm:shadow-panel">
-        <div className="border-b border-line bg-surface/60 px-4 pb-2.5 pt-1 sm:hidden">
+        <div className="border-b border-line bg-surface/60 px-4 pb-2 sm:hidden">
           <div role="tablist" aria-label="The six steps" onKeyDown={onKey} className="grid grid-cols-6 gap-1.5">
             {STEPS.map((label, n) => (
               <button
@@ -94,13 +94,13 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
                 aria-controls="flow-panel"
                 tabIndex={n === i ? 0 : -1}
                 onClick={() => go(n, "tab")}
-                className="grid h-11 place-items-center"
+                className="grid h-10 place-items-center"
               >
                 <span className={cn("block h-1.5 w-full rounded-full transition-colors duration-300", n === i ? "bg-accent" : n < i ? "bg-accent/45" : "bg-line-strong")} />
               </button>
             ))}
           </div>
-          <p aria-hidden className="flex items-baseline gap-2 text-[0.9375rem] font-medium text-ink"><span className="tnum text-xs font-normal text-muted">{i + 1} of {STEPS.length}</span>{STEPS[i]}</p>
+          <p aria-hidden className="pointer-events-none -mt-1 flex items-baseline gap-2 text-[0.9375rem] font-medium text-ink"><span className="tnum text-xs font-normal text-muted">{i + 1} of {STEPS.length}</span>{STEPS[i]}</p>
         </div>
 
         <div ref={strip} role="tablist" aria-label="The six steps" onKeyDown={onKey} className="scroll-thin hidden gap-1 overflow-x-auto border-b border-line bg-surface/60 px-3 py-2 sm:flex sm:px-5">
@@ -126,10 +126,10 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
           })}
         </div>
 
-        <motion.div id="flow-panel" role="tabpanel" aria-labelledby={`flow-tab-${i}`} onPanEnd={onPanEnd} style={{ touchAction: "pan-y" }} className="flow-grid grid gap-6 p-4 sm:gap-7 sm:p-8 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-x-10 md:p-10">
+        <motion.div id="flow-panel" role="tabpanel" aria-labelledby={`flow-tab-${i}`} onPanEnd={onPanEnd} style={{ touchAction: "pan-y" }} className="flow-grid grid gap-4 p-4 sm:gap-7 sm:p-8 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] md:gap-x-10 md:p-10">
           <div className="flow-problem relative">
             <p className="text-[0.8125rem] font-medium text-accent">The problem</p>
-            <div className="relative mt-3 min-h-[5.9rem] sm:min-h-[8.5rem] md:min-h-[10.5rem]">
+            <div className="relative mt-3 sm:min-h-[8.5rem] md:min-h-[10.5rem]">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.h3
                   key={`${c.id}-${i}`}
@@ -150,7 +150,7 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
           </div>
 
           <div className="flow-persona">
-            <p id="flow-who" className="text-[0.8125rem] font-medium text-muted">Pick an example creator</p>
+            <p id="flow-who" className="text-[0.8125rem] font-medium text-muted"><span className="sm:hidden">Pick your next competitor</span><span className="max-sm:hidden">Pick an example creator</span></p>
             <div role="radiogroup" aria-labelledby="flow-who" onKeyDown={onPickKey} className="mt-2.5 flex flex-wrap gap-2">
               {cases.map((k, n) => {
                 const on = n === who;
@@ -172,7 +172,7 @@ export function FlowSlides({ cases }: { cases: FlowCase[] }) {
                 );
               })}
             </div>
-            <p className="mt-2.5 text-[0.8125rem] leading-snug text-muted">Example creator, {c.who}. The numbers are for illustration.</p>
+            <p className="mt-2.5 text-[0.8125rem] leading-snug text-muted"><span className="sm:hidden">Your next competitor</span><span className="max-sm:hidden">Example creator</span>, {c.who}. The numbers are for illustration.</p>
           </div>
         </motion.div>
 

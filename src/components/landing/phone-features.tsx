@@ -42,7 +42,7 @@ export function PhoneFeatures() {
   };
 
   return (
-    <section id="features" aria-labelledby="features-title" className="relative isolate flex min-h-svh flex-col justify-center px-4 pb-8 pt-[5.5rem] [@media(max-height:780px)]:pb-6 [@media(max-height:780px)]:pt-[5rem] sm:hidden">
+    <section id="features" aria-labelledby="features-title" className="relative isolate px-4 pb-8 pt-6 [@media(max-height:780px)]:pb-6 sm:hidden">
       <Reveal>
         <div className="mb-7 px-1 text-center [@media(max-height:780px)]:mb-5">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Inside the workspace</p>
