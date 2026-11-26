@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ACCESS_COOKIE, accessConfigured, accessToken, codeIsRight, safeNext } from "@/lib/access";
+import { TRIAL_COOKIE } from "@/lib/trial";
 
 export const runtime = "nodejs";
 
@@ -41,9 +42,10 @@ export async function POST(req: Request) {
   return res;
 }
 
-/** Forget the access: removes the cookie. */
+/** Forget the access: removes the access cookie and the free-trial cookie, so "clear what CREO saved" leaves no way into the workspace behind. */
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
   res.cookies.delete(ACCESS_COOKIE);
+  res.cookies.delete(TRIAL_COOKIE);
   return res;
 }

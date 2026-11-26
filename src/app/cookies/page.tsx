@@ -19,7 +19,7 @@ export default function CookiesPage() {
             <li>Your analytics choice (below), so we do not ask twice.</li>
             <li>Only if you allow analytics: an anonymous visitor ID from PostHog, in a cookie and in local storage under names that start with ph_, so a returning visit is recognised.</li>
           </ul>
-          <p>If you start a free trial, one cookie keeps the workspace open on your browser until the trial ends (up to 35 days). It holds only a signed end date, no personal details, and you can remove it any time by clearing cookies for this site. Without it the workspace asks for the trial email again.</p>
+          <p>If you start a free trial, one cookie keeps the workspace open on your browser until the trial ends (up to 35 days). It holds only a signed end date, no personal details, and you can remove it any time with the button under "Forget them" below or by clearing cookies for this site. Without it the workspace asks for the trial email again.</p>
           <p>One cookie is set only if you enter an access code to open the workspace. It lets the server serve the workspace to you, does not contain the code, and is deleted when you close your browser. The code itself is never saved: the workspace asks for it every time you open it.</p>
         </DocSection>
         <DocSection title="Analytics">
