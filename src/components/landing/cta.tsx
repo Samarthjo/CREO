@@ -8,7 +8,7 @@ export function Cta() {
   return (
     <section id="cohort" className="night relative bg-bg">
       <Landscape time="night" fadeTop={false} sky={<WindClouds time="night" clouds={NIGHT_CLOUDS} />} className="min-h-[56rem]">
-        <div className="relative mx-auto flex w-full max-w-[76rem] justify-center px-4 pb-24 pt-20 sm:pt-28">
+        <div className="relative mx-auto flex w-full max-w-[76rem] justify-center px-4 pb-24 pt-8 sm:pt-12">
           <div className="w-full max-w-[46rem] rounded-[2.25rem] border border-line bg-surface px-6 py-10 shadow-pop sm:px-10 sm:py-12">
             <p className="text-sm font-medium text-accent">14-day free trial</p>
             <h2 className="mt-3 font-display text-[clamp(2.2rem,4.6vw,3.6rem)] font-normal leading-[1] tracking-[-0.04em]">Try CREO free for <Accent>14 days.</Accent></h2>
