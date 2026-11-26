@@ -4,7 +4,7 @@ import { NAV_LINKS } from "./nav-links";
 
 const link = "inline-flex items-center leading-5 hover:underline pointer-coarse:min-h-11 pointer-coarse:min-w-11";
 
-const EXPLORE = [{ href: "/app", label: "Workspace" }, ...NAV_LINKS];
+const EXPLORE = [{ href: "/app", label: "Workspace" }, ...NAV_LINKS, { href: "/trial", label: "Free trial" }, { href: "/preview", label: "Free ideas" }];
 const ABOUT = [
   { href: "/about", label: "Our Story" },
   { href: "/media", label: "Media Mentions" },

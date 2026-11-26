@@ -250,12 +250,13 @@ function Results({
       </Panel>
 
       <Panel as="section" className="mt-6 p-5 sm:p-6">
-        <h3 className="font-display text-xl font-semibold tracking-[-0.02em]">Want to test them for 30 days?</h3>
+        <h3 className="font-display text-xl font-semibold tracking-[-0.02em]">Want to test them for 14 days?</h3>
         <p className="mt-2 text-[0.9375rem] leading-relaxed text-body">
-          The 30-Day Founding Cohort is ₹499 for 30 days, with limited seats. CREO learns which hooks and formats work for your audience, and a strategist works alongside it. You approve every post.
+          Try the full CREO workspace free for 14 days. No card. CREO learns which hooks and formats work for your audience and drafts your next post. You approve every post.
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Button href="/cohort#apply" variant="primary" size="lg" data-track="join_cohort" data-track-where="preview">Join the 30-Day Founding Cohort</Button>
+          <Button href="/trial" variant="primary" size="lg" data-track="start_trial" data-track-where="preview">Try 14 days free</Button>
+          <Button href="/cohort" variant="ghost" size="md" data-track="join_cohort" data-track-where="preview">30-Day Founding Cohort</Button>
           <Button variant="quiet" size="md" onClick={onRestart}>Start over</Button>
         </div>
       </Panel>

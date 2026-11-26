@@ -18,6 +18,9 @@ export interface EventMap {
   cohort_apply_started: { variant: "short" | "full" };
   cohort_apply_submitted: { variant: "short" | "full"; followers: string; niche?: string; platform?: string; posts_per_week?: string; goal?: string; brand_inquiries?: string; extra_answers: number; has_problem: boolean };
   cohort_apply_failed: { variant: "short" | "full"; reason: Failure; fields?: string };
+  // the free trial: whether it was a new or returning sign-up, never the name, email or handle
+  trial_started: { returning: boolean };
+  trial_failed: { reason: Failure; fields?: string };
   contact_submitted: Record<string, never>;
   // the free preview: which option was picked, never a handle or anything typed
   preview_answer: { step: "niche" | "goal" | "format"; choice: string };

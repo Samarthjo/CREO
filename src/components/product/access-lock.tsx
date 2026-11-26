@@ -47,7 +47,7 @@ export function AccessLock({ children }: { children: ReactNode }) {
           <div className="mt-6"><AccessForm onUnlocked={() => setState("open")} autoFocus /></div>
         </Panel>
         <p className="mt-4 px-1 text-[0.9375rem] leading-relaxed text-body">
-          No code yet? <Link href="/cohort#apply" className={link} data-track="join_cohort" data-track-where="access">Join the 30-Day Founding Cohort</Link>, or <Link href="/contact" className={link}>contact us</Link>.
+          No code yet? <Link href="/trial" className={link} data-track="start_trial" data-track-where="access">Try 14 days free</Link>, <Link href="/cohort#apply" className={link} data-track="join_cohort" data-track-where="access">join the 30-Day Founding Cohort</Link>, or <Link href="/contact" className={link}>contact us</Link>.
         </p>
       </div>
     </main>

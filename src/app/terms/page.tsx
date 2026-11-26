@@ -10,7 +10,10 @@ export default function TermsPage() {
     <SubPage title="Terms & Conditions" flow="short">
       <Doc eyebrow="Legal" title="Terms & Conditions." intro="Last updated October 2026. By using this website you agree to these terms.">
         <DocSection title="This website">
-          <p>This website describes CREO and lets you apply for the Founding Creator Cohort or send us a message. The workspace is a working preview of how CREO behaves. It is open to people with an access code for now, it is there so you can try the ideas, and it does not connect to your accounts.</p>
+          <p>This website describes CREO and lets you start a free trial, apply for the Founding Creator Cohort or send us a message. The workspace is a working preview of how CREO behaves. It is open to people with an access code for now, it is there so you can try the ideas, and it does not connect to your accounts.</p>
+        </DocSection>
+        <DocSection title="The 14-day free trial">
+          <p>You can try the workspace free for 14 days with your name, email and creator handle. No card is taken. When the 14 days end the workspace locks, and keeping it costs ₹499 a month. We will tell you how to pay before you are asked to pay anything. One trial per email.</p>
         </DocSection>
         <DocSection title="Applying to the cohort">
           <p>What you tell us in an application must be true and yours to share. Applying does not guarantee a place: seats are limited for each cohort, and a place is confirmed only when we tell you so.</p>

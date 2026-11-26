@@ -29,7 +29,7 @@ export async function supabaseInsert(table: string, row: Record<string, unknown>
   await call(table, row, "return=minimal");
 }
 
-/** Calls a Postgres function exposed through the Data API. */
-export async function supabaseRpc(fn: string): Promise<unknown> {
-  return (await call(`rpc/${fn}`, {})).json();
+/** Calls a Postgres function exposed through the Data API, with named arguments if it takes any. */
+export async function supabaseRpc(fn: string, args: Record<string, unknown> = {}): Promise<unknown> {
+  return (await call(`rpc/${fn}`, args)).json();
 }

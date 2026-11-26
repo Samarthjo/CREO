@@ -27,7 +27,7 @@ npm run typecheck
 npm run build && npm start
 ```
 
-Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `CRON_SECRET` and `WORKSPACE_ACCESS_CODE` before deploying. Without `WORKSPACE_ACCESS_CODE` nobody can open `/app`, so set it locally too.
+Node 20.9 or newer. Copy `.env.example` to `.env.local` and set `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `CRON_SECRET` and `WORKSPACE_ACCESS_CODE` before deploying. Without `WORKSPACE_ACCESS_CODE` nobody can open `/app`, so set it locally too. To turn on the 14-day free trial, also set `TRIAL_SECRET` (16 or more random characters) and apply `supabase/migrations/20261127000000_trial_signups.sql`; see "Free trial" below.
 
 ## Workspace access
 
@@ -147,3 +147,12 @@ Also not built yet:
 - **Screenshot reading.** Collab Inbox accepts pasted text and `.txt` or `.eml` files. Reading screenshots needs a vision model.
 - **A live trend feed.** The pattern library is curated by hand (`LIBRARY` in `trend.ts`) and creators add saved Reels by describing them. CREO does not scrape Instagram.
 - **A strategist console.** Corrections from the creator are captured today. A separate strategist role is a next step.
+
+## Free trial
+
+`/trial` signs a visitor up for 14 days of the workspace with a name, an email and a creator handle (no card). `POST /api/trial` calls the database function `start_trial`, which creates the row or returns the end date of the trial that email already has, so clearing cookies never restarts the clock. The route then sets the `creo_trial` cookie: `v1.<end of trial>.<HMAC>`, signed with `TRIAL_SECRET`. `src/proxy.ts` lets `/app` open for the access-code cookie or a running trial; an ended trial goes to `/trial/ended`. Access-code members are unaffected.
+
+- To extend or unlock someone (for example after they pay), edit `access_until` on their row in `trial_signups` in the Supabase dashboard. They re-enter their email on `/trial`.
+- Paying online is not built yet. When a gateway is added, its webhook would write `access_until` for the email, and nothing else changes.
+- One trial per email. A different email starts a new trial; stopping that would need real accounts.
+- The workspace data is in the browser, so a trial is tied to one browser.

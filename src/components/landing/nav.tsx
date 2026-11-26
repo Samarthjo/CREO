@@ -16,7 +16,11 @@ import { NAV_LINKS } from "./nav-links";
  */
 export function Nav() {
   const path = usePathname();
-  const cta = { href: path === "/cohort" ? "#apply" : path === "/classic" ? "#cohort" : "/cohort#apply", label: "Join the cohort", short: "Join" };
+  // /cohort and /classic keep their own cohort button; everywhere else the button starts the 14-day free trial.
+  const cohortPage = path === "/cohort" || path === "/classic";
+  const cta = cohortPage
+    ? { href: path === "/cohort" ? "#apply" : "#cohort", label: "Join the cohort", short: "Join", id: "join_cohort" }
+    : { href: "/trial", label: "Try 14 days free", short: "Try free", id: "start_trial" };
   const [open, setOpen] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
 
@@ -53,7 +57,7 @@ export function Nav() {
           })}
         </nav>
         <span className="hidden lg:block"><ThemeToggle /></span>
-        <Button variant="primary" size="md" href={cta.href} className="ml-1" data-track="join_cohort" data-track-where="nav">
+        <Button variant="primary" size="md" href={cta.href} className="ml-1" data-track={cta.id} data-track-where="nav">
           {/* On the narrowest phones the pill would be wider than the screen, so the label shortens. Screen readers still get the full one. */}
           <span className="max-[363px]:sr-only">{cta.label}</span>
           <span aria-hidden className="min-[364px]:hidden">{cta.short}</span>

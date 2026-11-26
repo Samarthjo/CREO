@@ -61,6 +61,14 @@ test("analytics: the free preview sends the choices that were made and whether a
   assert.deepEqual(Object.keys(events[2]).sort(), ["action", "has_handle"]);
 });
 
+test("analytics: a trial sign-up is described by whether it was new, and a failure names fields, never what was typed", () => {
+  const started: EventMap["trial_started"] = { returning: false };
+  const failed: EventMap["trial_failed"] = { reason: "invalid", fields: fieldList({ name: SECRET, email: SECRET, handle: SECRET }) };
+  assert.deepEqual(Object.keys(started), ["returning"]);
+  assert.equal(failed.fields, "email,handle,name");
+  assert.ok(!JSON.stringify([started, failed]).includes(SECRET));
+});
+
 // Every workspace action, carrying the secret in every free-text field it has.
 const pkg = { ...ws.packages[0], topic: SECRET, proof: SECRET, caption: SECRET };
 const inquiry = makeInquiry(`${SAMPLE_INQUIRY}\n${SECRET}`, dna, "paste", "q1");
