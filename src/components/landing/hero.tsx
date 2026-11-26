@@ -15,7 +15,7 @@ export function Hero() {
         </h1>
         <div className="mt-7 flex flex-col items-center gap-3 max-sm:mt-5">
           <Button href="/trial" variant="primary" size="lg" data-track="start_trial" data-track-where="hero">Try 14 days free</Button>
-          <p className="text-[0.8125rem] text-body">No card needed. Or join the <a href="/cohort" className="font-medium text-ink underline underline-offset-4 hover:no-underline" data-track="join_cohort" data-track-where="hero">30-Day Founding Cohort</a>.</p>
+          <p className="text-[0.8125rem] text-body">No card needed.</p>
         </div>
       </div>
 
