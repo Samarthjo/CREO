@@ -13,9 +13,9 @@ export const FAQS = [
   { q: "Is there a free trial?", a: "Yes. Try the full workspace free for 14 days. Sign up with your name, email and creator handle, no card needed, and it opens right away on your browser." },
   { q: "What happens when the 14 days end?", a: "The workspace locks and you can keep CREO for ₹499 a month. Your saved work stays on your device and comes back once you are unlocked. You are never charged without being asked." },
   { q: "What does the trial store about me?", a: "Your name, email and creator handle, so we can start your trial and reach you before it ends. Your workspace itself is saved in your own browser, not on our servers." },
+  { q: "What do I get in the cohort?", a: "A CREO strategist works with you for 30 days to uplift your channel, CREO builds your Creator Intelligence around your content, and we make reels for you and post them on CREO's Instagram. Cohort members also get the CREO workspace." },
   { q: "What does the cohort cost?", a: "₹499 for 30 days." },
   { q: "How many creators can join?", a: "Seats are limited per cohort so the team can stay hands-on." },
-  { q: "What happens after the 30-day cohort?", a: "Founding creators who want to continue can move to the one-time Personalized CREO founding plan for ₹5,999, keeping the intelligence and Creator Memory built during the cohort and receiving six months of CREO Strategist Support." },
 ] as const;
 
 export function Faq() {
