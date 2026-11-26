@@ -77,3 +77,36 @@ test("trial: the database's end date is trusted for no more than 35 days, and a 
   assert.ok(Number.isNaN(trustedUntil(null, now)));
   assert.ok(trustedUntil("2020-01-01T00:00:00Z", now) < now);
 });
+
+test("trial: the lock lands exactly 14 days after sign-up, to the millisecond", () => {
+  const start = 1_800_000_000_000; // the moment of sign-up
+  const until = start + TRIAL_DAYS * DAY_MS; // what start_trial hands back: now() + 14 days
+  const cookie = signTrial(until)!;
+  assert.equal(trialState(cookie, start).state, "active", "at sign-up");
+  assert.equal(trialState(cookie, start + 13 * DAY_MS + 23 * 3600_000).state, "active", "13 days 23 hours in");
+  assert.equal(trialState(cookie, until - 1).state, "active", "one millisecond before the end");
+  assert.equal(trialState(cookie, until).state, "expired", "at the end date itself");
+  assert.equal(trialState(cookie, until + 1).state, "expired", "one millisecond after");
+  assert.equal(trialState(cookie, until + 21 * DAY_MS).state, "expired", "weeks later it still says ended, never none or active");
+});
+
+test("trial: the notice counts down one day at a time from 14, and the last day reads 1", () => {
+  const start = 1_800_000_000_000;
+  const until = start + TRIAL_DAYS * DAY_MS;
+  const left = (elapsed: number) => daysLeft(until, start + elapsed);
+  assert.equal(left(0), 14);
+  assert.equal(left(1), 14);
+  for (let d = 1; d < TRIAL_DAYS; d++) {
+    assert.equal(left(d * DAY_MS), TRIAL_DAYS - d, `exactly ${d} days in`);
+    assert.equal(left(d * DAY_MS - 1), TRIAL_DAYS - d + 1, `a moment before day ${d} is over`);
+  }
+  assert.equal(left(TRIAL_DAYS * DAY_MS - 1), 1, "the last millisecond");
+  const s = trialState(signTrial(until)!, start + 6 * DAY_MS + 1);
+  assert.equal(s.state === "active" ? s.daysLeft : -1, 8, "the cookie reports the same count");
+});
+
+test("trial: the date text Postgres returns (microseconds, +00:00) becomes the cookie's end date", () => {
+  const now = Date.parse("2026-12-01T00:00:00Z");
+  assert.equal(trustedUntil("2026-12-10T08:25:44.945248+00:00", now), Date.parse("2026-12-10T08:25:44.945Z"));
+  assert.equal(trustedUntil("2026-12-10T08:25:44+00:00", now), Date.parse("2026-12-10T08:25:44Z"));
+});
