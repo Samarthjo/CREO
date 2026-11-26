@@ -4,7 +4,7 @@ import { useState } from "react";
 import { forgetAnalytics } from "@/lib/analytics";
 import { Button } from "../ui/kit";
 
-/** What CREO keeps in this browser, and a button that forgets it: the saved theme and workspace, the access cookie and the analytics choice. */
+/** What CREO keeps in this browser, and a button that forgets it: the saved theme and workspace, the access and free-trial cookies and the analytics choice. */
 export function CookieSettings() {
   const [cleared, setCleared] = useState(false);
   async function clear() {
@@ -26,7 +26,7 @@ export function CookieSettings() {
   return (
     <div className="flex flex-col items-start gap-3">
       <Button variant="ghost" onClick={clear}>Clear what CREO saved in this browser</Button>
-      <p role="status" className="min-h-5 text-sm text-muted">{cleared ? "Cleared. Your theme is back to your device's setting, the workspace starts fresh, it asks for the access code again, and the analytics question is asked afresh." : ""}</p>
+      <p role="status" className="min-h-5 text-sm text-muted">{cleared ? "Cleared. Your theme is back to your device's setting, the workspace starts fresh, it asks for the access code (or your trial email) again, and the analytics question is asked afresh." : ""}</p>
     </div>
   );
 }

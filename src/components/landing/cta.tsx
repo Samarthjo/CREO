@@ -1,6 +1,6 @@
 import { Landscape } from "../scene/landscape";
 import { NIGHT_CLOUDS, WindClouds } from "../scene/wind-clouds";
-import { Accent } from "../ui/kit";
+import { Accent, Button } from "../ui/kit";
 import { ApplyForm } from "./apply-form";
 
 /** The one call to action: the offer once, and the full application on a solid panel. The night scene stays at the edges. */
@@ -10,8 +10,13 @@ export function Cta() {
       <Landscape time="night" fadeTop={false} sky={<WindClouds time="night" clouds={NIGHT_CLOUDS} />} className="min-h-[56rem]">
         <div className="relative mx-auto flex w-full max-w-[76rem] justify-center px-4 pb-24 pt-20 sm:pt-28">
           <div className="w-full max-w-[46rem] rounded-[2.25rem] border border-line bg-surface px-6 py-10 shadow-pop sm:px-10 sm:py-12">
+            <p className="text-sm font-medium text-accent">14-day free trial</p>
+            <h2 className="mt-3 font-display text-[clamp(2.2rem,4.6vw,3.6rem)] font-normal leading-[1] tracking-[-0.04em]">Try CREO free for <Accent>14 days.</Accent></h2>
+            <p className="mt-4 text-[1.0625rem] leading-relaxed text-body">No card. Sign up and the workspace opens right away. After 14 days it is ₹499 a month to keep it.</p>
+            <div className="mt-6"><Button href="/trial" variant="primary" size="lg" data-track="start_trial" data-track-where="cta">Start my 14 days free</Button></div>
+            <div className="my-10 flex items-center gap-4 text-sm text-muted" aria-hidden><span className="h-px flex-1 bg-line" />or<span className="h-px flex-1 bg-line" /></div>
             <p className="text-sm font-medium text-accent">30-Day Founding Cohort</p>
-            <h2 className="mt-3 font-display text-[clamp(2.2rem,4.6vw,3.6rem)] font-normal leading-[1] tracking-[-0.04em]">Build your Creator Intelligence with <Accent>CREO</Accent>.</h2>
+            <h3 className="mt-3 font-display text-[clamp(2.2rem,4.6vw,3.6rem)] font-normal leading-[1] tracking-[-0.04em]">Build your Creator Intelligence with <Accent>CREO</Accent>.</h3>
             <p className="mt-4 text-[1.0625rem] leading-relaxed text-body">₹499 for 30 days. CREO learns what works for your content and audience while a CREO strategist works alongside you. Limited seats per cohort.</p>
             <div className="mt-7"><ApplyForm variant="full" /></div>
             <p className="mt-5 text-[0.8125rem] text-body">Nothing leaves CREO without your approval.</p>

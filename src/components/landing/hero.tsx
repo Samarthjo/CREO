@@ -1,6 +1,6 @@
 import { Landscape } from "../scene/landscape";
 import { WindClouds } from "../scene/wind-clouds";
-import { Accent } from "../ui/kit";
+import { Accent, Button } from "../ui/kit";
 import { HeroProduct } from "./hero-product";
 
 export function Hero() {
@@ -13,6 +13,10 @@ export function Hero() {
         <h1 className="max-w-[18ch] font-display text-[clamp(2.5rem,5.2vw,5rem)] font-normal leading-[0.98] tracking-[-0.045em]">
           Stop guessing what to post <Accent>next.</Accent>
         </h1>
+        <div className="mt-7 flex flex-col items-center gap-3 max-sm:mt-5">
+          <Button href="/trial" variant="primary" size="lg" data-track="start_trial" data-track-where="hero">Try 14 days free</Button>
+          <p className="text-[0.8125rem] text-body">No card needed.</p>
+        </div>
       </div>
 
       <div id="product" className="mt-9 px-4 max-sm:mt-6 sm:px-6 lg:mt-12">

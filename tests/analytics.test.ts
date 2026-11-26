@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { applyProps, ctaProps, eventForAction, fieldList, inquiryProps, NEEDS_CONSENT, unlockFailure } from "../src/lib/analytics-events.ts";
+import { applyProps, ctaProps, eventForAction, fieldList, inquiryProps, NEEDS_CONSENT, unlockFailure, type EventMap } from "../src/lib/analytics-events.ts";
 import type { Action } from "../src/lib/store/actions.ts";
 import { makeInquiry, sampleDna, sampleWorkspace, SAMPLE_INQUIRY } from "../src/lib/store/seed.ts";
 
@@ -48,6 +48,25 @@ test("analytics: a marked link becomes a click event, an unmarked one does not",
 test("analytics: clicks, scrolling and recordings are the events that need a yes; visits and errors are not", () => {
   for (const e of ["$autocapture", "$rageclick", "$dead_click", "$$heatmap", "$heatmap_data", "$snapshot"]) assert.ok(NEEDS_CONSENT.has(e), e);
   for (const e of ["$pageview", "$pageleave", "$exception", "$web_vitals", "cohort_apply_submitted"]) assert.ok(!NEEDS_CONSENT.has(e), e);
+});
+
+test("analytics: the free preview sends the choices that were made and whether a handle was added, never the handle", () => {
+  const handle = SECRET;
+  const events: EventMap["preview_answer" | "preview_result" | "preview_share"][] = [
+    { step: "niche", choice: "ai-tech" },
+    { niche: "ai-tech", goal: "grow", format: "facecam", via_link: false },
+    { action: "download", has_handle: handle.length > 0 },
+  ];
+  assert.ok(!JSON.stringify(events).includes(SECRET));
+  assert.deepEqual(Object.keys(events[2]).sort(), ["action", "has_handle"]);
+});
+
+test("analytics: a trial sign-up is described by whether it was new, and a failure names fields, never what was typed", () => {
+  const started: EventMap["trial_started"] = { returning: false };
+  const failed: EventMap["trial_failed"] = { reason: "invalid", fields: fieldList({ name: SECRET, email: SECRET, handle: SECRET }) };
+  assert.deepEqual(Object.keys(started), ["returning"]);
+  assert.equal(failed.fields, "email,handle,name");
+  assert.ok(!JSON.stringify([started, failed]).includes(SECRET));
 });
 
 // Every workspace action, carrying the secret in every free-text field it has.
