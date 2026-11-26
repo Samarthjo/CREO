@@ -17,7 +17,7 @@ export function Cta() {
             <div className="my-10 flex items-center gap-4 text-sm text-muted" aria-hidden><span className="h-px flex-1 bg-line" />or<span className="h-px flex-1 bg-line" /></div>
             <p className="text-sm font-medium text-accent">30-Day Founding Cohort</p>
             <h3 className="mt-3 font-display text-[clamp(2.2rem,4.6vw,3.6rem)] font-normal leading-[1] tracking-[-0.04em]">Build your Creator Intelligence with <Accent>CREO</Accent>.</h3>
-            <p className="mt-4 text-[1.0625rem] leading-relaxed text-body">₹499 for 30 days. CREO learns what works for your content and audience while a CREO strategist works alongside you. Limited seats per cohort.</p>
+            <p className="mt-4 text-[1.0625rem] leading-relaxed text-body">₹499 for 30 days. CREO learns what works for your content and audience while a CREO strategist works with you to uplift your channel, and we make reels for you on CREO's Instagram. Limited seats per cohort.</p>
             <div className="mt-7"><ApplyForm variant="full" /></div>
             <p className="mt-5 text-[0.8125rem] text-body">Nothing leaves CREO without your approval.</p>
           </div>
